@@ -4,6 +4,6 @@ Version: 1.0
 Authors@R: person("Andre", "Dotto", email = "andrecdot@gmail.com", role = c("aut", "cre"))
 Description: Soil spectra preprocessing and modeling
 Depends: R (>= 3.3.2)
-License: What license is it under?
-Encoding: >GPL-2
+License: >GPL-2
 LazyData: true
+RoxygenNote: 5.0.1
