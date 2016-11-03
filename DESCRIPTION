@@ -1,9 +1,9 @@
 Package: AlradSpectra
-Title: What the Package Does (one line, title case)
-Version: 0.0.0.9000
-Authors@R: person("First", "Last", email = "first.last@example.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
+Title: Soil spectra preprocessing and modeling
+Version: 1.0
+Authors@R: person("Andre", "Dotto", email = "andrecdot@gmail.com", role = c("aut", "cre"))
+Description: Soil spectra preprocessing and modeling
 Depends: R (>= 3.3.2)
 License: What license is it under?
-Encoding: UTF-8
+Encoding: >GPL-2
 LazyData: true
