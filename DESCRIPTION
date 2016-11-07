@@ -1,9 +1,24 @@
 Package: AlradSpectra
-Title: Soil spectra preprocessing and modeling
-Version: 1.0
-Authors@R: person("Andre", "Dotto", email = "andrecdot@gmail.com", role = c("aut", "cre"))
-Description: Soil spectra preprocessing and modeling
-Depends: R (>= 3.3.2)
-License: >GPL-2
+Title: A GUI for preprocessing and modeling soil spectra
+Version: 0.0.9
+Authors@R: c(person("Andre", "Dotto", email = "andrecdot@gmail.com", role = c("aut", "cre")),
+             person("Diego", "Gris", email = "diegojgris@gmail.com", role = "aut"))
+Description: AlradSpectra provides a friendly user interface to apply preprocessing functions to soil spectra and run models on your data.
+Depends:
+    R (>= 3.3.2)
+Imports:
+    caret,
+    clusterSim,
+    e1071,
+    elmNN,
+    ggplot2,
+    gWidgetsRGtk2,
+    kernlab,
+    pls,
+    prospectr,
+    randomForest,
+    Rmisc
+License: GPL-2
+Encoding: UTF-8
 LazyData: true
 RoxygenNote: 5.0.1
