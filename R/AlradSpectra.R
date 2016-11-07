@@ -267,7 +267,7 @@ AlradSpectra <- function() {
   v.stats.name <- paste0(deparse(substitute(v)), ".stats")
   assign(t.stats.name, error.comp(t[,1], t[,2]), envir = .GlobalEnv)
   assign(v.stats.name, error.comp(v[,1], v[,2]), envir = .GlobalEnv)
-  train.plot <- ggplot2::ggplot(t, aes(x=t[,1], y=t[,2])) +
+  train.plot <- ggplot2::ggplot(t, ggplot2::aes(x=t[,1], y=t[,2])) +
     geom_point(shape=19) +
     labs(list(title="Training set", x="Mesured", y="Predicted")) +
     xlim(0, max(t)) + 
@@ -275,7 +275,7 @@ AlradSpectra <- function() {
     geom_abline(intercept = 0, slope = 1) +
     annotate("text", x=max(t)*0.1, y=seq(max(t)*0.9,max(t)*0.7,-max(t)*0.05),
              label = paste(names(get(t.stats.name)),"=",get(t.stats.name)))
-  val.plot   <- ggplot2::ggplot(v, aes(x=v[,1], y=v[,2])) +
+  val.plot   <- ggplot2::ggplot(v, ggplot2::aes(x=v[,1], y=v[,2])) +
     geom_point(shape=19) +
     labs(list(title="Validation set", x="Mesured", y="Predicted")) +
     xlim(0, max(v)) + 
