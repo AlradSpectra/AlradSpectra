@@ -648,7 +648,7 @@ AlradSpectra <- function() {
   pls.resampling     <- lyt.param.pls[2,1] <- gcombobox(train.ctrl.method, cont = lyt.param.pls)
   lyt.param.pls[1,2] <- "Number of resampling \niterations"
   pls.folds          <- lyt.param.pls[2,2] <- gspinbutton(from = 1, to = 500, by = 1, value = 5, cont = lyt.param.pls)
-  lyt.param.pls[1,3] <- "For cv resampling method only: \nnumber of folds to compute repeated k-fold)"
+  lyt.param.pls[1,3] <- "For cv resampling method only: \nnumber of folds (k-fold)"
   pls.kfold          <- lyt.param.pls[2,3] <- gspinbutton(from = 1, to = 500, by = 1,value =  10, cont = lyt.param.pls)
   lyt.param.pls[1,4] <- "Number of components to \ninclude in the model"
   pls.comp           <- lyt.param.pls[2,4] <- gspinbutton(from = 1, to = 500, by = 1, value =  30, cont = lyt.param.pls)
@@ -720,7 +720,7 @@ AlradSpectra <- function() {
   kbml.resampling     <- lyt.param.kbml[2,1] <- gcombobox(train.ctrl.method, cont = lyt.param.kbml)
   lyt.param.kbml[1,2] <- "Initial noise variance"
   kbml.var            <- lyt.param.kbml[2,2] <- gcombobox(kbml.param.var, selected = 2, cont = lyt.param.kbml)
-  lyt.param.kbml[1,3] <- "For cv resampling method only: \nnumber of folds to compute repeated k-fold)"
+  lyt.param.kbml[1,3] <- "For cv resampling method only: \nnumber of folds (k-fold)"
   kbml.cross          <- lyt.param.kbml[2,3] <- gspinbutton(from = 2, to = 100, by = 1, value = 10, cont = lyt.param.kbml)
   lyt.param.kbml[1,4] <- "kernel function \nused in training and predicting"
   kbml.kernel         <- lyt.param.kbml[2,4] <- gradio(kernel.param.kbml, cont = lyt.param.kbml)
