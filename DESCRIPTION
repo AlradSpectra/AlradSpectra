@@ -7,16 +7,19 @@ Description: AlradSpectra provides a friendly user interface to apply preprocess
 Depends:
     R (>= 3.2.5)
 Imports:
+    cairoDevice,
     caret,
     clusterSim,
     e1071,
     elmNN,
     ggplot2,
+    gWidgets,
     gWidgetsRGtk2,
     kernlab,
     pls,
     prospectr,
     randomForest,
+    RGtk2,
     Rmisc
 License: GPL-2
 Encoding: UTF-8
