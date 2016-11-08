@@ -449,10 +449,10 @@ AlradSpectra <- function() {
   train.ctrl.method    <- c("boot", "cv", "LOOCV", "LGOCV", "repeatedcv", "timeslice")
   train.ctrl.method.rf <- c("boot", "cv", "LOOCV", "LGOCV", "repeatedcv", "timeslice", "oob")
   kernel.param.svm     <- c("Support Vector Machines with Linear Kernel",
-                            "Support Vector Machines with Radial Basis Function Kernel")
+                            "Support Vector Machines with Radial Kernel")
   actf                 <- c("radial basis","sigmoid","sine","hard-limit","symmetric hard-limit",
                             "satlins","tan-sigmoid","triangular basis", "positive linear", "linear")
-  kernel.param.kbml    <- c("Linear kernel function", "Radial Basis kernel function")
+  kernel.param.kbml    <- c("Linear kernel", "Radial kernel")
   kbml.param.var       <- c(.0001,.001,.01,.1,1,10,100)
 
   ###################################################
@@ -570,7 +570,7 @@ AlradSpectra <- function() {
   ### SG Derivative
   frame.desc.sgd     <- gframe("Description:",cont = sgd, horizontal = T)
   lyt.desc.sgd       <- glayout(cont = frame.desc.sgd , expand = TRUE)
-  lyt.desc.sgd[1,1]  <- "Savitzky-Golay Derivative.The Savitzky-Golay algorithm fits a local polynomial regression on the signal. It requires evenly \nspaced data points. Mathematically, it operates simply as a weighted sum over a given window. Package: prospectr"
+  lyt.desc.sgd[1,1]  <- "Savitzky-Golay Derivative. The Savitzky-Golay algorithm fits a local polynomial regression on the signal. It requires evenly \nspaced data points. Package: prospectr"
   frame.param.sgd    <- gframe("Parameters:", cont = sgd, horizontal=T)
   lyt.param.sgd      <- glayout(cont = frame.param.sgd, expand = TRUE)
   lyt.param.sgd[1,1] <- "Number of smoothing points"
@@ -628,7 +628,7 @@ AlradSpectra <- function() {
   mdl.mlr            <- ggroup(cont = mdl, horizontal = F,label = gettext("   MLR   "))
   frame.desc.mlr     <- gframe("Description:",cont = mdl.mlr, horizontal = T)
   lyt.desc.mlr       <- glayout(cont = frame.desc.mlr, expand = TRUE)
-  lyt.desc.mlr[1,1]  <- "Fits generalized linear models (y=x1+x2+x3...). Package: stats / MASS / caret"
+  lyt.desc.mlr[1,1]  <- "Multiple Linear Regression. Packages: stats / MASS / caret"
   frame.param.mlr    <- gframe("Tuning parameters:", cont = mdl.mlr, horizontal=T)
   lyt.param.mlr      <- glayout(cont = frame.param.mlr , expand = TRUE)
   lyt.param.mlr[1,1] <- "Band interval"
@@ -641,14 +641,14 @@ AlradSpectra <- function() {
   mdl.pls            <- ggroup(cont = mdl, horizontal = F,label = gettext("   PLSR   "))
   frame.desc.pls     <- gframe("Description:",cont = mdl.pls, horizontal = T)
   lyt.desc.pls       <- glayout(cont = frame.desc.pls, expand = TRUE)
-  lyt.desc.pls[1,1]  <- "Functions to perform Partial Least Squares Regression (PLSR). Package: pls / caret"
+  lyt.desc.pls[1,1]  <- "Partial Least Squares Regression. Packages: pls / caret"
   frame.param.pls    <- gframe("Tuning parameters:", cont = mdl.pls, horizontal=T)
   lyt.param.pls      <- glayout(cont = frame.param.pls , expand = TRUE)
   lyt.param.pls[1,1] <- "Resampling method"
   pls.resampling     <- lyt.param.pls[2,1] <- gcombobox(train.ctrl.method, cont = lyt.param.pls)
-  lyt.param.pls[1,2] <- "Number of folds or number \nof resampling iterations"
+  lyt.param.pls[1,2] <- "Number of resampling \niterations"
   pls.folds          <- lyt.param.pls[2,2] <- gspinbutton(from = 1, to = 500, by = 1, value = 5, cont = lyt.param.pls)
-  lyt.param.pls[1,3] <- "For repeated k-fold cross-validation only: \nnumber of folds to compute"
+  lyt.param.pls[1,3] <- "For cv resampling method only: \nnumber of folds to compute repeated k-fold)"
   pls.kfold          <- lyt.param.pls[2,3] <- gspinbutton(from = 1, to = 500, by = 1,value =  10, cont = lyt.param.pls)
   lyt.param.pls[1,4] <- "Number of components to \ninclude in the model"
   pls.comp           <- lyt.param.pls[2,4] <- gspinbutton(from = 1, to = 500, by = 1, value =  30, cont = lyt.param.pls)
@@ -661,7 +661,7 @@ AlradSpectra <- function() {
   mdl.svm            <- ggroup(cont = mdl, horizontal = F,label = gettext("    SVM    "))
   frame.desc.svm     <- gframe("Description:",cont = mdl.svm, horizontal = T)
   lyt.desc.svm       <- glayout(cont = frame.desc.svm, expand = TRUE)
-  lyt.desc.svm[1,1]  <- "Trains a Support Vector Machine (SVM). Package: e1071 / kernlab / caret"
+  lyt.desc.svm[1,1]  <- "Support Vector Machine. Packages: e1071 / caret"
   frame.param.svm    <- gframe("Tuning parameters:", cont = mdl.svm, horizontal=T)
   lyt.param.svm      <- glayout(cont = frame.param.svm , expand = TRUE)
   lyt.param.svm[1,1] <- "Resampling method"
@@ -677,7 +677,7 @@ AlradSpectra <- function() {
   mdl.rf             <- ggroup(cont = mdl, horizontal = F,label = gettext("    RF    "))
   frame.desc.rf      <- gframe("Description:",cont = mdl.rf, horizontal = T)
   lyt.desc.rf        <- glayout(cont = frame.desc.rf, expand = TRUE)
-  lyt.desc.rf[1,1]   <- "Implements Breiman's Random Forest (RF) algorithm. Package: randomForest / caret"
+  lyt.desc.rf[1,1]   <- "Implements Breiman's Random Forest. Packages: randomForest / caret"
   frame.param.rf     <- gframe("Tuning parameters:", cont = mdl.rf, horizontal=T)
   lyt.param.rf       <- glayout(cont = frame.param.rf , expand = TRUE)
   lyt.param.rf[1,1]  <- "Resampling method"
@@ -695,7 +695,7 @@ AlradSpectra <- function() {
   mdl.ann            <- ggroup(cont = mdl, horizontal = F,label = gettext("    ANN    "))
   frame.desc.ann     <- gframe("Description:",cont = mdl.ann, horizontal = T)
   lyt.desc.ann       <- glayout(cont = frame.desc.ann, expand = TRUE)
-  lyt.desc.ann[1,1]  <- "Trains an Artificial Neural Network (ANN). Package: elmNN / caret"
+  lyt.desc.ann[1,1]  <- "Artificial Neural Network. Packages: elmNN / caret"
   frame.param.ann    <- gframe("Tuning parameters:", cont = mdl.ann, horizontal=T)
   lyt.param.ann      <- glayout(cont = frame.param.ann , expand = TRUE)
   lyt.param.ann[1,1] <- "Resampling method"
@@ -713,14 +713,14 @@ AlradSpectra <- function() {
   mdl.kbml            <- ggroup(cont = mdl, horizontal = F,label = gettext(" KBML "))
   frame.desc.kbml     <- gframe("Description:",cont = mdl.kbml, horizontal = T)
   lyt.desc.kbml       <- glayout(cont = frame.desc.kbml, expand = TRUE)
-  lyt.desc.kbml[1,1]  <- "Implements Gaussian processes for regression. Package: kernlab / caret"
+  lyt.desc.kbml[1,1]  <- "Kernel-Based Machine Learning. Implements Gaussian processes for regression. Packages: kernlab / caret"
   frame.param.kbml    <- gframe("Tuning parameters:", cont = mdl.kbml, horizontal=T)
   lyt.param.kbml      <- glayout(cont = frame.param.kbml , expand = TRUE)
   lyt.param.kbml[1,1] <- "Resampling method"
   kbml.resampling     <- lyt.param.kbml[2,1] <- gcombobox(train.ctrl.method, cont = lyt.param.kbml)
   lyt.param.kbml[1,2] <- "Initial noise variance"
   kbml.var            <- lyt.param.kbml[2,2] <- gcombobox(kbml.param.var, selected = 2, cont = lyt.param.kbml)
-  lyt.param.kbml[1,3] <- "K-fold cross-validation"
+  lyt.param.kbml[1,3] <- "For cv resampling method only: \nnumber of folds to compute repeated k-fold)"
   kbml.cross          <- lyt.param.kbml[2,3] <- gspinbutton(from = 2, to = 100, by = 1, value = 10, cont = lyt.param.kbml)
   lyt.param.kbml[1,4] <- "Kernel parameters"
   kbml.kernel         <- lyt.param.kbml[2,4] <- gradio(kernel.param.kbml, cont = lyt.param.kbml)
