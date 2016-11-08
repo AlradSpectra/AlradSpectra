@@ -312,7 +312,7 @@ AlradSpectra <- function() {
     {form.mlr  <- as.formula(paste(colnames(Train[last.col]),"~",paste(names(Train)[c(seq(1,last.col-1,
                                                                                           by=svalue(mlr.band.interval)))],collapse="+"),collapse=""))
     mlr.model <<- stats::glm(form.mlr, data=Train)
-    mlr.step  <<- stats::step(mlr.model, direction="both")
+    mlr.step  <<- stats::step(mlr.model, direction="both", trace=0)
     mlr.train <<- data.frame(Train[last.col], Predicted=mlr.model$fitted.values)
     mlr.val   <<- data.frame(Val[last.col], Predicted=predict(mlr.step, newdata=Val))
     },
