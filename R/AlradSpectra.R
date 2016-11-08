@@ -10,7 +10,7 @@ AlradSpectra <- function() {
   ###################################################
   ### Auxiliar functions
   ###################################################
-  fclear       <- function(...)       {gconfirm("Clear ALRAD Spectra?", title="Clear", icon="warning", parent=window,
+  fclear       <- function(...)       {gconfirm("Clear Alrad Spectra?", title="Clear", icon="warning", parent=window,
                                                 handler=function(h, ...) {svalue(file.browse)   <- ""
                                                 svalue(file.sep)      <- ","
                                                 svalue(spc.start.col) <- ""
@@ -33,9 +33,9 @@ AlradSpectra <- function() {
     return(FALSE) #close
   else
     return(TRUE)}  #don't close
-  fabout       <- function(...)       {aboutwin <- gwindow("About ALRAD Spectra",width=500, height=500, parent = window)
+  fabout       <- function(...)       {aboutwin <- gwindow("About Alrad Spectra",width=500, height=500, parent = window)
   lyt.about <- glayout(cont = aboutwin, expand = F)
-  lyt.about[1,1]   <- "ALRAD Spectra was developed by researchers at Federal University of Santa Maria. \nALRAD's name is based on the initials of its five authors: \nAndre \nLuis \nRicardo \nAlexandre \nDiego"}
+  lyt.about[1,1]   <- "Alrad Spectra was developed to perform Soil Spectra preprocessing and modeling. \nAlrad Spectra was developed by researchers at Federal University of Santa Maria and Federal University of Santa Catarina, Brazil. \nAlrad's name is based on the initials of its five authors: \nAndre \nLuis \nRicardo \nAlexandre \nDiego"}
   fbrowse      <- function(...)        svalue(file.browse) <- gfile("Open File", type="open",
                                                                     filter=c("Comma Separated Values (.csv)"="csv"))
   fwarning     <- function(w)         {dispose(alert)
@@ -458,7 +458,7 @@ AlradSpectra <- function() {
   ###################################################
   ### Main window
   ###################################################
-  window        <- gwindow("ALRAD Spectra", visible=F, width = 600,height = 600)
+  window        <- gwindow("Alrad Spectra", visible=F, width = 600,height = 600)
   addHandlerUnrealize(window, handler = fconfirmquit) #confirm closing
   ### Start Menu
   action.list   <- list(clear =  gaction(label = "Clear",  icon = "clear",  handler = fclear),
