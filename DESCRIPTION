@@ -12,6 +12,7 @@ Imports:
     e1071,
     elmNN,
     ggplot2,
+    gWidgets,
     gWidgetsRGtk2,
     kernlab,
     pls,
