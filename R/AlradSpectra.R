@@ -3,8 +3,6 @@
 #' AlradSpectra provides a friendly user interface to apply preprocessing functions to soil spectra and run models on your data
 #' @author Andre Dotto, \email{andrecdot@gmail.com}
 #' @import gWidgets
-#' @import RGtk2
-#' @import gWidgetsRGtk2
 #' @export
 
 AlradSpectra <- function() {
