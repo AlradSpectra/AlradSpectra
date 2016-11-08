@@ -450,8 +450,8 @@ AlradSpectra <- function() {
   train.ctrl.method.rf <- c("boot", "cv", "LOOCV", "LGOCV", "repeatedcv", "timeslice", "oob")
   kernel.param.svm     <- c("Support Vector Machines with Linear Kernel",
                             "Support Vector Machines with Radial Kernel")
-  actf                 <- c("radial basis","sigmoid","sine","hard-limit","symmetric hard-limit",
-                            "satlins","tan-sigmoid","triangular basis", "positive linear", "linear")
+  actf                 <- c( "linear","radial basis","sigmoid","sine","hard-limit","symmetric hard-limit",
+                            "satlins","tan-sigmoid","triangular basis", "positive linear")
   kernel.param.kbml    <- c("Linear kernel", "Radial kernel")
   kbml.param.var       <- c(.0001,.001,.01,.1,1,10,100)
 
@@ -722,7 +722,7 @@ AlradSpectra <- function() {
   kbml.var            <- lyt.param.kbml[2,2] <- gcombobox(kbml.param.var, selected = 2, cont = lyt.param.kbml)
   lyt.param.kbml[1,3] <- "For cv resampling method only: \nnumber of folds to compute repeated k-fold)"
   kbml.cross          <- lyt.param.kbml[2,3] <- gspinbutton(from = 2, to = 100, by = 1, value = 10, cont = lyt.param.kbml)
-  lyt.param.kbml[1,4] <- "Kernel parameters"
+  lyt.param.kbml[1,4] <- "kernel function \nused in training and predicting"
   kbml.kernel         <- lyt.param.kbml[2,4] <- gradio(kernel.param.kbml, cont = lyt.param.kbml)
   gbutton("Run KBML model", cont = mdl.kbml, handler = fkbml)
   gbutton("Plot variable importance", cont = mdl.kbml, handler = function(...) fmdl.plot.imp(kbml.test))
