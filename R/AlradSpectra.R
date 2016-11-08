@@ -425,13 +425,13 @@ AlradSpectra <- function() {
   }
   fkbmllinear  <- function(...) {kbml.test    <<- caret::train(form.mdl, data = Train, method = 'gaussprLinear',trControl = bootctrl.kbml)
   kbml.model    <<- kernlab::gausspr(form.mdl, data=Train, kernel= "vanilladot", type = "regression",kpar="automatic",
-                            variance.model = T, var=as.numeric(svalue(kbml.var)), cross= svalue(kbml.cross))
+                            variance.model = F, var=as.numeric(svalue(kbml.var)), cross= svalue(kbml.cross))
   }
   fkbmlradial  <- function(...) {Grid          <- expand.grid(.sigma = seq(.00001,.1,.005))
   kbml.test    <<- caret::train(form.mdl, data = Train, method = 'gaussprRadial',
                          trControl = bootctrl.kbml, tuneGrid = Grid)
   kbml.model   <<- kernlab::gausspr(form.mdl, data=Train, kernel="rbfdot", type ="regression",
-                           kpar="sigma", variance.model = T,
+                           kpar="automatic", variance.model = F,
                            var=svalue(kbml.var), cross= svalue(kbml.cross))
   }
 
