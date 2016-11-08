@@ -3,10 +3,12 @@
 #' AlradSpectra provides a friendly user interface to apply preprocessing functions to soil spectra and run models on your data
 #' @author Andre Dotto, \email{andrecdot@gmail.com}
 #' @import gWidgets
+#' @import RGtk2
+#' @import gWidgetsRGtk2
 #' @export
 
 AlradSpectra <- function() {
-  
+
   ###################################################
   ### Auxiliar functions
   ###################################################
@@ -26,7 +28,7 @@ AlradSpectra <- function() {
                                                 }
   )
   }
-  
+
   fquit        <- function(...)        gconfirm("Are you sure?", icon="warning", parent=window, handler=dispose(window))
   fconfirmquit <- function(h, ...)    {sure <- gconfirm("Are you sure?", parent=h$obj)
   if(as.logical(sure))
@@ -79,8 +81,8 @@ AlradSpectra <- function() {
   Sys.sleep(1)
   gbutton("Save plot", cont=wingroup, handler = function(...) fsaveplot(800, 600))
   matplot(colnames(h), t(h), xlim = c(spectra.start.number,spectra.end.number),
-          type = "l", 
-          xlab = "Wavelength (nm)", 
+          type = "l",
+          xlab = "Wavelength (nm)",
           ylab = ylab)
   }
   fsaveplot    <- function(w, h,...)  {fname <- paste0(gfile("Save File", type="save", container=window,
@@ -99,7 +101,7 @@ AlradSpectra <- function() {
   fchangesplit <- function(h, ...)    {enabled(mdl) = FALSE
   }
   ### Preprocessing functions
-  fnrm         <- function(...) {alert <- galert("Wait...", title = "Smoothing", delay=10000, parent=notebook)
+  fnrm         <- function(...) {alert <<- galert("Wait...", title = "Smoothing", delay=10000, parent=notebook)
   tryCatch(
     {Smoothing  <<- prospectr::movav(Raw, w = as.numeric(svalue(number.smooth)))
     faddtolist("Smoothing")
@@ -110,7 +112,7 @@ AlradSpectra <- function() {
   dispose(alert)
   gmessage(message = "Done!", title = "Smoothing", icon = "info", parent = window)
   }
-  fbin         <- function(...) {alert <- galert("Wait...", title = "Binning", delay=10000, parent=notebook)
+  fbin         <- function(...) {alert <<- galert("Wait...", title = "Binning", delay=10000, parent=notebook)
   tryCatch(
     {Binning <<- prospectr::binning(Raw, bin.size = as.numeric(svalue(bin.number)))
     faddtolist("Binning")
@@ -121,7 +123,7 @@ AlradSpectra <- function() {
   dispose(alert)
   gmessage(message = "Done!", title = "Binning", icon = "info", parent = window)
   }
-  fabs         <- function(...) {alert <- galert("Wait...", title = "Absorbance", delay=10000, parent=notebook)
+  fabs         <- function(...) {alert <<- galert("Wait...", title = "Absorbance", delay=10000, parent=notebook)
   tryCatch(
     {Absorbance <<- log10(1/Raw)
     faddtolist("Absorbance")
@@ -132,7 +134,7 @@ AlradSpectra <- function() {
   dispose(alert)
   gmessage(message = "Done!", title = "Absorbance", icon = "info", parent = window)
   }
-  fdet         <- function(...) {alert <- galert("Wait...", title = "Detrend", delay=10000, parent=notebook)
+  fdet         <- function(...) {alert <<- galert("Wait...", title = "Detrend", delay=10000, parent=notebook)
   tryCatch(
     {Detrend <<- prospectr::detrend(X = Raw, wav = as.numeric(colnames(Raw)))
     faddtolist("Detrend")
@@ -143,7 +145,7 @@ AlradSpectra <- function() {
   dispose(alert)
   gmessage(message = "Done!", title = "Detrend", icon = "info", parent = window)
   }
-  fcrm         <- function(...) {alert <- galert("Wait...", title = "Continuum Removal", delay=10000, parent=notebook)
+  fcrm         <- function(...) {alert <<- galert("Wait...", title = "Continuum Removal", delay=10000, parent=notebook)
   tryCatch(
     {ContinuumRemoval <<- prospectr::continuumRemoval(X=Raw, wav = as.numeric(colnames(Raw)),
                                            type = "R", interpol="linear", method="division")
@@ -155,9 +157,9 @@ AlradSpectra <- function() {
   dispose(alert)
   gmessage(message = "Done!", title = "Continuum Removal", icon = "info", parent = window)
   }
-  fsgd         <- function(...) {alert <- galert("Wait...", title = "Savitzky-Golay Derivative", delay=10000, parent=notebook)
+  fsgd         <- function(...) {alert <<- galert("Wait...", title = "Savitzky-Golay Derivative", delay=10000, parent=notebook)
   tryCatch(
-    {SavitzkyGolayDerivative <<- prospectr::savitzkyGolay(Raw, 
+    {SavitzkyGolayDerivative <<- prospectr::savitzkyGolay(Raw,
                                                p = as.numeric(svalue(sgd.poly)),
                                                w = as.numeric(svalue(sgd.smooth)),
                                                m = as.numeric(svalue(sgd.deriv)))
@@ -169,7 +171,7 @@ AlradSpectra <- function() {
   dispose(alert)
   gmessage(message = "Done!", title = "Savitzky-Golay Derivative", icon = "info", parent = window)
   }
-  fsnv         <- function(...) {alert <- galert("Wait...", title = "SNV", delay=10000, parent=notebook)
+  fsnv         <- function(...) {alert <<- galert("Wait...", title = "SNV", delay=10000, parent=notebook)
   tryCatch(
     {SNV <<- prospectr::standardNormalVariate(X = Raw)
     faddtolist("SNV")
@@ -180,7 +182,7 @@ AlradSpectra <- function() {
   dispose(alert)
   gmessage(message = "Done!", title = "SNV", icon = "info", parent = window)
   }
-  fmsc         <- function(...) {alert <- galert("Wait...", title = "MSC", delay=10000, parent=notebook)
+  fmsc         <- function(...) {alert <<- galert("Wait...", title = "MSC", delay=10000, parent=notebook)
   tryCatch(
     {MSC <<- pls::msc(as.matrix(Raw))
     faddtolist("MSC")
@@ -191,7 +193,7 @@ AlradSpectra <- function() {
   dispose(alert)
   gmessage(message = "Done!", title = "MSC", icon = "info", parent = window)
   }
-  fnor         <- function(...) {alert <- galert("Wait...", title = "Normalization", delay=10000, parent=notebook)
+  fnor         <- function(...) {alert <<- galert("Wait...", title = "Normalization", delay=10000, parent=notebook)
   tryCatch(
     {Normalization <<- clusterSim::data.Normalization(Raw,
                                           type = sub(":.*$","", svalue(nor.type)),
@@ -270,7 +272,7 @@ AlradSpectra <- function() {
   train.plot <- ggplot2::ggplot(t, ggplot2::aes(x=t[,1], y=t[,2])) +
     ggplot2::geom_point(shape=19) +
     ggplot2::labs(list(title="Training set", x="Mesured", y="Predicted")) +
-    ggplot2::xlim(0, max(t)) + 
+    ggplot2::xlim(0, max(t)) +
     ggplot2::ylim(0, max(t)) +
     ggplot2::geom_abline(intercept = 0, slope = 1) +
     ggplot2::annotate("text", x=max(t)*0.1, y=seq(max(t)*0.9,max(t)*0.7,-max(t)*0.05),
@@ -278,7 +280,7 @@ AlradSpectra <- function() {
   val.plot   <- ggplot2::ggplot(v, ggplot2::aes(x=v[,1], y=v[,2])) +
     ggplot2::geom_point(shape=19) +
     ggplot2::labs(list(title="Validation set", x="Mesured", y="Predicted")) +
-    ggplot2::xlim(0, max(v)) + 
+    ggplot2::xlim(0, max(v)) +
     ggplot2::ylim(0, max(v)) +
     ggplot2::geom_abline(intercept = 0, slope = 1) +
     ggplot2::annotate("text", x=max(v)*0.1,
@@ -306,7 +308,7 @@ AlradSpectra <- function() {
   Rmisc::multiplot(comp.plot)
   }
   ### MLR
-  fmlr        <- function(...)  {alert     <- galert("Wait... \nThis may take a few minutes!", title = "MLR model", delay=10000, parent=notebook)
+  fmlr        <- function(...)  {alert     <<- galert("Wait... \nThis may take a few minutes!", title = "MLR model", delay=10000, parent=notebook)
   Sys.sleep(1)
   tryCatch(
     {form.mlr  <- as.formula(paste(colnames(Train[last.col]),"~",paste(names(Train)[c(seq(1,last.col-1,
@@ -323,10 +325,10 @@ AlradSpectra <- function() {
   gmessage("MLR model done", title = "MLR model", parent = window)
   }
   ### PLS
-  fpls        <- function(...) {alert       <- galert("Wait... \nThis may take a few minutes!", title = "PLSR model", delay=10000, parent=notebook)
+  fpls        <- function(...) {alert       <<- galert("Wait... \nThis may take a few minutes!", title = "PLSR model", delay=10000, parent=notebook)
   Sys.sleep(1)
   tryCatch(
-    {bootctrl.pls<- caret::trainControl(method <- svalue(pls.resampling), 
+    {bootctrl.pls<- caret::trainControl(method <- svalue(pls.resampling),
                                  number <- ifelse (grepl("cv", method), svalue(pls.kfold), (svalue(pls.kfold)+10)),
                                  repeats <- ifelse (grepl("cv", method), svalue(pls.folds), number))
     Grid        <- expand.grid(.ncomp = seq(1,svalue(pls.comp), 1))
@@ -344,7 +346,7 @@ AlradSpectra <- function() {
   gmessage("PLSR model done", title = "PLSR model", parent = window)
   }
   ### SVM
-  fsvm        <- function(...) {alert        <-  galert("Wait... \nThis may take a few minutes! ", title = "SVM model", delay=10000, parent=notebook)
+  fsvm        <- function(...) {alert        <<-  galert("Wait... \nThis may take a few minutes! ", title = "SVM model", delay=10000, parent=notebook)
   Sys.sleep(1)
   tryCatch(
     {bootctrl.svm <<-  caret::trainControl(method <- svalue(svm.resampling))
@@ -372,7 +374,7 @@ AlradSpectra <- function() {
                       gamma=svm.test$bestTune$sigma, cost=svm.test$bestTune$C)
   }
   ### RF
-  frf         <- function(...) {alert       <- galert("Wait... \nThis may take a few minutes! ", title = "RF model", delay=10000, parent=notebook)
+  frf         <- function(...) {alert       <<- galert("Wait... \nThis may take a few minutes! ", title = "RF model", delay=10000, parent=notebook)
   Sys.sleep(.5)
   tryCatch(
     {bootControl <- caret::trainControl(method <- svalue(rf.resampling))
@@ -390,7 +392,7 @@ AlradSpectra <- function() {
   gmessage("RF model done", title = "RF model", parent = window)
   }
   ### ANN
-  fann         <- function(...) {alert       <- galert("Wait... \nThis may take a few minutes! ", title = "ANN model", delay=10000, parent=notebook)
+  fann         <- function(...) {alert       <<- galert("Wait... \nThis may take a few minutes! ", title = "ANN model", delay=10000, parent=notebook)
   Sys.sleep(.5)
   tryCatch(
     {bootControl  <- caret::trainControl(method= svalue(ann.resampling))
@@ -408,8 +410,8 @@ AlradSpectra <- function() {
   gmessage("ANN model done", title = "ANN model", parent = window)
   }
   ### KBML
-  fkbml        <- function(...) {alert       <-  galert("Wait... \nThis may take a few minutes! ", title = "KBML model", delay=10000, parent=notebook)
-  Sys.sleep(1) 
+  fkbml        <- function(...) {alert       <<-  galert("Wait... \nThis may take a few minutes! ", title = "KBML model", delay=10000, parent=notebook)
+  Sys.sleep(1)
   tryCatch(
     {bootctrl.kbml<<-  caret::trainControl(method <- svalue(kbml.resampling))
     if (svalue(kbml.kernel, index=TRUE)==1) fkbmllinear()
@@ -424,7 +426,7 @@ AlradSpectra <- function() {
   gmessage("KBML model done", title = "KBML model", parent = window)
   }
   fkbmllinear  <- function(...) {kbml.test    <<- caret::train(form.mdl, data = Train, method = 'gaussprLinear',trControl = bootctrl.kbml)
-  kbml.model    <<- kernlab::gausspr(form.mdl, data=Train, kernel= "vanilladot", type = "regression",kpar="automatic", 
+  kbml.model    <<- kernlab::gausspr(form.mdl, data=Train, kernel= "vanilladot", type = "regression",kpar="automatic",
                             variance.model = T, var=as.numeric(svalue(kbml.var)), cross= svalue(kbml.cross))
   }
   fkbmlradial  <- function(...) {Grid          <- expand.grid(.sigma = seq(.00001,.1,.005))
@@ -434,7 +436,7 @@ AlradSpectra <- function() {
                            kpar="sigma", variance.model = T,
                            var=svalue(kbml.var), cross= svalue(kbml.cross))
   }
-  
+
   ###################################################
   ### Vectors
   ###################################################
@@ -454,7 +456,7 @@ AlradSpectra <- function() {
                             "satlins","tan-sigmoid","triangular basis", "positive linear", "linear")
   kernel.param.kbml    <- c("Linear kernel function", "Radial Basis kernel function")
   kbml.param.var       <- c(.0001,.001,.01,.1,1,10,100)
-  
+
   ###################################################
   ### Main window
   ###################################################
@@ -464,10 +466,10 @@ AlradSpectra <- function() {
   action.list   <- list(clear =  gaction(label = "Clear",  icon = "clear",  handler = fclear),
                         quit = gaction(label = "Quit", icon = "quit",  handler = fquit),
                         about = gaction(label = "About", icon = "about",  handler = fabout))
-  toolbar.list  <- c(action.list[c("clear")], sep = gseparator(), action.list["quit"], 
+  toolbar.list  <- c(action.list[c("clear")], sep = gseparator(), action.list["quit"],
                      sep = gseparator(), action.list["about"] )
   toolbar       <- gtoolbar(toolbar.list, cont = window)
-  
+
   ###################################################
   ### Import data
   ###################################################
@@ -500,7 +502,7 @@ AlradSpectra <- function() {
   gbutton("View data", cont = import, handler = fview)
   ### Plot raw data
   gbutton("Plot imported spectra", cont = import, handler = function(...) fplot(Raw))
-  
+
   ###################################################
   ### Preprocessing
   ###################################################
@@ -515,7 +517,7 @@ AlradSpectra <- function() {
   snv <- ggroup(cont = pp, horizontal = F,label = gettext("   SNV   "))
   msc <- ggroup(cont = pp, horizontal = F,label = gettext("   MSC   "))
   nor <- ggroup(cont = pp, horizontal = F,label = gettext("Normalization"))
-  
+
   ### Smoothing
   frame.desc.nrm     <- gframe("Description:", cont = nrm, horizontal = T)
   lyt.desc.nrm       <- glayout(cont = frame.desc.nrm , expand = TRUE)
@@ -527,7 +529,7 @@ AlradSpectra <- function() {
   gbutton("Run", cont = nrm, handler = fnrm)
   gbutton("Plot spectra", cont = nrm, handler = function(...) fplot(Smoothing))
   gbutton("Save preprocessed spectra", cont = nrm, handler = function(...) fsavedata(Smoothing))
-  
+
   ### Binning
   frame.desc.bin     <- gframe("Description:", cont = bin, horizontal = T)
   lyt.desc.bin       <- glayout(cont = frame.desc.bin , expand = TRUE)
@@ -539,7 +541,7 @@ AlradSpectra <- function() {
   gbutton("Run", cont = bin, handler = fbin)
   gbutton("Plot spectra", cont = bin, handler = function(...) fplot(Binning))
   gbutton("Save preprocessed spectra", cont = bin, handler = function(...) fsavedata(Binning))
-  
+
   ### Absorbance
   frame.desc.abs     <- gframe("Description:", cont = abs, horizontal=T)
   lyt.desc.abs       <- glayout(cont = frame.desc.abs, expand = TRUE)
@@ -547,7 +549,7 @@ AlradSpectra <- function() {
   gbutton("Run", cont = abs, handler = fabs)
   gbutton("Plot spectra", cont = abs, handler = function(...) fplot(Absorbance, ylab="Absorbance"))
   gbutton("Save preprocessed spectra", cont = abs, handler = function(...) fsavedata(Absorbance))
-  
+
   ### Detrend
   frame.desc.det     <- gframe("Description:", cont = det, horizontal=T)
   lyt.desc.det       <- glayout(cont = frame.desc.det, expand = TRUE)
@@ -555,7 +557,7 @@ AlradSpectra <- function() {
   gbutton("Run", cont = det, handler = fdet)
   gbutton("Plot spectra", cont = det, handler = function(...) fplot(Detrend))
   gbutton("Save preprocessed spectra", cont = det, handler = function(...) fsavedata(Detrend))
-  
+
   ### Continuum Removal
   frame.desc.crm     <- gframe("Description:", cont = crm, horizontal=T)
   lyt.desc.crm       <- glayout(cont = frame.desc.crm, expand = TRUE)
@@ -566,7 +568,7 @@ AlradSpectra <- function() {
   gbutton("Run", cont = crm, handler = fcrm)
   gbutton("Plot spectra", cont = crm, handler = function(...) fplot(ContinuumRemoval))
   gbutton("Save preprocessed spectra", cont = crm, handler = function(...) fsavedata(ContinuumRemoval))
-  
+
   ### SG Derivative
   frame.desc.sgd     <- gframe("Description:",cont = sgd, horizontal = T)
   lyt.desc.sgd       <- glayout(cont = frame.desc.sgd , expand = TRUE)
@@ -582,7 +584,7 @@ AlradSpectra <- function() {
   gbutton("Run", cont = sgd, handler = fsgd)
   gbutton("Plot spectra", cont = sgd, handler = function(...) fplot(SavitzkyGolayDerivative))
   gbutton("Save preprocessed spectra", cont = sgd, handler = function(...) fsavedata(SavitzkyGolayDerivative))
-  
+
   ### SNV
   frame.desc.snv     <- gframe("Description:", cont = snv, horizontal=T)
   lyt.desc.snv       <- glayout(cont = frame.desc.snv, expand = TRUE)
@@ -590,7 +592,7 @@ AlradSpectra <- function() {
   gbutton("Run", cont = snv, handler = fsnv)
   gbutton("Plot spectra", cont = snv, handler = function(...) fplot(SNV))
   gbutton("Save preprocessed spectra", cont = snv, handler = function(...) fsavedata(SNV))
-  
+
   ### MSC
   frame.desc.msc     <- gframe("Description:", cont = msc, horizontal=T)
   lyt.desc.msc       <- glayout(cont = frame.desc.msc, expand = TRUE)
@@ -598,7 +600,7 @@ AlradSpectra <- function() {
   gbutton("Run", cont = msc, handler = fmsc)
   gbutton("Plot spectra", cont = msc, handler = function(...) fplot(MSC))
   gbutton("Save preprocessed spectra", cont = msc, handler = function(...) fsavedata(MSC))
-  
+
   ### Normalization
   frame.desc.nor     <- gframe("Description:",cont = nor, horizontal = T)
   lyt.desc.nor       <- glayout(cont = frame.desc.nor , expand = TRUE)
@@ -610,7 +612,7 @@ AlradSpectra <- function() {
   gbutton("Run", cont = nor, handler = fnor)
   gbutton("Plot spectra", cont = nor, handler = function(...) fplot(Normalization))
   gbutton("Save preprocessed spectra", cont = nor, handler = function(...) fsavedata(Normalization))
-  
+
   ###################################################
   ### Models
   ###################################################
@@ -623,7 +625,7 @@ AlradSpectra <- function() {
   mdl                <- gnotebook(cont = models)
   enabled(models) = FALSE
   enabled(mdl) = FALSE
-  
+
   ### MLR
   mdl.mlr            <- ggroup(cont = mdl, horizontal = F,label = gettext("   MLR   "))
   frame.desc.mlr     <- gframe("Description:",cont = mdl.mlr, horizontal = T)
@@ -636,7 +638,7 @@ AlradSpectra <- function() {
   gbutton("Run MLR model", cont = mdl.mlr, handler = fmlr)
   gbutton("MLR model results", cont = mdl.mlr, handler = function(...) fmdl.stats(mlr.train, mlr.val))
   gbutton("Plot model accuracy",cont = mdl.mlr, handler = function(...) fmdl.plot.res(mlr.train, mlr.val))
-  
+
   ### PLS
   mdl.pls            <- ggroup(cont = mdl, horizontal = F,label = gettext("   PLSR   "))
   frame.desc.pls     <- gframe("Description:",cont = mdl.pls, horizontal = T)
@@ -656,7 +658,7 @@ AlradSpectra <- function() {
   gbutton("Plot variable importance", cont = mdl.pls, handler = function(...) fpls.plot.imp(pls.test))
   gbutton("PLSR model results", cont = mdl.pls, handler = function(...) fmdl.stats(pls.train, pls.val))
   gbutton("Plot model accuracy",cont = mdl.pls, handler = function(...) fmdl.plot.res(pls.train, pls.val))
-  
+
   ### SVM
   mdl.svm            <- ggroup(cont = mdl, horizontal = F,label = gettext("    SVM    "))
   frame.desc.svm     <- gframe("Description:",cont = mdl.svm, horizontal = T)
@@ -672,7 +674,7 @@ AlradSpectra <- function() {
   gbutton("Plot variable importance", cont = mdl.svm, handler = function(...) fmdl.plot.imp(svm.test))
   gbutton("SVM model results", cont = mdl.svm, handler = function(...) fmdl.stats(svm.train, svm.val))
   gbutton("Plot model accuracy",cont = mdl.svm, handler = function(...) fmdl.plot.res(svm.train, svm.val))
-  
+
   ### RF
   mdl.rf             <- ggroup(cont = mdl, horizontal = F,label = gettext("    RF    "))
   frame.desc.rf      <- gframe("Description:",cont = mdl.rf, horizontal = T)
@@ -690,7 +692,7 @@ AlradSpectra <- function() {
   gbutton("Plot variable importance", cont = mdl.rf, handler = function(...) fmdl.plot.imp(rf.test))
   gbutton("RF model results", cont = mdl.rf, handler = function(...) fmdl.stats(rf.train, rf.val))
   gbutton("Plot model accuracy",cont = mdl.rf, handler = function(...) fmdl.plot.res(rf.train, rf.val))
-  
+
   ### ANN
   mdl.ann            <- ggroup(cont = mdl, horizontal = F,label = gettext("    ANN    "))
   frame.desc.ann     <- gframe("Description:",cont = mdl.ann, horizontal = T)
@@ -708,7 +710,7 @@ AlradSpectra <- function() {
   gbutton("Plot variable importance", cont = mdl.ann, handler = function(...) fmdl.plot.imp(ann.test))
   gbutton("ANN model results", cont = mdl.ann, handler = function(...) fmdl.stats(ann.train, ann.val))
   gbutton("Plot model accuracy", cont = mdl.ann, handler = function(...) fmdl.plot.res(ann.train, ann.val))
-  
+
   ### KBML
   mdl.kbml            <- ggroup(cont = mdl, horizontal = F,label = gettext(" KBML "))
   frame.desc.kbml     <- gframe("Description:",cont = mdl.kbml, horizontal = T)
@@ -720,7 +722,7 @@ AlradSpectra <- function() {
   kbml.resampling     <- lyt.param.kbml[2,1] <- gcombobox(train.ctrl.method, cont = lyt.param.kbml)
   lyt.param.kbml[1,2] <- "Initial noise variance"
   kbml.var            <- lyt.param.kbml[2,2] <- gcombobox(kbml.param.var, selected = 2, cont = lyt.param.kbml)
-  lyt.param.kbml[1,3] <- "K-fold cross-validation" 
+  lyt.param.kbml[1,3] <- "K-fold cross-validation"
   kbml.cross          <- lyt.param.kbml[2,3] <- gspinbutton(from = 2, to = 100, by = 1, value = 10, cont = lyt.param.kbml)
   lyt.param.kbml[1,4] <- "Kernel parameters"
   kbml.kernel         <- lyt.param.kbml[2,4] <- gradio(kernel.param.kbml, cont = lyt.param.kbml)
@@ -728,12 +730,12 @@ AlradSpectra <- function() {
   gbutton("Plot variable importance", cont = mdl.kbml, handler = function(...) fmdl.plot.imp(kbml.test))
   gbutton("KBML model results", cont = mdl.kbml, handler = function(...) fmdl.stats(kbml.train, kbml.val))
   gbutton("Plot model accuracy", cont = mdl.kbml, handler = function(...) fmdl.plot.res(kbml.train, kbml.val))
-  
+
   ### Focus on first tab
   svalue(notebook)   <- 1
   svalue(pp)         <- 1
   svalue(mdl)        <- 1
   ### Window visibility
   visible(window)    <- TRUE
-  
+
 }
