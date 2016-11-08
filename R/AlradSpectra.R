@@ -268,20 +268,20 @@ AlradSpectra <- function() {
   assign(t.stats.name, error.comp(t[,1], t[,2]), envir = .GlobalEnv)
   assign(v.stats.name, error.comp(v[,1], v[,2]), envir = .GlobalEnv)
   train.plot <- ggplot2::ggplot(t, ggplot2::aes(x=t[,1], y=t[,2])) +
-    geom_point(shape=19) +
-    labs(list(title="Training set", x="Mesured", y="Predicted")) +
-    xlim(0, max(t)) + 
-    ylim(0, max(t)) +
-    geom_abline(intercept = 0, slope = 1) +
-    annotate("text", x=max(t)*0.1, y=seq(max(t)*0.9,max(t)*0.7,-max(t)*0.05),
+    ggplot2::geom_point(shape=19) +
+    ggplot2::labs(list(title="Training set", x="Mesured", y="Predicted")) +
+    ggplot2::xlim(0, max(t)) + 
+    ggplot2::ylim(0, max(t)) +
+    ggplot2::geom_abline(intercept = 0, slope = 1) +
+    ggplot2::annotate("text", x=max(t)*0.1, y=seq(max(t)*0.9,max(t)*0.7,-max(t)*0.05),
              label = paste(names(get(t.stats.name)),"=",get(t.stats.name)))
   val.plot   <- ggplot2::ggplot(v, ggplot2::aes(x=v[,1], y=v[,2])) +
-    geom_point(shape=19) +
-    labs(list(title="Validation set", x="Mesured", y="Predicted")) +
-    xlim(0, max(v)) + 
-    ylim(0, max(v)) +
-    geom_abline(intercept = 0, slope = 1) +
-    annotate("text", x=max(v)*0.1,
+    ggplot2::geom_point(shape=19) +
+    ggplot2::labs(list(title="Validation set", x="Mesured", y="Predicted")) +
+    ggplot2::xlim(0, max(v)) + 
+    ggplot2::ylim(0, max(v)) +
+    ggplot2::geom_abline(intercept = 0, slope = 1) +
+    ggplot2::annotate("text", x=max(v)*0.1,
              y=seq(max(v)*0.9,max(v)*0.7,-max(v)*0.05),
              label = paste(names(get(v.stats.name)),"=",get(v.stats.name)))
   Sys.sleep(1)

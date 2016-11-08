@@ -5,7 +5,7 @@ Authors@R: c(person("Andre", "Dotto", email = "andrecdot@gmail.com", role = c("a
              person("Diego", "Gris", email = "diegojgris@gmail.com", role = "aut"))
 Description: AlradSpectra provides a friendly user interface to apply preprocessing functions to soil spectra and run models on your data.
 Depends:
-    R (>= 3.3.2)
+    R (>= 3.2.5)
 Imports:
     caret,
     clusterSim,
