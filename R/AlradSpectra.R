@@ -485,15 +485,15 @@ AlradSpectra <- function() {
   lyt.file.arg[1,2,anchor=c(-1,-1)] <- "Separator:"
   file.sep      <- lyt.file.arg[2,2,anchor=c(1,1)]   <- gedit(text = ",", cont = lyt.file.arg, width = 1)
   lyt.file.arg[1,3,anchor=c(1,0)]   <- "Spectral data \nstarts at column:"
-  spc.start.col <- lyt.file.arg[2,3,anchor=c(0,0)]   <- gedit(text = "11", cont = lyt.file.arg, width = 2)
+  spc.start.col <- lyt.file.arg[2,3,anchor=c(0,0)]   <- gedit(text = "", cont = lyt.file.arg, width = 2)
   lyt.file.arg[1,4,anchor=c(1,0)]   <- "Spectral data \nends at column:"
-  spc.end.col   <- lyt.file.arg[2,4,anchor=c(0,0)]   <- gedit(text = "2161", cont = lyt.file.arg, width = 4)
+  spc.end.col   <- lyt.file.arg[2,4,anchor=c(0,0)]   <- gedit(text = "", cont = lyt.file.arg, width = 4)
   lyt.file.arg[1,5,anchor=c(1,0)]   <- "Spectrum starts \nat wavelength:"
-  spc.first     <- lyt.file.arg[2,5,anchor=c(0,0)]   <- gedit(text = "350", cont = lyt.file.arg, width = 4)
+  spc.first     <- lyt.file.arg[2,5,anchor=c(0,0)]   <- gedit(text = "", cont = lyt.file.arg, width = 4)
   lyt.file.arg[1,6,anchor=c(1,0)]   <- "Spectrum ends \nat wavelength:"
-  spc.last      <- lyt.file.arg[2,6,anchor=c(0,0)]   <- gedit(text = "2500", cont = lyt.file.arg, width = 4)
+  spc.last      <- lyt.file.arg[2,6,anchor=c(0,0)]   <- gedit(text = "", cont = lyt.file.arg, width = 4)
   lyt.file.arg[1,7,anchor=c(1,0)]   <- "Soil variable \nis at column:"
-  soil.var.col  <- lyt.file.arg[2,7,anchor=c(0,0)]   <- gedit(text = "7", cont = lyt.file.arg, width = 4)
+  soil.var.col  <- lyt.file.arg[2,7,anchor=c(0,0)]   <- gedit(text = "", cont = lyt.file.arg, width = 4)
   ### Import
   gbutton("Import data", cont = import, handler = fimport)
   ### View data
