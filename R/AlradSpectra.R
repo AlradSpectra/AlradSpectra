@@ -411,7 +411,7 @@ AlradSpectra <- function() {
   fkbml        <- function(...) {alert       <<-  galert("Wait... \nThis may take a few minutes! ", title = "KBML model", delay=10000, parent=notebook)
   Sys.sleep(1)
   tryCatch(
-    {bootctrl.kbml<<-  caret::trainControl(method <- svalue(kbml.resampling))
+    {bootctrl.kbml<<-  caret::trainControl(method= svalue(kbml.resampling))
     if (svalue(kbml.kernel, index=TRUE)==1) fkbmllinear()
     if (svalue(kbml.kernel, index=TRUE)==2) fkbmlradial()
     kbml.train   <<- data.frame(Train[last.col], Predicted=predict(kbml.model, newdata=Train))
@@ -424,14 +424,14 @@ AlradSpectra <- function() {
   gmessage("KBML model done", title = "KBML model", parent = window)
   }
   fkbmllinear  <- function(...) {kbml.test    <<- caret::train(form.mdl, data = Train, method = 'gaussprLinear',trControl = bootctrl.kbml)
-  kbml.model    <<- kernlab::gausspr(form.mdl, data=Train, kernel= "vanilladot", type = "regression", kpar= "automatic",
+  kbml.model    <<- kernlab::gausspr(form.mdl, data=Train, kernel= "vanilladot", type = "regression", kpar= "automatic", scaled = FALSE,
                             variance.model = T, var=as.numeric(svalue(kbml.var)), cross= svalue(kbml.cross))
   }
   fkbmlradial  <- function(...) {Grid          <- expand.grid(.sigma = seq(.00001,.1,.005))
   kbml.test    <<- caret::train(form.mdl, data = Train, method = 'gaussprRadial',
                          trControl = bootctrl.kbml, tuneGrid = Grid)
   kbml.model   <<- kernlab::gausspr(form.mdl, data=Train, kernel="rbfdot", type ="regression",
-                           kpar= "automatic", variance.model = T,
+                           kpar= "automatic", variance.model = T, scaled = FALSE,
                            var=svalue(kbml.var), cross= svalue(kbml.cross))
   }
 
