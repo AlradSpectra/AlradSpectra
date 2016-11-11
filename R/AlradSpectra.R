@@ -615,7 +615,7 @@ AlradSpectra <- function() {
   ###################################################
   ### Models
   ###################################################
-  models             <- ggroup(cont = notebook, label = gettext("           MODEL           "), horizontal = F)
+  models             <- ggroup(cont = notebook, label = gettext("           MODELING           "), horizontal = F)
   glabel("Select input data for modeling:", cont = models, anchor = c(-1,0))
   select.dataset     <- gcombobox("", cont = models, handler = fchangesplit)
   glabel("Size of validation set (%):", cont = models, anchor = c(-1,0))
