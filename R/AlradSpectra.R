@@ -56,9 +56,9 @@ AlradSpectra <- function() {
     soil.var.column      <<- as.numeric(svalue(soil.var.col))
     soil.var.name        <<- colnames(alldata[soil.var.column])
     fonlyspectra()
-    dataset              <<- c("Raw")
+    dataset              <<- c("Original")
     select.dataset[]     <- dataset
-    svalue(select.dataset) <- "Raw"
+    svalue(select.dataset) <- "Original"
     },
     warning = function(w) fwarning(w),
     error =  function(e) ferror(e)
@@ -70,7 +70,7 @@ AlradSpectra <- function() {
   }
   fonlyspectra <- function(...)       {spc <- alldata[,spectra.start.column:spectra.end.column]
   colnames(spc) <- c(spectra.start.number:spectra.end.number)
-  Raw <<- spc
+  Original <<- spc
   }
   fview        <- function(...)        gtable(alldata, cont = gwindow("View data", width = 800, height = 200, parent = window))
   fplot        <- function(h, ylab="Reflectance", ...) {plotwin <- gwindow("Plot", width = 800, height = 600, parent = window)
@@ -90,7 +90,9 @@ AlradSpectra <- function() {
   }
   fsavedata    <- function(h, ...)    {fname <- paste0(gfile("Save File", type="save",
                                                              filter=c("Comma Separated Values (.csv)"="csv")),".csv")
-  write.csv(h, row.names = FALSE, file = fname)
+  spectrum <- seq(spectra.start.column, spectra.end.column)
+  exportdata <- cbind(alldata[,-spectrum], h)
+  write.csv(exportdata, row.names = FALSE, file = fname)
   }
   faddtolist   <- function(h, ...)    {present <- is.element(h, dataset)
   if(present==FALSE) dataset <<- c(dataset, h)
@@ -101,7 +103,7 @@ AlradSpectra <- function() {
   ### Preprocessing functions
   fnrm         <- function(...) {alert <<- galert("Wait...", title = "Smoothing", delay=10000, parent=notebook)
   tryCatch(
-    {Smoothing  <<- prospectr::movav(Raw, w = as.numeric(svalue(number.smooth)))
+    {Smoothing  <<- prospectr::movav(Original, w = as.numeric(svalue(number.smooth)))
     faddtolist("Smoothing")
     },
     warning = function(w) fwarning(w),
@@ -112,7 +114,7 @@ AlradSpectra <- function() {
   }
   fbin         <- function(...) {alert <<- galert("Wait...", title = "Binning", delay=10000, parent=notebook)
   tryCatch(
-    {Binning <<- prospectr::binning(Raw, bin.size = as.numeric(svalue(bin.number)))
+    {Binning <<- prospectr::binning(Original, bin.size = as.numeric(svalue(bin.number)))
     faddtolist("Binning")
     },
     warning = function(w) fwarning(w),
@@ -123,7 +125,7 @@ AlradSpectra <- function() {
   }
   fabs         <- function(...) {alert <<- galert("Wait...", title = "Absorbance", delay=10000, parent=notebook)
   tryCatch(
-    {Absorbance <<- log10(1/Raw)
+    {Absorbance <<- log10(1/Original)
     faddtolist("Absorbance")
     },
     warning = function(w) fwarning(w),
@@ -134,7 +136,7 @@ AlradSpectra <- function() {
   }
   fdet         <- function(...) {alert <<- galert("Wait...", title = "Detrend", delay=10000, parent=notebook)
   tryCatch(
-    {Detrend <<- prospectr::detrend(X = Raw, wav = as.numeric(colnames(Raw)))
+    {Detrend <<- prospectr::detrend(X = Original, wav = as.numeric(colnames(Original)))
     faddtolist("Detrend")
     },
     warning = function(w) fwarning(w),
@@ -145,8 +147,9 @@ AlradSpectra <- function() {
   }
   fcrm         <- function(...) {alert <<- galert("Wait...", title = "Continuum Removal", delay=10000, parent=notebook)
   tryCatch(
-    {ContinuumRemoval <<- prospectr::continuumRemoval(X=Raw, wav = as.numeric(colnames(Raw)),
+    {ContRem <- prospectr::continuumRemoval(X=Original, wav = as.numeric(colnames(Original)),
                                            type = "R", interpol="linear", method="division")
+    ContinuumRemoval <<- ContRem[,c(-1,-ncol(ContRem))]
     faddtolist("ContinuumRemoval")
     },
     warning = function(w) fwarning(w),
@@ -157,7 +160,7 @@ AlradSpectra <- function() {
   }
   fsgd         <- function(...) {alert <<- galert("Wait...", title = "Savitzky-Golay Derivative", delay=10000, parent=notebook)
   tryCatch(
-    {SavitzkyGolayDerivative <<- prospectr::savitzkyGolay(Raw,
+    {SavitzkyGolayDerivative <<- prospectr::savitzkyGolay(Original,
                                                p = as.numeric(svalue(sgd.poly)),
                                                w = as.numeric(svalue(sgd.smooth)),
                                                m = as.numeric(svalue(sgd.deriv)))
@@ -171,7 +174,7 @@ AlradSpectra <- function() {
   }
   fsnv         <- function(...) {alert <<- galert("Wait...", title = "SNV", delay=10000, parent=notebook)
   tryCatch(
-    {SNV <<- prospectr::standardNormalVariate(X = Raw)
+    {SNV <<- prospectr::standardNormalVariate(X = Original)
     faddtolist("SNV")
     },
     warning = function(w) fwarning(w),
@@ -182,7 +185,7 @@ AlradSpectra <- function() {
   }
   fmsc         <- function(...) {alert <<- galert("Wait...", title = "MSC", delay=10000, parent=notebook)
   tryCatch(
-    {MSC <<- pls::msc(as.matrix(Raw))
+    {MSC <<- pls::msc(as.matrix(Original))
     faddtolist("MSC")
     },
     warning = function(w) fwarning(w),
@@ -193,7 +196,7 @@ AlradSpectra <- function() {
   }
   fnor         <- function(...) {alert <<- galert("Wait...", title = "Normalization", delay=10000, parent=notebook)
   tryCatch(
-    {Normalization <<- clusterSim::data.Normalization(Raw,
+    {Normalization <<- clusterSim::data.Normalization(Original,
                                           type = sub(":.*$","", svalue(nor.type)),
                                           normalization = "row")
     faddtolist("Normalization")
@@ -269,7 +272,7 @@ AlradSpectra <- function() {
   assign(v.stats.name, error.comp(v[,1], v[,2]), envir = .GlobalEnv)
   train.plot <- ggplot2::ggplot(t, ggplot2::aes(x=t[,1], y=t[,2])) +
     ggplot2::geom_point(shape=19) +
-    ggplot2::labs(list(title="Training set", x="Mesured", y="Predicted")) +
+    ggplot2::labs(list(title="Training set", x="Measured", y="Predicted")) +
     ggplot2::xlim(0, max(t)) +
     ggplot2::ylim(0, max(t)) +
     ggplot2::geom_abline(intercept = 0, slope = 1) +
@@ -277,7 +280,7 @@ AlradSpectra <- function() {
              label = paste(names(get(t.stats.name)),"=",get(t.stats.name)))
   val.plot   <- ggplot2::ggplot(v, ggplot2::aes(x=v[,1], y=v[,2])) +
     ggplot2::geom_point(shape=19) +
-    ggplot2::labs(list(title="Validation set", x="Mesured", y="Predicted")) +
+    ggplot2::labs(list(title="Validation set", x="Measured", y="Predicted")) +
     ggplot2::xlim(0, max(v)) +
     ggplot2::ylim(0, max(v)) +
     ggplot2::geom_abline(intercept = 0, slope = 1) +
@@ -425,14 +428,14 @@ AlradSpectra <- function() {
   }
   fkbmllinear  <- function(...) {kbml.test    <<- caret::train(form.mdl, data = Train, method = 'gaussprLinear', trControl = bootctrl.kbml,
                                                                tuneLength = 10)
-  kbml.model    <<- kernlab::gausspr(form.mdl, data=Train, kernel= "vanilladot", type = "regression", kpar= "automatic", scaled = F,
+  kbml.model    <<- kernlab::gausspr(form.mdl, data=Train, kernel= "vanilladot", type = "regression", kpar= "automatic",
                             variance.model = T, var=as.numeric(svalue(kbml.var)), cross= svalue(kbml.cross))
   }
   fkbmlradial  <- function(...) {Grid          <- expand.grid(.sigma = seq(.00001,.1,.005))
   kbml.test    <<- caret::train(form.mdl, data = Train, method = 'gaussprRadial',
                                 tuneLength = 10,  trControl = bootctrl.kbml, tuneGrid = Grid)
   kbml.model   <<- kernlab::gausspr(form.mdl, data=Train, kernel="rbfdot", type ="regression",
-                           kpar= "automatic", variance.model = T, scaled = F,
+                           kpar= "automatic", variance.model = T,
                            var=svalue(kbml.var), cross= svalue(kbml.cross))
   }
 
@@ -499,8 +502,8 @@ AlradSpectra <- function() {
   gbutton("Import data", cont = import, handler = fimport)
   ### View data
   gbutton("View data", cont = import, handler = fview)
-  ### Plot raw data
-  gbutton("Plot imported spectra", cont = import, handler = function(...) fplot(Raw))
+  ### Plot imported data
+  gbutton("Plot imported spectra", cont = import, handler = function(...) fplot(Original))
 
   ###################################################
   ### Preprocessing
