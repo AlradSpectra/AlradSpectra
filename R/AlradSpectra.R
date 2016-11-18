@@ -33,9 +33,24 @@ AlradSpectra <- function() {
     return(FALSE) #close
   else
     return(TRUE)}  #don't close
-  fabout       <- function(...)       {aboutwin <- gwindow("About Alrad Spectra",width=500, height=500, parent = window)
-  lyt.about <- glayout(cont = aboutwin, expand = F)
-  lyt.about[1,1]   <- "Alrad Spectra was developed to perform Soil Spectra preprocessing and modeling. \nAlrad Spectra was developed by researchers at Federal University of Santa Maria and Federal University of Santa Catarina, Brazil. \nAlrad's name is based on the initials of its five authors: \nAndre \nLuis \nRicardo \nAlexandre \nDiego"}
+  fabout       <- function(...)       {aboutwin <- gwindow("About Alrad Spectra",width=400, height=300, parent = window)
+  wingroup <- ggroup(horizontal = FALSE, container = aboutwin)
+  gimage(system.file("images","AlradLogo.bmp",package="AlradSpectra"),  container = wingroup)
+  glabel(paste0(
+    "Soil spectra preprocessing and modeling\n\n",
+    "Developed by researchers at\n",
+    "Federal University of Santa Maria and\n",
+    "Federal University of Santa Catarina, Brazil.\n\n",
+    "Authors and contributors:\n",
+    "<b>A</b>","ndre\n",
+    "<b>L</b>","uis\n",
+    "<b>R</b>","icardo\n",
+    "<b>A</b>","lexandre\n",
+    "<b>D</b>","iego\n",
+    "\n",
+    "For further information:\n",
+    "<i>http://www.linktopaper.com/</i>\n\n",
+    sep="", collapse=""), markup = TRUE, container = wingroup)}
   fbrowse      <- function(...)        svalue(file.browse) <- gfile("Open File", type="open",
                                                                     filter=c("Comma Separated Values (.csv)"="csv"))
   fwarning     <- function(w)         {dispose(alert)
