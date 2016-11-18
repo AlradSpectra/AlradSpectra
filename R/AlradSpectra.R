@@ -42,11 +42,11 @@ AlradSpectra <- function() {
     "Federal University of Santa Maria and\n",
     "Federal University of Santa Catarina, Brazil.\n\n",
     "Authors and contributors:\n",
-    "<b>A</b>","ndre\n",
-    "<b>L</b>","uis\n",
-    "<b>R</b>","icardo\n",
-    "<b>A</b>","lexandre\n",
-    "<b>D</b>","iego\n",
+    "<b>A</b>","ndre Dotto\n",
+    "<b>L</b>","uis Ruiz\n",
+    "<b>R</b>","icardo Dalmolin\n",
+    "<b>A</b>","lexandre ten Caten\n",
+    "<b>D</b>","iego Gris\n",
     "\n",
     "For further information:\n",
     "<i>http://www.linktopaper.com/</i>\n\n",
@@ -491,7 +491,7 @@ AlradSpectra <- function() {
   ### Import data
   ###################################################
   notebook       <- gnotebook(cont = window)
-  import         <- ggroup(cont = notebook, horizontal = F, label = gettext("      IMPORT DATA      "))
+  import         <- ggroup(cont = notebook, horizontal = F, label = gettext("      Import Data      "))
   ### Browse file
   frame.imp      <- gframe("File path:", cont = import, horizontal=T)
   file.browse    <- gedit(text = "", cont = frame.imp, width = 100)
@@ -523,7 +523,7 @@ AlradSpectra <- function() {
   ###################################################
   ### Preprocessing
   ###################################################
-  pp  <- gnotebook(cont = notebook, label = gettext(" SPECTRAL PREPROCESSING"),horizontal = F, width = 30)
+  pp  <- gnotebook(cont = notebook, label = gettext(" Spectral Preprocessing"),horizontal = F, width = 30)
   enabled(pp) = FALSE
   nrm <- ggroup(cont = pp, horizontal = F,label = gettext(" Smoothing "))
   bin <- ggroup(cont = pp, horizontal = F,label = gettext(" Binning "))
@@ -633,7 +633,7 @@ AlradSpectra <- function() {
   ###################################################
   ### Models
   ###################################################
-  models             <- ggroup(cont = notebook, label = gettext("           MODELING           "), horizontal = F)
+  models             <- ggroup(cont = notebook, label = gettext("           Modeling           "), horizontal = F)
   glabel("Select input data for modeling:", cont = models, anchor = c(-1,0))
   select.dataset     <- gcombobox("", cont = models, handler = fchangesplit)
   glabel("Size of validation set (%):", cont = models, anchor = c(-1,0))
