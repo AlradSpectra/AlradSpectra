@@ -702,7 +702,7 @@ AlradSpectra <- function() {
   lyt.param.rf[1,1]  <- "Resampling method"
   rf.resampling      <- lyt.param.rf[2,1]  <- gcombobox(train.ctrl.method.rf, cont = lyt.param.rf)
   lyt.param.rf[1,2]  <- "Randomly selected predictors \n(mtry)"
-  rf.mtry            <- lyt.param.rf[2,2]  <- gspinbutton(from = 50, to = 500, by = 50, value = 50, cont = lyt.param.rf)
+  rf.mtry            <- lyt.param.rf[2,2]  <- gspinbutton(from = 5, to = 500, by = 5, value = 5, cont = lyt.param.rf)
   lyt.param.rf[1,3]  <- "Number of trees \n(ntree)"
   rf.ntree           <- lyt.param.rf[2,3]  <- gedit(text = "500", cont = lyt.param.rf, width = 4)
   gbutton("Run RF model", cont = mdl.rf, handler = frf)
