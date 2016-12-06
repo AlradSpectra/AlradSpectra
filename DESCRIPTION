@@ -3,9 +3,9 @@ Title: A GUI for preprocessing and modeling soil spectra
 Version: 0.9
 Date: 2016-12-06
 Authors@R: c(person("Andre", "C. Dotto", email = "andrecdot@gmail.com", role = c("aut", "cre")),
-             person("Diego", "Gris", email = "diegojgris@gmail.com", role = "aut"))
-             person("Luis", "Chimelo Ruiz", role= "ctb"))
-             person("Alexandre", "ten Caten", role= "ctb"))
+             person("Diego", "Gris", email = "diegojgris@gmail.com", role = "aut"),
+             person("Luis", "Chimelo Ruiz", role= "ctb"),
+             person("Alexandre", "ten Caten", role= "ctb"),
              person("Ricardo", "S. D. Dalmolin", role= "ctb"))
 Description: AlradSpectra provides a friendly user interface to apply preprocessing functions to soil spectra and run models on your data.
 Depends: R (>= 3.0) 
