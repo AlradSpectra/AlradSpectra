@@ -19,7 +19,6 @@ Imports:
     e1071, 
     foreach,  
     ggplot2,
-    git2r,
     graphics, 
     grDevices,
     grid, 
