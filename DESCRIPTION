@@ -8,8 +8,7 @@ Authors@R: c(person("Andre", "C. Dotto", email = "andrecdot@gmail.com", role = c
              person("Alexandre", "ten Caten", role= "ctb"))
              person("Ricardo", "S. D. Dalmolin", role= "ctb"))
 Description: AlradSpectra provides a friendly user interface to apply preprocessing functions to soil spectra and run models on your data.
-Depends:
-    R (>= 3.0), gWidgetsRGtk2, prospectr, pls, clusterSim, ggplot2, Rmisc, caret, e1071, kernlab, elmNN, randomForest, devtools
+Depends: R (>= 3.0), gWidgetsRGtk2, prospectr, pls, clusterSim, ggplot2, Rmisc, caret, e1071, kernlab, elmNN, randomForest, devtools 
 Imports:
     ade4, 
     cairoDevice,
@@ -55,7 +54,7 @@ Imports:
     whisker, 
     withr
 Suggests:
-  BiocInstaller, 
+        BiocInstaller, 
 	bitops, 
 	BradleyTerry2, 
 	cluster, 
@@ -118,7 +117,6 @@ Suggests:
 	svglite, 
 	testthat (≥ 0.9.1),
 	xtable
-
 License: GPL-2
 Encoding: UTF-8
 LazyData: true
