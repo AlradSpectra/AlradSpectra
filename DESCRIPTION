@@ -8,7 +8,7 @@ Authors@R: c(person("Andre", "C. Dotto", email = "andrecdot@gmail.com", role = c
              person("Alexandre", "ten Caten", role= "ctb"),
              person("Ricardo", "S. D. Dalmolin", role= "ctb"))
 Description: AlradSpectra provides a friendly user interface to apply preprocessing functions to soil spectra and run models on your data.
-Depends: R (>= 3.0) 
+Depends: R (>= 3.0), gWidgetsRGtk2, prospectr, pls, clusterSim, ggplot2, Rmisc, caret, e1071, kernlab, elmNN, randomForest
 Imports: 
     ade4, 
     cairoDevice,
@@ -19,7 +19,7 @@ Imports:
     e1071, 
     foreach,  
     ggplot2,
-    git2r (≥ 0.11.0),
+    git2r,
     graphics, 
     grDevices,
     grid, 
