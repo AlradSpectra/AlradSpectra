@@ -114,13 +114,13 @@ AlradSpectra <- function() {
                                                                 ylab = ylab)
                                                         }
   # Export plot as png graphics file
-  fsaveplot    <- function(w, h,...)  {fname <- paste0(gfile("Save File", type="save", container=window,
+  fsaveplot    <- function(w, h,...)  {fname <- paste0(gfile("Save File", type="save", initialfilename="Plot", container=window,
                                                              filter=c("Portable Network Graphics (.png)"="png")),".png")
                                                 dev.copy(png, fname, width=w, height=h, res=100, antialias = "cleartype")
                                                 dev.off() #Close graphics device
                                        }
   # Export preprocessed spectra as csv file
-  fsavedata    <- function(h, ...)    {fname      <- paste0(gfile("Save File", type="save",
+  fsavedata    <- function(h, ...)    {fname      <- paste0(gfile("Save File", type="save", initialfilename="Data", container=window,
                                                                   filter=c("Comma Separated Values (.csv)"="csv")),".csv")
                                        spectrum   <- seq(spectra.start.column, spectra.end.column)
                                        exportdata <- cbind(alldata[,-spectrum], h)
@@ -183,8 +183,8 @@ AlradSpectra <- function() {
                                         assign(t.stats.name, error.comp(t[,1], t[,2]), envir = .GlobalEnv) #Compute training stats
                                         assign(v.stats.name, error.comp(v[,1], v[,2]), envir = .GlobalEnv) #Compute validation stats
                                         results      <- rbind(get(t.stats.name), get(v.stats.name)) #Merge training and validation stats
-                                        set          <- c("Training", "Validation") #Titles for model results table
-                                        res.table    <- cbind(set, results) #Create model results table
+                                        Set          <- c("Training", "Validation") #Titles for model results table
+                                        res.table    <- cbind(Set, results) #Create model results table
                                         statswin     <- gwindow("Model results", width=320, height=150, parent=window)
                                         stats.lyt    <- glayout(horizontal=FALSE, container=statswin)
                                         stats.lyt[1,1,expand=TRUE] <- gtable(res.table, cont = stats.lyt)
