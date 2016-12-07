@@ -114,13 +114,13 @@ AlradSpectra <- function() {
                                                                 ylab = ylab)
                                                         }
   # Export plot as png graphics file
-  fsaveplot    <- function(w, h,...)  {fname <- paste0(gfile("Save File", type="save", initialfilename="Plot", container=window,
+  fsaveplot    <- function(w, h,...)  {fname <- paste0(gfile(text="Save File", type="save", initialfilename="Plot", container=window,
                                                              filter=c("Portable Network Graphics (.png)"="png")),".png")
                                                 dev.copy(png, fname, width=w, height=h, res=100, antialias = "cleartype")
                                                 dev.off() #Close graphics device
                                        }
   # Export preprocessed spectra as csv file
-  fsavedata    <- function(h, ...)    {fname      <- paste0(gfile("Save File", type="save", initialfilename="Data", container=window,
+  fsavedata    <- function(h, ...)    {fname      <- paste0(gfile(text="Save File", type="save", initialfilename="Data", container=window,
                                                                   filter=c("Comma Separated Values (.csv)"="csv")),".csv")
                                        spectrum   <- seq(spectra.start.column, spectra.end.column)
                                        exportdata <- cbind(alldata[,-spectrum], h)
