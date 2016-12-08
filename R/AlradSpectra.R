@@ -116,19 +116,21 @@ AlradSpectra <- function() {
   # Export plot as png graphics file
   fsaveplot    <- function(w, h,...)  {fdialog <- gfile("Save File", type="save", initialfilename="Plot", container=window,
                                                         filter=c("Portable Network Graphics (.png)"="png"))
-                                       if(!(is.na(fdialog))) #If fdialog is not equal to NA, keep running
-                                         fname <- paste0(fdialog,".png")
-                                         dev.copy(png, fname, width=w, height=h, res=100, antialias = "cleartype")
-                                         dev.off() #Close graphics device
+                                       #If fdialog is not equal to NA, keep running
+                                       if(!(is.na(fdialog))) {fname <- paste0(fdialog,".png")
+                                                              dev.copy(png, fname, width=w, height=h, res=100, antialias = "cleartype")
+                                                              dev.off() #Close graphics device
+                                                              }
                                        }
   # Export preprocessed spectra as csv file
   fsavedata    <- function(h, ...)    {fdialog <- gfile("Save File", type="save", initialfilename="Output", container=window,
                                                         filter=c("Portable Network Graphics (.png)"="png"))
-                                       if(!(is.na(fdialog))) #If fdialog is not equal to NA, keep running
-                                         fname      <- paste0(fdialog,".csv")
-                                         spectrum   <- seq(spectra.start.column, spectra.end.column)
-                                         exportdata <- cbind(alldata[,-spectrum], h)
-                                         write.csv(exportdata, row.names = FALSE, file = fname)
+                                       #If fdialog is not equal to NA, keep running        
+                                       if(!(is.na(fdialog))) {fname      <- paste0(fdialog,".csv")
+                                                              spectrum   <- seq(spectra.start.column, spectra.end.column)
+                                                              exportdata <- cbind(alldata[,-spectrum], h)
+                                                              write.csv(exportdata, row.names = FALSE, file = fname)
+                                                              }
                                        }
   # Adds preprocessing to combobox in Model tab only if it is not already there
   faddtolist   <- function(h, ...)    {present <- is.element(h, dataset)
