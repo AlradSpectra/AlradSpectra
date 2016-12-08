@@ -800,6 +800,46 @@ AlradSpectra <- function() {
   gbutton("Plot variable importance", cont = mdl.kbml, handler = function(...) fmdl.plot.imp(kbml.test))
   gbutton("KBML model results", cont = mdl.kbml, handler = function(...) fmdl.stats(kbml.train, kbml.val))
   gbutton("Plot model accuracy", cont = mdl.kbml, handler = function(...) fmdl.plot.res(kbml.train, kbml.val))
+  
+  ###################################################
+  ### Prediction module
+  ###################################################
+  
+  ### Add Prediction module to main notebook
+  pred                <- ggroup(cont = notebook, label = gettext("          Prediction          "), horizontal = F)
+  ### Browse file
+  glabel("Import spectral data for prediction:", cont = pred, anchor = c(-1,0))
+  pred.frame.imp      <- gframe("File path:", cont = pred, horizontal=T)
+  pred.file.browse    <- gedit(text = "", cont = pred.frame.imp, width = 100)
+  pred.browse.button  <- gbutton("Browse", cont = pred.frame.imp, handler = fbrowse)
+  ### Parameters
+  pred.frame.file.arg <- gframe("Parameters:", cont = pred, horizontal=TRUE)
+  pred.lyt.file.arg   <- glayout(cont = pred.frame.file.arg, expand = F)
+                         pred.lyt.file.arg[1,1,anchor=c(-1,-1)] <- "Header:"
+  pred.file.header    <- pred.lyt.file.arg[2,1,anchor=c(0,0)]   <- gradio(c("TRUE", "FALSE"), cont = pred.lyt.file.arg)
+                         pred.lyt.file.arg[1,2,anchor=c(-1,-1)] <- "Separator:"
+  pred.file.sep       <- pred.lyt.file.arg[2,2,anchor=c(1,1)]   <- gedit(text = ",", cont = pred.lyt.file.arg, width = 1)
+                         pred.lyt.file.arg[1,3,anchor=c(1,0)]   <- "Spectral data \nstarts at column:"
+  pred.spc.start.col  <- pred.lyt.file.arg[2,3,anchor=c(0,0)]   <- gedit(text = "", cont = pred.lyt.file.arg, width = 2)
+                         pred.lyt.file.arg[1,4,anchor=c(1,0)]   <- "Spectral data \nends at column:"
+  pred.spc.end.col    <- pred.lyt.file.arg[2,4,anchor=c(0,0)]   <- gedit(text = "", cont = pred.lyt.file.arg, width = 4)
+                         pred.lyt.file.arg[1,5,anchor=c(1,0)]   <- "Spectrum starts \nat wavelength:"
+  pred.spc.first      <- pred.lyt.file.arg[2,5,anchor=c(0,0)]   <- gedit(text = "", cont = pred.lyt.file.arg, width = 4)
+                         pred.lyt.file.arg[1,6,anchor=c(1,0)]   <- "Spectrum ends \nat wavelength:"
+  spc.last            <- pred.lyt.file.arg[2,6,anchor=c(0,0)]   <- gedit(text = "", cont = pred.lyt.file.arg, width = 4)
+  ### Import button
+  gbutton("Import data", cont = pred, handler = NULL)
+  ### View data button
+  gbutton("View data", cont = pred, handler = fview)
+  ### Plot imported data button
+  gbutton("Plot imported spectra", cont = pred, handler = function(...) fplot())
+  ### Select model for prediction
+  glabel("Select model for prediction:", cont = pred, anchor = c(-1,0))
+  pred.model          <- gcombobox("", cont = pred, handler = NULL)
+  gbutton("Predict", cont = pred, handler = NULL)
+  gbutton("View data", cont = pred, handler = fview)
+  gbutton("Save predictions", cont = pred, handler = fsavedata)
+  enabled(pred) = FALSE #Disable prediction module
 
   ### Focus on first tabs
   svalue(notebook) <- 1
