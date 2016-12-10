@@ -11,6 +11,23 @@ AlradSpectra <- function() {
   ### Auxiliar functions
   ###################################################
   
+  # Warning handler
+  fwarning     <- function(w)         {dispose(alert)
+                                       gmessage(message = w$message, title = "Warning", icon="warning", parent = window)
+                                       stop()
+                                       }
+  # Error handler
+  ferror       <- function(e)         {dispose(alert)
+                                       gmessage(message = e$message, title = "Error", icon="error", parent = window)
+                                       stop()
+                                       }
+  # Makes sure the user really wants to quit Alrad when closing the window.
+  fconfirmquit <- function(h, ...)    {sure <- gconfirm("Are you sure?", parent=h$obj)
+                                       if(as.logical(sure))
+                                         return(FALSE) #Close
+                                       else
+                                         return(TRUE) #Don't close
+                                       }
   # Clears all data, empties forms and resets Alrad to initial status
   fclear       <- function(...)       {gconfirm("Clear Alrad Spectra?", title="Clear", icon="warning", parent=window,
                                                 handler=function(h, ...) {svalue(file.browse)   <- ""
@@ -30,13 +47,6 @@ AlradSpectra <- function() {
                                        }
   # Handler for quit action. Makes sure the user really wants to quit Alrad.
   fquit        <- function(...)        gconfirm("Are you sure?", icon="warning", parent=window, handler=dispose(window))
-  # Makes sure the user really wants to quit Alrad when closing the window.
-  fconfirmquit <- function(h, ...)    {sure <- gconfirm("Are you sure?", parent=h$obj)
-                                       if(as.logical(sure))
-                                         return(FALSE) #Close
-                                       else
-                                         return(TRUE) #Don't close
-                                       }
   # Creates and shows the window with information about Alrad Spectra
   fabout       <- function(...)       {aboutwin <- gwindow("About Alrad Spectra", width=400, height=300, parent = window)
                                        wingroup <- ggroup(horizontal = FALSE, container = aboutwin)
@@ -59,18 +69,9 @@ AlradSpectra <- function() {
                                               )
                                        }
   # Opens up a dialog to search for file to be imported
-  fbrowse      <- function(...)        svalue(file.browse) <- gfile("Open File", type="open",
-                                                                    filter=c("Comma Separated Values (.csv)"="csv"))
-  # Warning handler
-  fwarning     <- function(w)         {dispose(alert)
-                                       gmessage(message = w$message, title = "Warning", icon="warning", parent = window)
-                                       stop()
-                                       }
-  # Error handler
-  ferror       <- function(e)         {dispose(alert)
-                                       gmessage(message = e$message, title = "Error", icon="error", parent = window)
-                                       stop()
-                                       }
+  fbrowse      <- function(h, ...)    {svalue(h) <- gfile("Open File", type="open",
+                                                          filter=c("Comma Separated Values (.csv)"="csv"),
+                                                          cont = window)}
   # Imports csv file to global environment and sets variables used afterwards
   fimport      <- function(...)       {alert <<- galert("Wait...", title = "Importing File", delay=10000, parent=notebook)
                                        tryCatch({alldata <<- read.table(file = svalue(file.browse),
@@ -101,18 +102,19 @@ AlradSpectra <- function() {
                                        Original <<- spc
                                        }
   # Opens up a window to display imported data in tabular form
-  fview        <- function(...)        gtable(alldata, cont = gwindow("View data", width = 800, height = 200, parent = window))
+  fview        <- function(h, w, ...) {gtable(h, cont = gwindow("View data", width = w, height = 200, parent = window))}
   # Plots spectral data
-  fplot        <- function(h, ylab="Reflectance", ...) {plotwin <- gwindow("Plot", width = 800, height = 600, parent = window)
-                                                        wingroup <- ggroup(horizontal=FALSE, cont=plotwin)
-                                                        ggraphics(cont = wingroup, no_popup=TRUE)
-                                                        Sys.sleep(1) #Wait for window creation before trying to plot to avoid errors
-                                                        gbutton("Save plot", cont=wingroup, handler = function(...) fsaveplot(800, 600))
-                                                        matplot(colnames(h), t(h), xlim = c(spectra.start.number,spectra.end.number),
-                                                                type = "l",
-                                                                xlab = "Wavelength (nm)",
-                                                                ylab = ylab)
-                                                        }
+  fplot        <- function(h, s, e,
+                           ylab="Reflectance", ...) {plotwin <- gwindow("Plot", width = 800, height = 600, parent = window)
+                                                     wingroup <- ggroup(horizontal=FALSE, cont=plotwin)
+                                                     ggraphics(cont = wingroup, no_popup=TRUE)
+                                                     Sys.sleep(1) #Wait for window creation before trying to plot to avoid errors
+                                                     gbutton("Save plot", cont=wingroup, handler = function(...) fsaveplot(800, 600))
+                                                     matplot(colnames(h), t(h), xlim = c(s, e),
+                                                             type = "l",
+                                                             xlab = "Wavelength (nm)",
+                                                             ylab = ylab)
+                                                     }
   # Export plot as png graphics file
   fsaveplot    <- function(w, h,...)  {fdialog <- gfile("Save File", type="save", initialfilename="Plot", container=window,
                                                         filter=c("Portable Network Graphics (.png)"="png"))
@@ -123,8 +125,8 @@ AlradSpectra <- function() {
                                                               }
                                        }
   # Export preprocessed spectra as csv file
-  fsavedata    <- function(h, ...)    {fdialog <- gfile("Save File", type="save", initialfilename="Output", container=window,
-                                                        filter=c("Portable Network Graphics (.png)"="png"))
+  fsavespectra <- function(h, ...)    {fdialog <- gfile("Save File", type="save", initialfilename="Output", container=window,
+                                                        filter=c("Comma Separated Values (.csv)"="csv"))
                                        #If fdialog is not equal to NA, keep running        
                                        if(!(is.na(fdialog))) {fname      <- paste0(fdialog,".csv")
                                                               spectrum   <- seq(spectra.start.column, spectra.end.column)
@@ -133,7 +135,7 @@ AlradSpectra <- function() {
                                                               }
                                        }
   # Adds preprocessing to combobox in Model tab only if it is not already there
-  faddtolist   <- function(h, ...)    {present <- is.element(h, dataset)
+  faddtodtset  <- function(h, ...) {present <- is.element(h, dataset)
                                        if(present==FALSE)
                                          dataset <<- c(dataset, h)
                                          select.dataset[] <<- dataset
@@ -160,8 +162,16 @@ AlradSpectra <- function() {
                                        }
   # Disables models module when dataset or validation size is changed
   fchangesplit <- function(h, ...)    enabled(mdl) = FALSE
+  # Export model or prediction results
+  fsaveresults <- function(h, ...)    {fdialog <- gfile("Save File", type="save", initialfilename="Output", container=window,
+                                                        filter=c("Comma Separated Values (.csv)"="csv"))
+                                       #If fdialog is not equal to NA, keep running        
+                                       if(!(is.na(fdialog))) {fname <- paste0(fdialog,".csv")
+                                                              write.csv(h, row.names = FALSE, file = fname)
+                                                              }
+                                       }
   # Compute model prediction errors
-  error.comp   <- function(y, yhat)   {n              <- length(y)
+  fstats       <- function(y, yhat)   {n              <- length(y)
                                        r              <- cor(y, yhat)
                                        lmy            <- lm(y~yhat)
                                        a              <- coefficients(lmy)[1]
@@ -186,8 +196,8 @@ AlradSpectra <- function() {
   # Get model accuracy and display in tabular form
   fmdl.stats    <- function(t, v, ...) {t.stats.name <- paste0(deparse(substitute(t)), ".stats") #Create training stats table name
                                         v.stats.name <- paste0(deparse(substitute(v)), ".stats") #Create validation stats table name
-                                        assign(t.stats.name, error.comp(t[,1], t[,2]), envir = .GlobalEnv) #Compute training stats
-                                        assign(v.stats.name, error.comp(v[,1], v[,2]), envir = .GlobalEnv) #Compute validation stats
+                                        assign(t.stats.name, fstats(t[,1], t[,2]), envir = .GlobalEnv) #Compute training stats
+                                        assign(v.stats.name, fstats(v[,1], v[,2]), envir = .GlobalEnv) #Compute validation stats
                                         results      <- rbind(get(t.stats.name), get(v.stats.name)) #Merge training and validation stats
                                         Set          <- c("Training", "Validation") #Titles for model results table
                                         res.table    <- cbind(Set, results) #Create model results table
@@ -196,7 +206,7 @@ AlradSpectra <- function() {
                                         stats.lyt[1,1,expand=TRUE] <- gtable(res.table, cont = stats.lyt)
                                         stats.lyt[2,1,expand=TRUE] <- gbutton("Save results", cont=stats.lyt,
                                                                               anchor=c(0,-1),
-                                                                              handler=function(...) fsavedata(res.table))
+                                                                              handler=function(...) fsaveresults(res.table))
                                         }
   # Plot model accuracy
   fmdl.plot.res <- function(t, v, ...) {plotwin      <- gwindow("Model accuracy", width = 1000, height = 400, parent = window)
@@ -204,8 +214,8 @@ AlradSpectra <- function() {
                                         ggraphics(cont = wingroup, no_popup=TRUE)
                                         t.stats.name <- paste0(deparse(substitute(t)), ".stats") #Create training stats table name
                                         v.stats.name <- paste0(deparse(substitute(v)), ".stats") #Create validation stats table name
-                                        assign(t.stats.name, error.comp(t[,1], t[,2]), envir = .GlobalEnv) #Compute training stats
-                                        assign(v.stats.name, error.comp(v[,1], v[,2]), envir = .GlobalEnv) #Compute validation stats
+                                        assign(t.stats.name, fstats(t[,1], t[,2]), envir = .GlobalEnv) #Compute training stats
+                                        assign(v.stats.name, fstats(v[,1], v[,2]), envir = .GlobalEnv) #Compute validation stats
                                         train.plot   <- ggplot2::ggplot(t, ggplot2::aes(x=t[,1], y=t[,2])) +
                                                         ggplot2::geom_point(shape=19) +
                                                         ggplot2::labs(list(title="Training set", x="Measured", y="Predicted")) +
@@ -245,6 +255,55 @@ AlradSpectra <- function() {
                                         gbutton("Save plot", cont = wingroup, handler = function(...) fsaveplot(800, 600))
                                         comp.plot <- ggplot(varImp(h), top=40)
                                         Rmisc::multiplot(comp.plot)
+  }
+  # Adds preprocessing to combobox in Model tab only if it is not already there
+  faddtomodels  <- function(h, ...) {present <- is.element(h, pred.models)
+                                     if(present==FALSE) {
+                                       if(length(pred.models)==0) { #Special case when the list is empty (first model is being added)
+                                         pred.models          <<- c(h)
+                                         select.model[]       <<- pred.models
+                                         svalue(select.model) <-  h
+                                       } else {
+                                           pred.models        <<- c(pred.models, h)
+                                           select.model[]     <<- pred.models
+                                         }
+                                       
+                                     }
+                                     }
+  # Imports csv file to global environment for prediction
+  fimport.pred  <- function(...)       {alert <<- galert("Wait...", title = "Importing File", delay=10000, parent=notebook)
+                                        tryCatch({spc <- read.table(file = svalue(pred.file.browse),
+                                                                    header = as.logical(svalue(pred.file.header)),
+                                                                    sep = svalue(pred.file.sep))
+                                                  pred.spectra.start.number <<- as.numeric(svalue(pred.spc.first))
+                                                  pred.spectra.end.number   <<- as.numeric(svalue(pred.spc.last))
+                                                  colnames(spc)             <-  c(pred.spectra.start.number:pred.spectra.end.number)
+                                                  spc.pred                  <<- spc
+                                                  },
+                                                 warning = function(w) fwarning(w),
+                                                 error =  function(e) ferror(e)
+                                                 )
+                                        enabled(pred.predict) = TRUE #Enable predict group
+                                        dispose(alert)
+                                        gmessage(message = "Import successful!", title = "File import", parent = window)
+                                        }
+  # Predict soil property based on a new spectra
+  fpredict      <- function(...)       {alert <<- galert("Wait...", title = "Importing File", delay=10000, parent=notebook)
+                                        tryCatch({colnames(spc.pred) <- paste("X", colnames(spc.pred), sep = "") #Add X before wavelength
+                                                  mdl                <- eval(parse(text = svalue(select.model))) #Get selected model
+                                                  if(svalue(select.model)=="PLSR") {#PLSR special case
+                                                    pls.pred         <-  data.frame(predict(PLSR, newdata=spc.pred))
+                                                    prediction       <<- data.frame(ID=row.names(spc.pred),
+                                                                                    Predicted=pls.pred[,ncol(pls.pred)])
+                                                  } else {
+                                                      prediction     <<- data.frame(ID=row.names(spc.pred), Predicted=predict(mdl, newdata=spc.pred))
+                                                    }
+                                                  },
+                                                 warning = function(w) fwarning(w),
+                                                 error =  function(e) ferror(e)
+                                                 )
+                                        dispose(alert)
+                                        gmessage(message = "Done!", title = "Prediction", parent = window)
                                         }
   
   ###################################################
@@ -255,7 +314,7 @@ AlradSpectra <- function() {
   fnrm         <- function(...) {alert <<- galert("Wait...", title = "Smoothing", delay=10000, parent=notebook)
                                  tryCatch(
                                           {Smoothing  <<- prospectr::movav(Original, w = as.numeric(svalue(number.smooth)))
-                                           faddtolist("Smoothing")
+                                           faddtodtset("Smoothing")
                                            },
                                           warning = function(w) fwarning(w),
                                           error =  function(e) ferror(e)
@@ -267,7 +326,7 @@ AlradSpectra <- function() {
   fbin         <- function(...) {alert <<- galert("Wait...", title = "Binning", delay=10000, parent=notebook)
                                  tryCatch(
                                           {Binning <<- prospectr::binning(Original, bin.size = as.numeric(svalue(bin.number)))
-                                           faddtolist("Binning")
+                                           faddtodtset("Binning")
                                            },
                                           warning = function(w) fwarning(w),
                                           error =  function(e) ferror(e)
@@ -279,7 +338,7 @@ AlradSpectra <- function() {
   fabs         <- function(...) {alert <<- galert("Wait...", title = "Absorbance", delay=10000, parent=notebook)
                                  tryCatch(
                                           {Absorbance <<- log10(1/Original)
-                                           faddtolist("Absorbance")
+                                           faddtodtset("Absorbance")
                                            },
                                           warning = function(w) fwarning(w),
                                           error =  function(e) ferror(e)
@@ -291,7 +350,7 @@ AlradSpectra <- function() {
   fdet         <- function(...) {alert <<- galert("Wait...", title = "Detrend", delay=10000, parent=notebook)
                                  tryCatch(
                                           {Detrend <<- prospectr::detrend(X = Original, wav = as.numeric(colnames(Original)))
-                                           faddtolist("Detrend")
+                                           faddtodtset("Detrend")
                                            },
                                           warning = function(w) fwarning(w),
                                           error =  function(e) ferror(e)
@@ -305,7 +364,7 @@ AlradSpectra <- function() {
                                           {ContRem <- prospectr::continuumRemoval(X=Original, wav = as.numeric(colnames(Original)),
                                                                                   type = "R", interpol="linear", method="division")
                                            ContinuumRemoval <<- ContRem[,c(-1,-ncol(ContRem))]
-                                           faddtolist("ContinuumRemoval")
+                                           faddtodtset("ContinuumRemoval")
                                            },
                                           warning = function(w) fwarning(w),
                                           error =  function(e) ferror(e)
@@ -320,7 +379,7 @@ AlradSpectra <- function() {
                                                                                                 p = as.numeric(svalue(sgd.poly)),
                                                                                                 w = as.numeric(svalue(sgd.smooth)),
                                                                                                 m = as.numeric(svalue(sgd.deriv)))
-                                           faddtolist("SavitzkyGolayDerivative")
+                                           faddtodtset("SavitzkyGolayDerivative")
                                            },
                                           warning = function(w) fwarning(w),
                                           error =  function(e) ferror(e)
@@ -332,7 +391,7 @@ AlradSpectra <- function() {
   fsnv         <- function(...) {alert <<- galert("Wait...", title = "SNV", delay=10000, parent=notebook)
                                  tryCatch(
                                           {SNV <<- prospectr::standardNormalVariate(X = Original)
-                                           faddtolist("SNV")
+                                           faddtodtset("SNV")
                                            },
                                           warning = function(w) fwarning(w),
                                           error =  function(e) ferror(e)
@@ -344,7 +403,7 @@ AlradSpectra <- function() {
   fmsc         <- function(...) {alert <<- galert("Wait...", title = "MSC", delay=10000, parent=notebook)
                                  tryCatch(
                                           {MSC <<- pls::msc(as.matrix(Original))
-                                           faddtolist("MSC")
+                                           faddtodtset("MSC")
                                            },
                                           warning = function(w) fwarning(w),
                                           error =  function(e) ferror(e)
@@ -358,7 +417,7 @@ AlradSpectra <- function() {
                                           {Normalization <<- clusterSim::data.Normalization(Original,
                                                                                             type = sub(":.*$","", svalue(nor.type)),
                                                                                             normalization = "row")
-                                           faddtolist("Normalization")
+                                           faddtodtset("Normalization")
                                            },
                                           warning = function(w) fwarning(w),
                                           error =  function(e) ferror(e)
@@ -379,9 +438,11 @@ AlradSpectra <- function() {
                                                                          paste(names(Train)[c(seq(1,last.col-1, by=svalue(mlr.band.interval)))],
                                                                                collapse="+"),collapse=""))
                                            mlr.model <<- stats::glm(form.mlr, data=Train)
-                                           mlr.step  <<- stats::step(mlr.model, direction="both", trace=0)
+                                           MLR       <<- stats::step(mlr.model, direction="both", trace=0)
                                            mlr.train <<- data.frame(Train[last.col], Predicted=mlr.model$fitted.values)
-                                           mlr.val   <<- data.frame(Val[last.col], Predicted=predict(mlr.step, newdata=Val))
+                                           mlr.val   <<- data.frame(Val[last.col], Predicted=predict(MLR, newdata=Val))
+                                           faddtomodels("MLR")
+                                           enabled(pred) = TRUE #Enable prediction module
                                            },
                                           warning = function(w) fwarning(w),
                                           error =  function(e) ferror(e)
@@ -389,24 +450,26 @@ AlradSpectra <- function() {
                                  dispose(alert)
                                  gmessage("MLR model done", title = "MLR model", parent = window)
                                  }
-  # PLS
+  # PLSR
   fpls        <- function(...) {alert <<- galert("Wait... \nThis may take a few minutes!", title = "PLSR model", delay=10000, parent=notebook)
                                 Sys.sleep(1)
                                 tryCatch(
-                                         {bootctrl.pls<- caret::trainControl(method <- svalue(pls.resampling),
-                                                                             number <- ifelse(grepl("cv", method), svalue(pls.kfold),
-                                                                                              (svalue(pls.kfold)+10)),
-                                                                             repeats <- ifelse (grepl("cv", method), svalue(pls.folds),
+                                         {bootctrl.pls <- caret::trainControl(method  <- svalue(pls.resampling),
+                                                                              number  <- ifelse(grepl("cv", method), svalue(pls.kfold),
+                                                                                                (svalue(pls.kfold)+10)),
+                                                                              repeats <- ifelse(grepl("cv", method), svalue(pls.folds),
                                                                                                 number)
-                                                                             )
+                                                                              )
                                           Grid      <-  expand.grid(.ncomp = seq(1,svalue(pls.comp), 1))
                                           pls.test  <<- caret::train(form.mdl, data = Train, method = 'pls',
                                                                      trControl = bootctrl.pls, tuneGrid = Grid)
-                                          pls.model <<- pls::plsr(form.mdl, data = Train, ncomp = pls.test$bestTune$ncomp)
-                                          t.pred    <-  data.frame(pls.model$fitted.values)
-                                          v.pred    <-  data.frame(predict(pls.model, newdata=Val))
+                                          PLSR      <<- pls::plsr(form.mdl, data = Train, ncomp = pls.test$bestTune$ncomp)
+                                          t.pred    <-  data.frame(PLSR$fitted.values)
+                                          v.pred    <-  data.frame(predict(PLSR, newdata=Val))
                                           pls.train <<- data.frame(Train[last.col], Predicted=t.pred[,ncol(t.pred)])
                                           pls.val   <<- data.frame(Val[last.col], Predicted=v.pred[,ncol(v.pred)])
+                                          faddtomodels("PLSR")
+                                          enabled(pred) = TRUE #Enable prediction module
                                           },
                                          warning = function(w) fwarning(w),
                                          error =  function(e) ferror(e)
@@ -421,8 +484,10 @@ AlradSpectra <- function() {
                                          {bootctrl.svm <<- caret::trainControl(method <- svalue(svm.resampling))
                                           if (svalue(svm.kernel, index=TRUE)==1) fsvmlinear()
                                           if (svalue(svm.kernel, index=TRUE)==2) fsvmradial()
-                                          svm.train    <<- data.frame(Train[last.col], Predicted=svm.model$fitted)
-                                          svm.val      <<- data.frame(Val[last.col], Predicted=predict(svm.model, newdata=Val))
+                                          svm.train    <<- data.frame(Train[last.col], Predicted=SVM$fitted)
+                                          svm.val      <<- data.frame(Val[last.col], Predicted=predict(SVM, newdata=Val))
+                                          faddtomodels("SVM")
+                                          enabled(pred) = TRUE #Enable prediction module
                                           },
                                          warning = function(w) fwarning(w),
                                          error =  function(e) ferror(e)
@@ -433,13 +498,13 @@ AlradSpectra <- function() {
   fsvmlinear  <- function(...) {Grid        <-  expand.grid(.C = seq(1,16,5))
                                 svm.test    <<- caret::train(form.mdl, data = Train, method = "svmLinear",
                                                              trControl = bootctrl.svm, tuneGrid = Grid)
-                                svm.model   <<- e1071::svm(form.mdl, data=Train, kernel="linear", type ="eps",
+                                SVM         <<- e1071::svm(form.mdl, data=Train, kernel="linear", type ="eps",
                                                            cost=svm.test$bestTune$C)
                                 }
   fsvmradial  <- function(...) {Grid        <-  expand.grid(.sigma = seq(0.000001,0.1,0.01), .C = seq(1,16,5))
                                 svm.test    <<- caret::train(form.mdl, data = Train, method = "svmRadial",
                                                              trControl = bootctrl.svm, tuneGrid = Grid)
-                                svm.model   <<- e1071::svm(form.mdl, data=Train, kernel="radial", type ="eps",
+                                SVM         <<- e1071::svm(form.mdl, data=Train, kernel="radial", type ="eps",
                                                            gamma=svm.test$bestTune$sigma, cost=svm.test$bestTune$C)
                                 }
   # RF
@@ -450,10 +515,12 @@ AlradSpectra <- function() {
                                           Grid        <- expand.grid(.mtry = seq(svalue(rf.mtry)/5,svalue(rf.mtry),svalue(rf.mtry)/5))
                                           rf.test     <<- caret::train(form.mdl, data = Train, method = 'rf', trControl = bootControl,
                                                                        tuneGrid = Grid, importance = TRUE)
-                                          rf.model    <<- randomForest::randomForest(form.mdl, data=Train, mtry=rf.test$bestTune$mtry,
+                                          RF          <<- randomForest::randomForest(form.mdl, data=Train, mtry=rf.test$bestTune$mtry,
                                                                                      ntree = as.numeric(svalue(rf.ntree)))
-                                          rf.train    <<- data.frame(Train[last.col], Predicted=rf.model$predicted)
-                                          rf.val      <<- data.frame(Val[last.col], Predicted=predict(rf.model, newdata=Val))
+                                          rf.train    <<- data.frame(Train[last.col], Predicted=RF$predicted)
+                                          rf.val      <<- data.frame(Val[last.col], Predicted=predict(RF, newdata=Val))
+                                          faddtomodels("RF")
+                                          enabled(pred) = TRUE #Enable prediction module
                                           },
                                          warning = function(w) fwarning(w),
                                          error =  function(e) ferror(e)
@@ -470,10 +537,12 @@ AlradSpectra <- function() {
                                                                        .actfun= c("sin", "radbas", "purelin", "tansig"))
                                            ann.test     <<- caret::train(form.mdl, data = Train, method = 'elm', trControl = bootControl,
                                                                          tuneGrid =Grid ,na.action = na.omit)
-                                           ann.model    <<- elmNN::elmtrain(form.mdl, data=Train, nhid=ann.test$bestTune$nhid,
+                                           ANN          <<- elmNN::elmtrain(form.mdl, data=Train, nhid=ann.test$bestTune$nhid,
                                                                             actfun= ann.test$bestTune$actfun)
-                                           ann.train    <<- data.frame(Train[last.col], Predicted=ann.model$fitted.values)
-                                           ann.val      <<- data.frame(Val[last.col], Predicted=predict(ann.model, newdata=Val))
+                                           ann.train    <<- data.frame(Train[last.col], Predicted=ANN$fitted.values)
+                                           ann.val      <<- data.frame(Val[last.col], Predicted=predict(ANN, newdata=Val))
+                                           faddtomodels("ANN")
+                                           enabled(pred) = TRUE #Enable prediction module
                                            },
                                           warning = function(w) fwarning(w),
                                           error =  function(e) ferror(e)
@@ -488,8 +557,10 @@ AlradSpectra <- function() {
                                           {bootctrl.kbml <<- caret::trainControl(method= svalue(kbml.resampling))
                                            if (svalue(kbml.kernel, index=TRUE)==1) fkbmllinear()
                                            if (svalue(kbml.kernel, index=TRUE)==2) fkbmlradial()
-                                           kbml.train    <<- data.frame(Train[last.col], Predicted=predict(kbml.model, newdata=Train))
-                                           kbml.val      <<- data.frame(Val[last.col], Predicted=predict(kbml.model, newdata=Val))
+                                           kbml.train    <<- data.frame(Train[last.col], Predicted=predict(KBML, newdata=Train))
+                                           kbml.val      <<- data.frame(Val[last.col], Predicted=predict(KBML, newdata=Val))
+                                           faddtomodels("KBML")
+                                           enabled(pred) = TRUE #Enable prediction module
                                            },
                                           warning = function(w) fwarning(w),
                                           error =  function(e) ferror(e)
@@ -499,14 +570,14 @@ AlradSpectra <- function() {
                                  }
   fkbmllinear  <- function(...) {kbml.test <<- caret::train(form.mdl, data = Train, method = 'gaussprLinear',
                                                             trControl = bootctrl.kbml, tuneLength = 10)
-                                kbml.model <<- kernlab::gausspr(form.mdl, data=Train, kernel= "vanilladot",
+                                KBML       <<- kernlab::gausspr(form.mdl, data=Train, kernel= "vanilladot",
                                                                 type = "regression", kpar= "automatic", variance.model = T,
                                                                 var=as.numeric(svalue(kbml.var)), cross= svalue(kbml.cross))
                                 }
   fkbmlradial  <- function(...) {Grid      <-  expand.grid(.sigma = seq(.00001,.1,.005))
                                 kbml.test  <<- caret::train(form.mdl, data = Train, method = 'gaussprRadial', tuneLength = 10,
                                                             trControl = bootctrl.kbml, tuneGrid = Grid)
-                                kbml.model <<- kernlab::gausspr(form.mdl, data=Train, kernel="rbfdot",
+                                KBML       <<- kernlab::gausspr(form.mdl, data=Train, kernel="rbfdot",
                                                                 type ="regression", kpar= "automatic", variance.model = T,
                                                                 var=svalue(kbml.var), cross= svalue(kbml.cross))
                                 }
@@ -531,6 +602,7 @@ AlradSpectra <- function() {
                             "satlins","tan-sigmoid","triangular basis", "positive linear")
   kernel.param.kbml    <- c("Linear kernel", "Radial kernel")
   kbml.param.var       <- c(.0001,.001,.01,.1,1,10,100)
+  pred.models          <- c()
 
   ###################################################
   ### Main window
@@ -559,7 +631,7 @@ AlradSpectra <- function() {
   ### Browse file
   frame.imp      <- gframe("File path:", cont = import, horizontal=T)
   file.browse    <- gedit(text = "", cont = frame.imp, width = 100)
-  browse.button  <- gbutton("Browse", cont = frame.imp, handler = fbrowse)
+  browse.button  <- gbutton("  Browse  ", cont = frame.imp, handler = function(...) fbrowse(file.browse))
   ### Parameters
   frame.file.arg <- gframe("Parameters:", cont = import, horizontal=TRUE)
   lyt.file.arg   <- glayout(cont = frame.file.arg, expand = F)
@@ -580,9 +652,9 @@ AlradSpectra <- function() {
   ### Import button
   gbutton("Import data", cont = import, handler = fimport)
   ### View data button
-  gbutton("View data", cont = import, handler = fview)
+  gbutton("View data", cont = import, handler = function(...) fview(alldata, 800))
   ### Plot imported data button
-  gbutton("Plot imported spectra", cont = import, handler = function(...) fplot(Original))
+  gbutton("Plot imported spectra", cont = import, handler = function(...) fplot(Original, spectra.start.number, spectra.end.number))
 
   ###################################################
   ### Preprocessing module
@@ -609,8 +681,8 @@ AlradSpectra <- function() {
   lyt.param.nrm[1,1] <- "Number of smoothing points"
   number.smooth      <- lyt.param.nrm[2,1] <- gspinbutton(from = 5, to = 101, by = 2, cont = lyt.param.nrm)
   gbutton("Run", cont = nrm, handler = fnrm)
-  gbutton("Plot spectra", cont = nrm, handler = function(...) fplot(Smoothing))
-  gbutton("Save preprocessed spectra", cont = nrm, handler = function(...) fsavedata(Smoothing))
+  gbutton("Plot spectra", cont = nrm, handler = function(...) fplot(Smoothing, spectra.start.number, spectra.end.number))
+  gbutton("Save preprocessed spectra", cont = nrm, handler = function(...) fsavespectra(Smoothing))
   ### Binning
   frame.desc.bin     <- gframe("Description:", cont = bin, horizontal = T)
   lyt.desc.bin       <- glayout(cont = frame.desc.bin , expand = TRUE)
@@ -620,22 +692,22 @@ AlradSpectra <- function() {
   lyt.param.bin[1,1] <- "Bin size"
   bin.number         <- lyt.param.bin[2,1:4] <- gspinbutton(from = 2, to = 100, by = 1, cont = lyt.param.bin)
   gbutton("Run", cont = bin, handler = fbin)
-  gbutton("Plot spectra", cont = bin, handler = function(...) fplot(Binning))
-  gbutton("Save preprocessed spectra", cont = bin, handler = function(...) fsavedata(Binning))
+  gbutton("Plot spectra", cont = bin, handler = function(...) fplot(Binning, spectra.start.number, spectra.end.number))
+  gbutton("Save preprocessed spectra", cont = bin, handler = function(...) fsavespectra(Binning))
   ### Absorbance
   frame.desc.abs     <- gframe("Description:", cont = abs, horizontal=T)
   lyt.desc.abs       <- glayout(cont = frame.desc.abs, expand = TRUE)
   lyt.desc.abs[1,1]  <- "Transforms reflectance to absorbance values (log10(1/R))."
   gbutton("Run", cont = abs, handler = fabs)
-  gbutton("Plot spectra", cont = abs, handler = function(...) fplot(Absorbance, ylab="Absorbance"))
-  gbutton("Save preprocessed spectra", cont = abs, handler = function(...) fsavedata(Absorbance))
+  gbutton("Plot spectra", cont = abs, handler = function(...) fplot(Absorbance, spectra.start.number, spectra.end.number, ylab="Absorbance"))
+  gbutton("Save preprocessed spectra", cont = abs, handler = function(...) fsavespectra(Absorbance))
   ### Detrend
   frame.desc.det     <- gframe("Description:", cont = det, horizontal=T)
   lyt.desc.det       <- glayout(cont = frame.desc.det, expand = TRUE)
   lyt.desc.det[1,1]  <- "Normalizes each row by applying a Standard Normal Variate transformation followed by fitting a second order \nlinear model and returning the fitted residuals. Package: prospectr"
   gbutton("Run", cont = det, handler = fdet)
-  gbutton("Plot spectra", cont = det, handler = function(...) fplot(Detrend))
-  gbutton("Save preprocessed spectra", cont = det, handler = function(...) fsavedata(Detrend))
+  gbutton("Plot spectra", cont = det, handler = function(...) fplot(Detrend, spectra.start.number, spectra.end.number))
+  gbutton("Save preprocessed spectra", cont = det, handler = function(...) fsavespectra(Detrend))
   ### Continuum Removal
   frame.desc.crm     <- gframe("Description:", cont = crm, horizontal=T)
   lyt.desc.crm       <- glayout(cont = frame.desc.crm, expand = TRUE)
@@ -644,8 +716,8 @@ AlradSpectra <- function() {
   lyt.desc.crm[3,1]  <- "Interpolation method: Linear"
   lyt.desc.crm[4,1]  <- "Normalization method: Division"
   gbutton("Run", cont = crm, handler = fcrm)
-  gbutton("Plot spectra", cont = crm, handler = function(...) fplot(ContinuumRemoval))
-  gbutton("Save preprocessed spectra", cont = crm, handler = function(...) fsavedata(ContinuumRemoval))
+  gbutton("Plot spectra", cont = crm, handler = function(...) fplot(ContinuumRemoval, spectra.start.number, spectra.end.number))
+  gbutton("Save preprocessed spectra", cont = crm, handler = function(...) fsavespectra(ContinuumRemoval))
   ### SG Derivative
   frame.desc.sgd     <- gframe("Description:",cont = sgd, horizontal = T)
   lyt.desc.sgd       <- glayout(cont = frame.desc.sgd , expand = TRUE)
@@ -659,22 +731,22 @@ AlradSpectra <- function() {
   lyt.param.sgd[1,3] <- "Derivative order"
   sgd.deriv          <- lyt.param.sgd[2,3] <- gcombobox(sgderivarive, cont = lyt.param.sgd)
   gbutton("Run", cont = sgd, handler = fsgd)
-  gbutton("Plot spectra", cont = sgd, handler = function(...) fplot(SavitzkyGolayDerivative))
-  gbutton("Save preprocessed spectra", cont = sgd, handler = function(...) fsavedata(SavitzkyGolayDerivative))
+  gbutton("Plot spectra", cont = sgd, handler = function(...) fplot(SavitzkyGolayDerivative, spectra.start.number, spectra.end.number))
+  gbutton("Save preprocessed spectra", cont = sgd, handler = function(...) fsavespectra(SavitzkyGolayDerivative))
   ### SNV
   frame.desc.snv     <- gframe("Description:", cont = snv, horizontal=T)
   lyt.desc.snv       <- glayout(cont = frame.desc.snv, expand = TRUE)
   lyt.desc.snv[1,1]  <- "Standard Normal Variate normalizes each row by substracting each row by its mean and dividing by \nits standard deviation. Package: prospectr"
   gbutton("Run", cont = snv, handler = fsnv)
-  gbutton("Plot spectra", cont = snv, handler = function(...) fplot(SNV))
-  gbutton("Save preprocessed spectra", cont = snv, handler = function(...) fsavedata(SNV))
+  gbutton("Plot spectra", cont = snv, handler = function(...) fplot(SNV, spectra.start.number, spectra.end.number))
+  gbutton("Save preprocessed spectra", cont = snv, handler = function(...) fsavespectra(SNV))
   ### MSC
   frame.desc.msc     <- gframe("Description:", cont = msc, horizontal=T)
   lyt.desc.msc       <- glayout(cont = frame.desc.msc, expand = TRUE)
   lyt.desc.msc[1,1]  <- "Performs multiplicative scatter/signal correction on spectral data. Package: pls"
   gbutton("Run", cont = msc, handler = fmsc)
-  gbutton("Plot spectra", cont = msc, handler = function(...) fplot(MSC))
-  gbutton("Save preprocessed spectra", cont = msc, handler = function(...) fsavedata(MSC))
+  gbutton("Plot spectra", cont = msc, handler = function(...) fplot(MSC, spectra.start.number, spectra.end.number))
+  gbutton("Save preprocessed spectra", cont = msc, handler = function(...) fsavespectra(MSC))
   ### Normalization
   frame.desc.nor     <- gframe("Description:",cont = nor, horizontal = T)
   lyt.desc.nor       <- glayout(cont = frame.desc.nor , expand = TRUE)
@@ -684,8 +756,8 @@ AlradSpectra <- function() {
   lyt.param.nor[1,1] <- "Type of Normalization."
   nor.type           <- lyt.param.nor[2,1] <- gradio(normalization.types, checked = T, cont = lyt.param.nor)
   gbutton("Run", cont = nor, handler = fnor)
-  gbutton("Plot spectra", cont = nor, handler = function(...) fplot(Normalization))
-  gbutton("Save preprocessed spectra", cont = nor, handler = function(...) fsavedata(Normalization))
+  gbutton("Plot spectra", cont = nor, handler = function(...) fplot(Normalization, spectra.start.number, spectra.end.number))
+  gbutton("Save preprocessed spectra", cont = nor, handler = function(...) fsavespectra(Normalization))
 
   ###################################################
   ### Modeling module
@@ -807,38 +879,41 @@ AlradSpectra <- function() {
   
   ### Add Prediction module to main notebook
   pred                <- ggroup(cont = notebook, label = gettext("          Prediction          "), horizontal = F)
+  ### Create import group
+  pred.imp            <- ggroup(cont = pred, horizontal = F)
   ### Browse file
-  glabel("Import spectral data for prediction:", cont = pred, anchor = c(-1,0))
-  pred.frame.imp      <- gframe("File path:", cont = pred, horizontal=T)
+  glabel("Import spectral data for prediction (file must contain only spectra):", cont = pred.imp, anchor = c(-1,0))
+  pred.frame.imp      <- gframe("File path:", cont = pred.imp, horizontal=T)
   pred.file.browse    <- gedit(text = "", cont = pred.frame.imp, width = 100)
-  pred.browse.button  <- gbutton("Browse", cont = pred.frame.imp, handler = fbrowse)
+  pred.browse.button  <- gbutton("  Browse  ", cont = pred.frame.imp, handler = function(...) fbrowse(pred.file.browse))
   ### Parameters
-  pred.frame.file.arg <- gframe("Parameters:", cont = pred, horizontal=TRUE)
+  pred.frame.file.arg <- gframe("Parameters:", cont = pred.imp, horizontal=TRUE)
   pred.lyt.file.arg   <- glayout(cont = pred.frame.file.arg, expand = F)
                          pred.lyt.file.arg[1,1,anchor=c(-1,-1)] <- "Header:"
   pred.file.header    <- pred.lyt.file.arg[2,1,anchor=c(0,0)]   <- gradio(c("TRUE", "FALSE"), cont = pred.lyt.file.arg)
                          pred.lyt.file.arg[1,2,anchor=c(-1,-1)] <- "Separator:"
   pred.file.sep       <- pred.lyt.file.arg[2,2,anchor=c(1,1)]   <- gedit(text = ",", cont = pred.lyt.file.arg, width = 1)
-                         pred.lyt.file.arg[1,3,anchor=c(1,0)]   <- "Spectral data \nstarts at column:"
-  pred.spc.start.col  <- pred.lyt.file.arg[2,3,anchor=c(0,0)]   <- gedit(text = "", cont = pred.lyt.file.arg, width = 2)
-                         pred.lyt.file.arg[1,4,anchor=c(1,0)]   <- "Spectral data \nends at column:"
-  pred.spc.end.col    <- pred.lyt.file.arg[2,4,anchor=c(0,0)]   <- gedit(text = "", cont = pred.lyt.file.arg, width = 4)
-                         pred.lyt.file.arg[1,5,anchor=c(1,0)]   <- "Spectrum starts \nat wavelength:"
-  pred.spc.first      <- pred.lyt.file.arg[2,5,anchor=c(0,0)]   <- gedit(text = "", cont = pred.lyt.file.arg, width = 4)
-                         pred.lyt.file.arg[1,6,anchor=c(1,0)]   <- "Spectrum ends \nat wavelength:"
-  spc.last            <- pred.lyt.file.arg[2,6,anchor=c(0,0)]   <- gedit(text = "", cont = pred.lyt.file.arg, width = 4)
+                         pred.lyt.file.arg[1,3,anchor=c(1,0)]   <- "Spectrum starts \nat wavelength:"
+  pred.spc.first      <- pred.lyt.file.arg[2,3,anchor=c(0,0)]   <- gedit(text = "", cont = pred.lyt.file.arg, width = 4)
+                         pred.lyt.file.arg[1,4,anchor=c(1,0)]   <- "Spectrum ends \nat wavelength:"
+  pred.spc.last       <- pred.lyt.file.arg[2,4,anchor=c(0,0)]   <- gedit(text = "", cont = pred.lyt.file.arg, width = 4)
   ### Import button
-  gbutton("Import data", cont = pred, handler = NULL)
+  gbutton("Import data", cont = pred.imp, handler = fimport.pred)
   ### View data button
-  gbutton("View data", cont = pred, handler = fview)
+  gbutton("View data", cont = pred.imp, handler = function(...) fview(spc.pred, 800))
   ### Plot imported data button
-  gbutton("Plot imported spectra", cont = pred, handler = function(...) fplot())
+  gbutton("Plot imported spectra", cont = pred.imp, handler = function(...) fplot(spc.pred, pred.spectra.start.number, pred.spectra.end.number))
+  ### Draw a separator line
+  gseparator(cont = pred)
+  ### Create predict group
+  pred.predict        <- ggroup(cont = pred, horizontal = F)
   ### Select model for prediction
-  glabel("Select model for prediction:", cont = pred, anchor = c(-1,0))
-  pred.model          <- gcombobox("", cont = pred, handler = NULL)
-  gbutton("Predict", cont = pred, handler = NULL)
-  gbutton("View data", cont = pred, handler = fview)
-  gbutton("Save predictions", cont = pred, handler = fsavedata)
+  glabel("Select model for prediction:", cont = pred.predict, anchor = c(-1,0))
+  select.model        <- gcombobox("", cont = pred.predict)
+  gbutton("Predict", cont = pred.predict, handler = fpredict)
+  gbutton("View predictions", cont = pred.predict, handler = function(...) fview(prediction, 300))
+  gbutton("Save predictions", cont = pred.predict, handler = function(...) fsaveresults(prediction))
+  enabled(pred.predict) = FALSE #Disable predict group
   enabled(pred) = FALSE #Disable prediction module
 
   ### Focus on first tabs
