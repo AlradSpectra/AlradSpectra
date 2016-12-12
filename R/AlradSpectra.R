@@ -840,7 +840,7 @@ AlradSpectra <- function() {
   mdl.ann            <- ggroup(cont = mdl, horizontal = F,label = gettext("    ANN    "))
   frame.desc.ann     <- gframe("Description:",cont = mdl.ann, horizontal = T)
   lyt.desc.ann       <- glayout(cont = frame.desc.ann, expand = TRUE)
-  lyt.desc.ann[1,1]  <- "Artificial Neural Network. Packages: elmNN / caret"
+  lyt.desc.ann[1,1]  <- "Artificial Neural Network. Packages: elmNN / caret / MASS"
   frame.param.ann    <- gframe("Tuning parameters:", cont = mdl.ann, horizontal=T)
   lyt.param.ann      <- glayout(cont = frame.param.ann , expand = TRUE)
   lyt.param.ann[1,1] <- "Resampling method"
@@ -882,7 +882,8 @@ AlradSpectra <- function() {
   ### Create import group
   pred.imp            <- ggroup(cont = pred, horizontal = F)
   ### Browse file
-  glabel("Import spectral data for prediction (file must contain only spectra):", cont = pred.imp, anchor = c(-1,0))
+  glabel("Import spectral data for Prediction:\nConditions:\n-File must contain only spectral data.\n-Spectral data for Prediction and Modeling must contain the same length.\n-Spectral data used here must have the same preprocessing used to build the model",
+         cont = pred.imp, anchor = c(-1,0))
   pred.frame.imp      <- gframe("File path:", cont = pred.imp, horizontal=T)
   pred.file.browse    <- gedit(text = "", cont = pred.frame.imp, width = 100)
   pred.browse.button  <- gbutton("  Browse  ", cont = pred.frame.imp, handler = function(...) fbrowse(pred.file.browse))
