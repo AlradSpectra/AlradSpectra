@@ -1,6 +1,6 @@
-#' A GUI for preprocessing and modeling soil spectra
+#' A GUI for preprocessing soil spectra and predicting soil properties.
 #'
-#' AlradSpectra provides a friendly user interface to apply preprocessing functions to soil spectra and run models on your data
+#' AlradSpectra provides a friendly GUI to apply preprocessing functions to soil spectra and predict soil properties using a model. 
 #' @author Andre Dotto, \email{andrecdot@gmail.com}
 #' @import gWidgets
 #' @export
