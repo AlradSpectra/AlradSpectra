@@ -883,7 +883,7 @@ AlradSpectra <- function() {
   ### Create import group
   pred.imp            <- ggroup(cont = pred, horizontal = F)
   ### Browse file
-  glabel("Import spectral data for Prediction\n  Conditions:\n-File must contain only spectral data.\n-Spectral data for Prediction and Modeling must be the same length.\n-Spectral data used here must be the same preprocessing used to build the model.",
+  glabel("Import spectral data for Prediction\n  Conditions:\n-File must contain only spectral data.\n-Spectral data for Prediction and Modeling must be the same length.\n-Spectral data used here must have the same preprocessing used to build the model.",
          cont = pred.imp, anchor = c(-1,0))
   pred.frame.imp      <- gframe("File path:", cont = pred.imp, horizontal=T)
   pred.file.browse    <- gedit(text = "", cont = pred.frame.imp, width = 100)
