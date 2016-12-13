@@ -636,7 +636,7 @@ AlradSpectra <- function() {
   frame.file.arg <- gframe("Parameters:", cont = import, horizontal=TRUE)
   lyt.file.arg   <- glayout(cont = frame.file.arg, expand = F)
                     lyt.file.arg[1,1,anchor=c(-1,-1)] <- "Header:"
-  file.header    <- lyt.file.arg[2,1,anchor=c(0,0)]   <- gradio(c("TRUE", "FALSE"), cont = lyt.file.arg)
+  file.header    <- lyt.file.arg[2,1,anchor=c(0,0)]   <- gcombobox(c("TRUE", "FALSE"), cont = lyt.file.arg)
                     lyt.file.arg[1,2,anchor=c(-1,-1)] <- "Separator:"
   file.sep       <- lyt.file.arg[2,2,anchor=c(1,1)]   <- gedit(text = ",", cont = lyt.file.arg, width = 1)
                     lyt.file.arg[1,3,anchor=c(1,0)]   <- "Spectral data \nstarts at column:"
@@ -891,7 +891,7 @@ AlradSpectra <- function() {
   pred.frame.file.arg <- gframe("Parameters:", cont = pred.imp, horizontal=TRUE)
   pred.lyt.file.arg   <- glayout(cont = pred.frame.file.arg, expand = F)
                          pred.lyt.file.arg[1,1,anchor=c(-1,-1)] <- "Header:"
-  pred.file.header    <- pred.lyt.file.arg[2,1,anchor=c(0,0)]   <- gradio(c("TRUE", "FALSE"), cont = pred.lyt.file.arg)
+  pred.file.header    <- pred.lyt.file.arg[2,1,anchor=c(0,0)]   <- gcombobox(c("TRUE", "FALSE"), cont = pred.lyt.file.arg)
                          pred.lyt.file.arg[1,2,anchor=c(-1,-1)] <- "Separator:"
   pred.file.sep       <- pred.lyt.file.arg[2,2,anchor=c(1,1)]   <- gedit(text = ",", cont = pred.lyt.file.arg, width = 1)
                          pred.lyt.file.arg[1,3,anchor=c(1,0)]   <- "Spectrum starts \nat wavelength:"
