@@ -2,14 +2,14 @@
 % Please edit documentation in R/AlradSpectra.R
 \name{AlradSpectra}
 \alias{AlradSpectra}
-\title{A GUI for preprocessing and modeling soil spectra}
+\title{A GUI for preprocessing soil spectra and predicting soil properties}
 \usage{
 AlradSpectra()
 }
 \description{
-AlradSpectra provides a friendly user interface to apply preprocessing functions to soil spectra and run models on your data
+Alrad Spectra provides a friendly GUI to apply preprocessing functions to soil spectra and predict soil properties using models.
 }
 \author{
-Andre Dotto, \email{andrecdot@gmail.com}
+Andre C. Dotto, \email{andrecdot@gmail.com}
 }
 
