@@ -1,5 +1,5 @@
 Package: AlradSpectra
-Title: A GUI for preprocessing soil spectra and predicting soil properties.
+Title: A GUI for preprocessing soil spectra and predicting soil properties
 Version: 0.1
 Date: 2016-12-13
 Authors@R: c(person("Andre C.", "Dotto", email = "andrecdot@gmail.com", role = c("aut", "cre")),
