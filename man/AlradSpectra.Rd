@@ -7,9 +7,9 @@
 AlradSpectra()
 }
 \description{
-Alrad Spectra provides a friendly GUI to apply preprocessing functions to soil spectra and predict soil properties using models.
+AlradSpectra provides a friendly GUI to apply preprocessing functions to soil spectra and predict soil properties using models.
 }
 \author{
-Andre C. Dotto, \email{andrecdot@gmail.com}
+Andre Dotto, \email{andrecdot@gmail.com}
 }
 
