@@ -51,7 +51,7 @@ AlradSpectra <- function() {
   # Creates and shows the window with information about Alrad Spectra
   fabout       <- function(...)       {aboutwin <- gwindow("About Alrad Spectra", width=400, height=300, parent = window)
                                        wingroup <- ggroup(horizontal = FALSE, container = aboutwin)
-                                       gimage(system.file("images","AlradLogo.bmp", package="AlradSpectra"), container = wingroup)
+                                       gimage(system.file("images","AlradLogo2.png", package="AlradSpectra"), container = wingroup)
                                        glabel(paste0("Soil spectra preprocessing and modeling\n\n",
                                                      "Developed by researchers at\n",
                                                      "Federal University of Santa Maria and\n",
