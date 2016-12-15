@@ -3,7 +3,7 @@ Title: A GUI for preprocessing soil spectra and predicting soil properties
 Version: 0.1
 Date: 2016-12-13
 Authors@R: c(person("Andre C.", "Dotto", email = "andrecdot@gmail.com", role = c("aut", "cre")),
-             person("Diego J.", "Gris", email = "diegojgris@gmail.com", role = c("aut", "cre")),
+             person("Diego J.", "Gris", email = "diegojgris@gmail.com", role = "aut"),
              person("Luis F. C.", "Ruiz", role= "ctb"),
              person("Alexandre", "ten Caten", role= "ctb"),
              person("Ricardo S. D.", "Dalmolin", role= "ctb"))
