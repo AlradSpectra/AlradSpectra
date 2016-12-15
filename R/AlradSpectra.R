@@ -52,7 +52,7 @@ AlradSpectra <- function() {
   fabout       <- function(...)       {aboutwin <- gwindow("About Alrad Spectra", width=400, height=300, parent = window)
                                        wingroup <- ggroup(horizontal = FALSE, container = aboutwin)
                                        gimage(system.file("images","AlradLogo2.png", package="AlradSpectra"), container = wingroup)
-                                       glabel(paste0("Soil spectra preprocessing and modeling\n\n",
+                                       glabel(paste0("A GUI for preprocessing soil spectra and predicting soil properties\n\n",
                                                      "Developed by researchers at\n",
                                                      "Federal University of Santa Maria and\n",
                                                      "Federal University of Santa Catarina, Brazil.\n\n",
@@ -64,7 +64,7 @@ AlradSpectra <- function() {
                                                      "<b>D</b>","iego Gris\n",
                                                      "\n",
                                                      "For further information:\n",
-                                                     "<i>http://www.linktopaper.com/</i>\n\n",
+                                                     "<i>Contact the authors by e-mail.\nTAlrad Spectra paper will be available soon.</i>\n\n",
                                                      sep="", collapse=""),
                                               markup = TRUE, container = wingroup
                                               )
