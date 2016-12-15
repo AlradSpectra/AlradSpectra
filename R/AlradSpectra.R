@@ -64,7 +64,7 @@ AlradSpectra <- function() {
                                                      "<b>D</b>","iego Gris\n",
                                                      "\n",
                                                      "For further information:\n",
-                                                     "<i>Contact the authors by e-mail.\nTAlrad Spectra paper will be available soon.</i>\n\n",
+                                                     "<i>Contact the authors by e-mail.\nAlrad Spectra paper will be available soon.</i>\n\n",
                                                      sep="", collapse=""),
                                               markup = TRUE, container = wingroup
                                               )
