@@ -11,7 +11,8 @@ Description: Alrad Spectra provides a friendly GUI to apply preprocessing functi
 Depends: 
     R (>= 3.0)
 Imports: 
-    ade4, 
+    ade4,
+    assertthat,
     cairoDevice,
     car, 
     caret,
