@@ -42,6 +42,7 @@ AlradSpectra <- function() {
                                                                           enabled(pp) = FALSE
                                                                           enabled(models) = FALSE
                                                                           enabled(mdl) = FALSE
+                                                                          enabled(pred) = FALSE
                                                                           rm(envir=.GlobalEnv) #Remove everything in Global Environment
                                                                           }
                                                 )
