@@ -2,12 +2,12 @@
 % Please edit documentation in R/AlradSpectra.R
 \name{AlradSpectra}
 \alias{AlradSpectra}
-\title{A GUI for preprocessing soil spectra and predicting soil properties}
+\title{A GUI for preprocessing spectra and predicting environmental variables}
 \usage{
 AlradSpectra()
 }
 \description{
-AlradSpectra provides a friendly GUI to apply preprocessing functions to soil spectra and predict soil properties using models.
+AlradSpectra provides a friendly GUI to apply preprocessing functions to spectra and predict environmental variables using models.
 }
 \author{
 Andre C. Dotto, \email{andrecdot@gmail.com}

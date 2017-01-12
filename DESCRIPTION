@@ -1,13 +1,13 @@
 Package: AlradSpectra
-Title: A GUI for preprocessing soil spectra and predicting soil properties
+Title: A GUI for preprocessing spectra and predicting environmental variables
 Version: 0.1
-Date: 2016-12-13
+Date: 2017-01-12
 Authors@R: c(person("Andre C.", "Dotto", email = "andrecdot@gmail.com", role = c("aut", "cre")),
              person("Diego J.", "Gris", email = "diegojgris@gmail.com", role = "aut"),
              person("Luis F. C.", "Ruiz", role= "ctb"),
              person("Alexandre", "ten Caten", role= "ctb"),
              person("Ricardo S. D.", "Dalmolin", role= "ctb"))
-Description: Alrad Spectra provides a friendly GUI to apply preprocessing functions to soil spectra and predict soil properties using models.
+Description: Alrad Spectra provides a friendly GUI to apply preprocessing functions to spectra and predict environmental variables using models.
 Depends: 
     R (>= 3.0)
 Imports: 

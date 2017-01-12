@@ -1,6 +1,6 @@
-#' A GUI for preprocessing soil spectra and predicting soil properties
+#' A GUI for preprocessing spectra and predicting environmental variables
 #'
-#' AlradSpectra provides a friendly GUI to apply preprocessing functions to soil spectra and predict soil properties using models. 
+#' AlradSpectra provides a friendly GUI to apply preprocessing functions to spectra and predict environmental variables using models. 
 #' @author Andre C. Dotto, \email{andrecdot@gmail.com}
 #' @author Diego J. Gris, \email{diegojgris@gmail.com}
 #' @import gWidgets
@@ -53,7 +53,7 @@ AlradSpectra <- function() {
   fabout       <- function(...)       {aboutwin <- gwindow("About Alrad Spectra", width=400, height=300, parent = window)
                                        wingroup <- ggroup(horizontal = FALSE, container = aboutwin)
                                        gimage(system.file("images","AlradLogo2.png", package="AlradSpectra"), container = wingroup)
-                                       glabel(paste0("A GUI for preprocessing soil spectra and predicting soil properties\n\n",
+                                       glabel(paste0("A GUI for preprocessing spectra and predicting environmental variables\n\n",
                                                      "Developed by researchers at\n",
                                                      "Federal University of Santa Maria and\n",
                                                      "Federal University of Santa Catarina, Brazil.\n\n",
@@ -649,7 +649,7 @@ AlradSpectra <- function() {
   spc.first      <- lyt.file.arg[2,5,anchor=c(0,0)]   <- gedit(text = "", cont = lyt.file.arg, width = 4)
                     lyt.file.arg[1,6,anchor=c(1,0)]   <- "Spectrum ends \nat wavelength:"
   spc.last       <- lyt.file.arg[2,6,anchor=c(0,0)]   <- gedit(text = "", cont = lyt.file.arg, width = 4)
-                    lyt.file.arg[1,7,anchor=c(1,0)]   <- "Soil variable \nis at column:"
+                    lyt.file.arg[1,7,anchor=c(1,0)]   <- "Environmental variable \nis at column:"
   soil.var.col   <- lyt.file.arg[2,7,anchor=c(0,0)]   <- gedit(text = "", cont = lyt.file.arg, width = 4)
   ### Import button
   gbutton("Import data", cont = import, handler = fimport)
