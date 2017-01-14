@@ -33,6 +33,7 @@ Imports:
     gWidgetsRGtk2,
     htmltools,
     htmlwidgets,
+    httpuv,
     httr, 
     iterators, 
     jsonlite, 
@@ -41,13 +42,18 @@ Imports:
     labeling,
     lattice, 
     lazyeval,
+    lme4,
+    magrittr,
     MASS, 
+    MatrixModels,
     memoise, 
     methods, 
+    minqa,
     modeest, 
     ModelMetrics, 
     munsell,
     nlme, 
+    nloptr,
     pbkrtest,
     plyr,
     pls,
@@ -65,13 +71,17 @@ Imports:
     rstudioapi,
     scales,
     shiny,
+    SparseM, 
     stats, 
     stats4, 
+    stringi,
+    stringr,
     tibble, 
     tools, 
     utils, 
     whisker, 
-    withr
+    withr,
+    xtable
 Suggests:
     BiocInstaller, 
     bitops, 
@@ -118,13 +128,11 @@ Suggests:
     rpart, 
     rversions, 
     sp,
-    SparseM, 
     spls, 
     subselect, 
     superpc, 
     svglite, 
-    testthat,
-    xtable
+    testthat
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
