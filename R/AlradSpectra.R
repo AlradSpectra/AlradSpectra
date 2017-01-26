@@ -538,7 +538,7 @@ AlradSpectra <- function() {
                                            Grid         <- expand.grid(.nhid= seq(1,svalue(ann.hid),ceiling(svalue(ann.hid)/10)),
                                                                        .actfun= c("sin", "radbas", "purelin", "tansig"))
                                            ann.test     <<- caret::train(form.mdl, data = Train, method = 'elm', trControl = bootControl,
-                                                                         tuneGrid = Grid ,na.action = na.omit, preProcess = c("YeoJohnson"))
+                                                                         tuneGrid = Grid ,na.action = na.omit, preProcess = c("range"))
                                            ANN          <<- elmNN::elmtrain(form.mdl, data=Train, nhid=ann.test$bestTune$nhid,
                                                                             actfun= ann.test$bestTune$actfun)
                                            ann.train    <<- data.frame(Train[last.col], Predicted=ANN$fitted.values)
