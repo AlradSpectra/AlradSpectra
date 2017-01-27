@@ -53,7 +53,8 @@ AlradSpectra <- function() {
   fabout       <- function(...)       {aboutwin <- gwindow("About Alrad Spectra", width=400, height=300, parent = window)
                                        wingroup <- ggroup(horizontal = FALSE, container = aboutwin)
                                        gimage(system.file("images","AlradLogo2.png", package="AlradSpectra"), container = wingroup)
-                                       glabel(paste0("A GUI for preprocessing spectra and predicting environmental variables\n\n",
+                                       glabel(paste0("A GUI to perform preprocessing, multivariate modeling \n
+                                                     and prediction using spectral data\n\n",
                                                      "Developed by researchers at\n",
                                                      "Federal University of Santa Maria and\n",
                                                      "Federal University of Santa Catarina, Brazil.\n\n",
@@ -201,17 +202,17 @@ AlradSpectra <- function() {
                                         assign(t.stats.name, fstats(t[,1], t[,2]), envir = .GlobalEnv) #Compute training stats
                                         assign(v.stats.name, fstats(v[,1], v[,2]), envir = .GlobalEnv) #Compute validation stats
                                         results      <- rbind(get(t.stats.name), get(v.stats.name)) #Merge training and validation stats
-                                        Set          <- c("Training", "Validation") #Titles for model results table
-                                        res.table    <- cbind(Set, results) #Create model results table
-                                        statswin     <- gwindow("Model results", width=320, height=150, parent=window)
+                                        Set          <- c("Training", "Validation") #Titles for prediction statistics table
+                                        res.table    <- cbind(Set, results) #Create prediction statistics table
+                                        statswin     <- gwindow("Prediction statistics", width=320, height=150, parent=window)
                                         stats.lyt    <- glayout(horizontal=FALSE, container=statswin)
                                         stats.lyt[1,1,expand=TRUE] <- gtable(res.table, cont = stats.lyt)
                                         stats.lyt[2,1,expand=TRUE] <- gbutton("Save results", cont=stats.lyt,
                                                                               anchor=c(0,-1),
                                                                               handler=function(...) fsaveresults(res.table))
                                         }
-  # Plot model accuracy
-  fmdl.plot.res <- function(t, v, ...) {plotwin      <- gwindow("Model accuracy", width = 1000, height = 400, parent = window)
+  # Plot measured vs. predicted
+  fmdl.plot.res <- function(t, v, ...) {plotwin      <- gwindow("Plot", width = 1000, height = 400, parent = window)
                                         wingroup     <- ggroup(horizontal=FALSE, cont=plotwin)
                                         ggraphics(cont = wingroup, no_popup=TRUE)
                                         t.stats.name <- paste0(deparse(substitute(t)), ".stats") #Create training stats table name
@@ -649,14 +650,14 @@ AlradSpectra <- function() {
   spc.first      <- lyt.file.arg[2,5,anchor=c(0,0)]   <- gedit(text = "", cont = lyt.file.arg, width = 4)
                     lyt.file.arg[1,6,anchor=c(1,0)]   <- "Spectrum ends \nat wavelength:"
   spc.last       <- lyt.file.arg[2,6,anchor=c(0,0)]   <- gedit(text = "", cont = lyt.file.arg, width = 4)
-                    lyt.file.arg[1,7,anchor=c(1,0)]   <- "Environmental variable \nis at column:"
+                    lyt.file.arg[1,7,anchor=c(1,0)]   <- "Y variable \nis at column:"
   soil.var.col   <- lyt.file.arg[2,7,anchor=c(0,0)]   <- gedit(text = "", cont = lyt.file.arg, width = 4)
   ### Import button
   gbutton("Import data", cont = import, handler = fimport)
   ### View data button
   gbutton("View data", cont = import, handler = function(...) fview(alldata, 800))
   ### Plot imported data button
-  gbutton("Plot imported spectra", cont = import, handler = function(...) fplot(Original, spectra.start.number, spectra.end.number))
+  gbutton("View imported spectra", cont = import, handler = function(...) fplot(Original, spectra.start.number, spectra.end.number))
 
   ###################################################
   ### Preprocessing module
@@ -683,7 +684,7 @@ AlradSpectra <- function() {
   lyt.param.nrm[1,1] <- "Number of smoothing points"
   number.smooth      <- lyt.param.nrm[2,1] <- gspinbutton(from = 5, to = 101, by = 2, cont = lyt.param.nrm)
   gbutton("Run", cont = nrm, handler = fnrm)
-  gbutton("Plot spectra", cont = nrm, handler = function(...) fplot(Smoothing, spectra.start.number, spectra.end.number))
+  gbutton("View spectra", cont = nrm, handler = function(...) fplot(Smoothing, spectra.start.number, spectra.end.number))
   gbutton("Save preprocessed spectra", cont = nrm, handler = function(...) fsavespectra(Smoothing))
   ### Binning
   frame.desc.bin     <- gframe("Description:", cont = bin, horizontal = T)
@@ -694,21 +695,21 @@ AlradSpectra <- function() {
   lyt.param.bin[1,1] <- "Bin size"
   bin.number         <- lyt.param.bin[2,1:4] <- gspinbutton(from = 2, to = 100, by = 1, cont = lyt.param.bin)
   gbutton("Run", cont = bin, handler = fbin)
-  gbutton("Plot spectra", cont = bin, handler = function(...) fplot(Binning, spectra.start.number, spectra.end.number))
+  gbutton("View spectra", cont = bin, handler = function(...) fplot(Binning, spectra.start.number, spectra.end.number))
   gbutton("Save preprocessed spectra", cont = bin, handler = function(...) fsavespectra(Binning))
   ### Absorbance
   frame.desc.abs     <- gframe("Description:", cont = abs, horizontal=T)
   lyt.desc.abs       <- glayout(cont = frame.desc.abs, expand = TRUE)
   lyt.desc.abs[1,1]  <- "Transforms reflectance to absorbance values (log10(1/R))."
   gbutton("Run", cont = abs, handler = fabs)
-  gbutton("Plot spectra", cont = abs, handler = function(...) fplot(Absorbance, spectra.start.number, spectra.end.number, ylab="Absorbance"))
+  gbutton("View spectra", cont = abs, handler = function(...) fplot(Absorbance, spectra.start.number, spectra.end.number, ylab="Absorbance"))
   gbutton("Save preprocessed spectra", cont = abs, handler = function(...) fsavespectra(Absorbance))
   ### Detrend
   frame.desc.det     <- gframe("Description:", cont = det, horizontal=T)
   lyt.desc.det       <- glayout(cont = frame.desc.det, expand = TRUE)
   lyt.desc.det[1,1]  <- "Normalizes each row by applying a Standard Normal Variate transformation followed by fitting a second order \nlinear model and returning the fitted residuals. Package: prospectr"
   gbutton("Run", cont = det, handler = fdet)
-  gbutton("Plot spectra", cont = det, handler = function(...) fplot(Detrend, spectra.start.number, spectra.end.number))
+  gbutton("View spectra", cont = det, handler = function(...) fplot(Detrend, spectra.start.number, spectra.end.number))
   gbutton("Save preprocessed spectra", cont = det, handler = function(...) fsavespectra(Detrend))
   ### Continuum Removal
   frame.desc.crm     <- gframe("Description:", cont = crm, horizontal=T)
@@ -718,7 +719,7 @@ AlradSpectra <- function() {
   lyt.desc.crm[3,1]  <- "Interpolation method: Linear"
   lyt.desc.crm[4,1]  <- "Normalization method: Division"
   gbutton("Run", cont = crm, handler = fcrm)
-  gbutton("Plot spectra", cont = crm, handler = function(...) fplot(ContinuumRemoval, spectra.start.number, spectra.end.number))
+  gbutton("View spectra", cont = crm, handler = function(...) fplot(ContinuumRemoval, spectra.start.number, spectra.end.number))
   gbutton("Save preprocessed spectra", cont = crm, handler = function(...) fsavespectra(ContinuumRemoval))
   ### SG Derivative
   frame.desc.sgd     <- gframe("Description:",cont = sgd, horizontal = T)
@@ -733,21 +734,21 @@ AlradSpectra <- function() {
   lyt.param.sgd[1,3] <- "Derivative order"
   sgd.deriv          <- lyt.param.sgd[2,3] <- gcombobox(sgderivarive, cont = lyt.param.sgd)
   gbutton("Run", cont = sgd, handler = fsgd)
-  gbutton("Plot spectra", cont = sgd, handler = function(...) fplot(SavitzkyGolayDerivative, spectra.start.number, spectra.end.number))
+  gbutton("View spectra", cont = sgd, handler = function(...) fplot(SavitzkyGolayDerivative, spectra.start.number, spectra.end.number))
   gbutton("Save preprocessed spectra", cont = sgd, handler = function(...) fsavespectra(SavitzkyGolayDerivative))
   ### SNV
   frame.desc.snv     <- gframe("Description:", cont = snv, horizontal=T)
   lyt.desc.snv       <- glayout(cont = frame.desc.snv, expand = TRUE)
   lyt.desc.snv[1,1]  <- "Standard Normal Variate normalizes each row by substracting each row by its mean and dividing by \nits standard deviation. Package: prospectr"
   gbutton("Run", cont = snv, handler = fsnv)
-  gbutton("Plot spectra", cont = snv, handler = function(...) fplot(SNV, spectra.start.number, spectra.end.number))
+  gbutton("View spectra", cont = snv, handler = function(...) fplot(SNV, spectra.start.number, spectra.end.number))
   gbutton("Save preprocessed spectra", cont = snv, handler = function(...) fsavespectra(SNV))
   ### MSC
   frame.desc.msc     <- gframe("Description:", cont = msc, horizontal=T)
   lyt.desc.msc       <- glayout(cont = frame.desc.msc, expand = TRUE)
   lyt.desc.msc[1,1]  <- "Performs multiplicative scatter/signal correction on spectral data. Package: pls"
   gbutton("Run", cont = msc, handler = fmsc)
-  gbutton("Plot spectra", cont = msc, handler = function(...) fplot(MSC, spectra.start.number, spectra.end.number))
+  gbutton("View spectra", cont = msc, handler = function(...) fplot(MSC, spectra.start.number, spectra.end.number))
   gbutton("Save preprocessed spectra", cont = msc, handler = function(...) fsavespectra(MSC))
   ### Normalization
   frame.desc.nor     <- gframe("Description:",cont = nor, horizontal = T)
@@ -758,7 +759,7 @@ AlradSpectra <- function() {
   lyt.param.nor[1,1] <- "Type of Normalization."
   nor.type           <- lyt.param.nor[2,1] <- gradio(normalization.types, checked = T, cont = lyt.param.nor)
   gbutton("Run", cont = nor, handler = fnor)
-  gbutton("Plot spectra", cont = nor, handler = function(...) fplot(Normalization, spectra.start.number, spectra.end.number))
+  gbutton("View spectra", cont = nor, handler = function(...) fplot(Normalization, spectra.start.number, spectra.end.number))
   gbutton("Save preprocessed spectra", cont = nor, handler = function(...) fsavespectra(Normalization))
 
   ###################################################
@@ -785,8 +786,8 @@ AlradSpectra <- function() {
   lyt.param.mlr[1,1] <- "Band interval"
   mlr.band.interval  <- lyt.param.mlr[2,1] <- gspinbutton(from = 1, to = 30, by = 1, value = 25, cont = lyt.param.mlr)
   gbutton("Run MLR model", cont = mdl.mlr, handler = fmlr)
-  gbutton("MLR model results", cont = mdl.mlr, handler = function(...) fmdl.stats(mlr.train, mlr.val))
-  gbutton("Plot model accuracy",cont = mdl.mlr, handler = function(...) fmdl.plot.res(mlr.train, mlr.val))
+  gbutton("MLR prediction statistics", cont = mdl.mlr, handler = function(...) fmdl.stats(mlr.train, mlr.val))
+  gbutton("View measured vs. predicted",cont = mdl.mlr, handler = function(...) fmdl.plot.res(mlr.train, mlr.val))
   ### PLS
   mdl.pls            <- ggroup(cont = mdl, horizontal = F,label = gettext("   PLSR   "))
   frame.desc.pls     <- gframe("Description:",cont = mdl.pls, horizontal = T)
@@ -803,9 +804,9 @@ AlradSpectra <- function() {
   lyt.param.pls[1,4] <- "Number of components to \ninclude in the model"
   pls.comp           <- lyt.param.pls[2,4] <- gspinbutton(from = 1, to = 500, by = 1, value =  30, cont = lyt.param.pls)
   gbutton("Run PLSR model", cont = mdl.pls , handler = fpls)
-  gbutton("Plot variable importance", cont = mdl.pls, handler = function(...) fpls.plot.imp(pls.test))
-  gbutton("PLSR model results", cont = mdl.pls, handler = function(...) fmdl.stats(pls.train, pls.val))
-  gbutton("Plot model accuracy",cont = mdl.pls, handler = function(...) fmdl.plot.res(pls.train, pls.val))
+  gbutton("View variable importance", cont = mdl.pls, handler = function(...) fpls.plot.imp(pls.test))
+  gbutton("PLSR prediction statistics", cont = mdl.pls, handler = function(...) fmdl.stats(pls.train, pls.val))
+  gbutton("View measured vs. predicted",cont = mdl.pls, handler = function(...) fmdl.plot.res(pls.train, pls.val))
   ### SVM
   mdl.svm            <- ggroup(cont = mdl, horizontal = F,label = gettext("    SVM    "))
   frame.desc.svm     <- gframe("Description:",cont = mdl.svm, horizontal = T)
@@ -818,9 +819,9 @@ AlradSpectra <- function() {
   lyt.param.svm[1,2] <- "Kernel parameters"
   svm.kernel         <- lyt.param.svm[2,2] <- gradio(kernel.param.svm, cont = lyt.param.svm)
   gbutton("Run SVM model", cont = mdl.svm, handler = fsvm)
-  gbutton("Plot variable importance", cont = mdl.svm, handler = function(...) fmdl.plot.imp(svm.test))
-  gbutton("SVM model results", cont = mdl.svm, handler = function(...) fmdl.stats(svm.train, svm.val))
-  gbutton("Plot model accuracy",cont = mdl.svm, handler = function(...) fmdl.plot.res(svm.train, svm.val))
+  gbutton("View variable importance", cont = mdl.svm, handler = function(...) fmdl.plot.imp(svm.test))
+  gbutton("SVM prediction statistics", cont = mdl.svm, handler = function(...) fmdl.stats(svm.train, svm.val))
+  gbutton("View measured vs. predicted",cont = mdl.svm, handler = function(...) fmdl.plot.res(svm.train, svm.val))
   ### RF
   mdl.rf             <- ggroup(cont = mdl, horizontal = F,label = gettext("    RF    "))
   frame.desc.rf      <- gframe("Description:",cont = mdl.rf, horizontal = T)
@@ -835,9 +836,9 @@ AlradSpectra <- function() {
   lyt.param.rf[1,3]  <- "Number of trees \n(ntree)"
   rf.ntree           <- lyt.param.rf[2,3]  <- gedit(text = "500", cont = lyt.param.rf, width = 4)
   gbutton("Run RF model", cont = mdl.rf, handler = frf)
-  gbutton("Plot variable importance", cont = mdl.rf, handler = function(...) fmdl.plot.imp(rf.test))
-  gbutton("RF model results", cont = mdl.rf, handler = function(...) fmdl.stats(rf.train, rf.val))
-  gbutton("Plot model accuracy",cont = mdl.rf, handler = function(...) fmdl.plot.res(rf.train, rf.val))
+  gbutton("View variable importance", cont = mdl.rf, handler = function(...) fmdl.plot.imp(rf.test))
+  gbutton("RF prediction statistics", cont = mdl.rf, handler = function(...) fmdl.stats(rf.train, rf.val))
+  gbutton("View measured vs. predicted",cont = mdl.rf, handler = function(...) fmdl.plot.res(rf.train, rf.val))
   ### ANN
   mdl.ann            <- ggroup(cont = mdl, horizontal = F,label = gettext("    ANN    "))
   frame.desc.ann     <- gframe("Description:",cont = mdl.ann, horizontal = T)
@@ -852,9 +853,9 @@ AlradSpectra <- function() {
   lyt.param.ann[1,3] <- "Hidden units"
   ann.hid            <- lyt.param.ann[2,3] <- gspinbutton(from = 1, to = 50, by = 1, value = 50, cont = lyt.param.ann)
   gbutton("Run ANN model", cont = mdl.ann, handler = fann)
-  gbutton("Plot variable importance", cont = mdl.ann, handler = function(...) fmdl.plot.imp(ann.test))
-  gbutton("ANN model results", cont = mdl.ann, handler = function(...) fmdl.stats(ann.train, ann.val))
-  gbutton("Plot model accuracy", cont = mdl.ann, handler = function(...) fmdl.plot.res(ann.train, ann.val))
+  gbutton("View variable importance", cont = mdl.ann, handler = function(...) fmdl.plot.imp(ann.test))
+  gbutton("ANN prediction statistics", cont = mdl.ann, handler = function(...) fmdl.stats(ann.train, ann.val))
+  gbutton("View measured vs. predicted", cont = mdl.ann, handler = function(...) fmdl.plot.res(ann.train, ann.val))
   ### KBML
   mdl.kbml            <- ggroup(cont = mdl, horizontal = F,label = gettext(" KBML "))
   frame.desc.kbml     <- gframe("Description:",cont = mdl.kbml, horizontal = T)
@@ -871,9 +872,9 @@ AlradSpectra <- function() {
   lyt.param.kbml[1,4] <- "kernel function \nused in training and predicting"
   kbml.kernel         <- lyt.param.kbml[2,4] <- gradio(kernel.param.kbml, cont = lyt.param.kbml)
   gbutton("Run KBML model", cont = mdl.kbml, handler = fkbml)
-  gbutton("Plot variable importance", cont = mdl.kbml, handler = function(...) fmdl.plot.imp(kbml.test))
-  gbutton("KBML model results", cont = mdl.kbml, handler = function(...) fmdl.stats(kbml.train, kbml.val))
-  gbutton("Plot model accuracy", cont = mdl.kbml, handler = function(...) fmdl.plot.res(kbml.train, kbml.val))
+  gbutton("View variable importance", cont = mdl.kbml, handler = function(...) fmdl.plot.imp(kbml.test))
+  gbutton("KBML prediction statistics", cont = mdl.kbml, handler = function(...) fmdl.stats(kbml.train, kbml.val))
+  gbutton("View measured vs. predicted", cont = mdl.kbml, handler = function(...) fmdl.plot.res(kbml.train, kbml.val))
   
   ###################################################
   ### Prediction module
@@ -905,7 +906,7 @@ AlradSpectra <- function() {
   ### View data button
   gbutton("View data", cont = pred.imp, handler = function(...) fview(spc.pred, 800))
   ### Plot imported data button
-  gbutton("Plot imported spectra", cont = pred.imp, handler = function(...) fplot(spc.pred, pred.spectra.start.number, pred.spectra.end.number))
+  gbutton("View imported spectra", cont = pred.imp, handler = function(...) fplot(spc.pred, pred.spectra.start.number, pred.spectra.end.number))
   ### Draw a separator line
   gseparator(cont = pred)
   ### Create predict group
