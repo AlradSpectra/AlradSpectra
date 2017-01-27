@@ -534,8 +534,7 @@ AlradSpectra <- function() {
   fann         <- function(...) {alert <<- galert("Wait... \nThis may take a few minutes! ", title = "ANN model", delay=10000, parent=notebook)
                                  Sys.sleep(1)
                                  tryCatch(
-                                          {bootControl  <- caret::trainControl(method= svalue(ann.resampling), preProcOptions = list(thresh = 0.95, cutoff = 0.95),
-                                                                               na.remove = TRUE)
+                                          {bootControl  <- caret::trainControl(method= svalue(ann.resampling), preProcOptions = list(thresh = 0.95, cutoff = 0.95))
                                            Grid         <- expand.grid(.nhid= seq(1,svalue(ann.hid),ceiling(svalue(ann.hid)/10)),
                                                                        .actfun= c("sin", "radbas", "purelin", "tansig"))
                                            ann.test     <<- caret::train(form.mdl, data = Train, method = 'elm', trControl = bootControl,
