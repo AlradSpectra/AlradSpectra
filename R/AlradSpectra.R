@@ -1,6 +1,6 @@
-#' A GUI for preprocessing spectra and predicting environmental variables
+#' A GUI to perform preprocessing, multivariate modeling and prediction using spectral data
 #'
-#' AlradSpectra provides a friendly GUI to apply preprocessing functions to spectra and predict environmental variables using models. 
+#' Alrad Spectra was developed to accomplish tasks such as perform a large range of spectral preprocessing techniques, implement several multivariate calibration methods, provide statistics assessment, provide graphical output, validate the models using independent datasets, and predict unknown samples.
 #' @author Andre C. Dotto, \email{andrecdot@gmail.com}
 #' @author Diego J. Gris, \email{diegojgris@gmail.com}
 #' @import gWidgets

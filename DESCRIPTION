@@ -1,5 +1,5 @@
 Package: AlradSpectra
-Title: A GUI to perform preprocessing, multivariate modeling and prediction using spectral data.
+Title: A GUI to perform preprocessing, multivariate modeling and prediction using spectral data
 Version: 0.2
 Date: 2017-01-25
 Authors@R: c(person("Andre C.", "Dotto", email = "andrecdot@gmail.com", role = c("aut", "cre")),
