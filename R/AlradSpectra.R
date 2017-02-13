@@ -85,7 +85,7 @@ AlradSpectra <- function() {
                                                  spectra.start.number   <<- as.numeric(svalue(spc.first))
                                                  spectra.end.number     <<- as.numeric(svalue(spc.last))
                                                  soil.var.column        <<- as.numeric(svalue(soil.var.col))
-                                                 soil.var.name          <<- colnames(alldata[soil.var.column])
+                                                 soil.var.name          <<- svalue(soil.var.nm)
                                                  fonlyspectra() #Create dataframe with spectra only
                                                  dataset                <<- c("Original")
                                                  select.dataset[]       <-  dataset
@@ -127,6 +127,34 @@ AlradSpectra <- function() {
                                                               dev.off() #Close graphics device
                                                               }
                                        }
+  # View Y variable descriptive statistics
+  fdesc        <- function(...)       {descstats  <- fitdistrplus::descdist(alldata[,soil.var.column], graph=F)
+                                       descnames  <- rbind("Obs","Min","Max","Mean","Median","Std Dev","Skewness","Kurtosis")
+                                       descvalues <- rbind(nrow(alldata),
+                                                           round(descstats$min,2),
+                                                           round(descstats$max,2),
+                                                           round(descstats$mean,2),
+                                                           round(descstats$median,2),
+                                                           round(descstats$sd,2),
+                                                           round(descstats$skewness,2),
+                                                           round(descstats$kurtosis,2))
+                                       desctable  <- data.frame("Parameter"=descnames,"Value"=descvalues)
+                                       descwin    <- gwindow("Descriptive statistics", width=300, height=300, parent=window)
+                                       desc.lyt   <- glayout(horizontal=FALSE, container=descwin)
+                                       desc.lyt[1,1,expand=TRUE] <- gtable(as.data.frame(desctable), cont = desc.lyt)
+                                       desc.lyt[2,1,expand=FALSE] <- gbutton("Save results", cont=desc.lyt,
+                                                                            anchor=c(0,-1),
+                                                                            handler=function(...) fsaveresults(desctable))
+                                       }
+  # Plots y histogram
+  fhist        <- function(...)       {plotwin  <- gwindow("Histogram", width = 800, height = 600, parent = window)
+                                       wingroup <- ggroup(horizontal=FALSE, cont=plotwin)
+                                       ggraphics(cont = wingroup, no_popup=TRUE)
+                                       Sys.sleep(1) #Wait for window creation before trying to plot to avoid errors
+                                       gbutton("Save plot", cont=wingroup, handler = function(...) fsaveplot(800, 600))
+                                       graphics::hist(alldata[,soil.var.column],main="Histogram",xlab=soil.var.name,
+                                                      border="black",col="gray",las=1)
+                                       }
   # Export preprocessed spectra as csv file
   fsavespectra <- function(h, ...)    {fdialog <- gfile("Save File", type="save", initialfilename="Output", container=window,
                                                         filter=c("Comma Separated Values (.csv)"="csv"))
@@ -159,12 +187,41 @@ AlradSpectra <- function() {
                                        form.mdl    <<- as.formula(paste(colnames(Train[last.col]),"~",
                                                                         paste(names(Train)[c(1:last.col-1)], collapse="+"), collapse=""))
                                        enabled(mdl) = TRUE #Enable models module
+                                       enabled(homo.button) = TRUE #Enable homogeneity test button
+                                       enabled(violin.button) = TRUE #Enable violin plots button
                                        gmessage(paste("Number of training samples:", nrow(Train),
                                                       "\n\nNumber of validation samples:", nrow(Val)),
                                                 title = "Split", parent = window)
                                        }
-  # Disables models module when dataset or validation size is changed
-  fchangesplit <- function(h, ...)    enabled(mdl) = FALSE
+  # Homogeneity of variance test
+  fhomo        <- function(...)       {categories <- as.factor(c(rep(1,length(Train[,last.col])),rep(2,length(Val[,last.col]))))
+                                       homog.test <- car::leveneTest(alldata[,soil.var.column]~categories)
+                                       gmessage(paste("Levene's Test for Homogeneity of Variance",
+                                                      "\n\nSignificance level = 0.05",
+                                                      "\nDegrees of freedom =",homog.test$Df[2],
+                                                      "\nF-value =", round(homog.test$`F value`[1], 3),
+                                                      "\nP-value =", round(homog.test$`Pr(>F)`[1], 3),
+                                                      "\n\nIf the P-value is greater than 0.05 (significance level) \nthe null hypothesis",
+                                                      "is not rejected, and it is concluded \nthat there is no significant difference",
+                                                      "between \nthe variances of the two groups."),
+                                                title = "Levene's test", parent = window)
+                                       }
+  # Violin plots
+  fviolin      <- function(...)       {plotwin <- gwindow("Plot", width = 800, height = 600, parent = window)
+                                       wingroup <- ggroup(horizontal=FALSE, cont=plotwin)
+                                       ggraphics(cont = wingroup, no_popup=TRUE)
+                                       Sys.sleep(1) #Wait for window creation before trying to plot to avoid errors
+                                       gbutton("Save plot", cont=wingroup, handler = function(...) fsaveplot(800, 600))
+                                       vioplot::vioplot(Train[,last.col], Val[,last.col], col="gray",
+                                                        names=c("Training Set","Validation Set"), range=2)
+                                       graphics::axis(2, at=3.5, pos=0.3, tck=0, labels=soil.var.name)
+                                       graphics::title(main="Violin Plots")
+                                       }
+  # Disables models module and homo and violin buttons when dataset or validation size is changed
+  fchangesplit <- function(h, ...)    {enabled(mdl) = FALSE
+                                       enabled(homo.button) = FALSE
+                                       enabled(violin.button) = FALSE
+                                       }
   # Export model or prediction results
   fsaveresults <- function(h, ...)    {fdialog <- gfile("Save File", type="save", initialfilename="Output", container=window,
                                                         filter=c("Comma Separated Values (.csv)"="csv"))
@@ -193,7 +250,7 @@ AlradSpectra <- function() {
                                        q3             <- quantile(y)[4]
                                        rpiq           <- (q3-q1)/rmse
                                        error.i        <- round(c(r2, bias, rmse,  rpd, rpiq),2)
-                                       names(error.i) <- c("R2", "Bias", "RMSE", "RPD", "RPIQ")
+                                       names(error.i) <- c("R-squared", "Bias", "RMSE", "RPD", "RPIQ")
                                        return(error.i)
                                        }
   # Get model accuracy and display in tabular form
@@ -207,7 +264,7 @@ AlradSpectra <- function() {
                                         statswin     <- gwindow("Prediction statistics", width=320, height=150, parent=window)
                                         stats.lyt    <- glayout(horizontal=FALSE, container=statswin)
                                         stats.lyt[1,1,expand=TRUE] <- gtable(res.table, cont = stats.lyt)
-                                        stats.lyt[2,1,expand=TRUE] <- gbutton("Save results", cont=stats.lyt,
+                                        stats.lyt[2,1,expand=FALSE] <- gbutton("Save results", cont=stats.lyt,
                                                                               anchor=c(0,-1),
                                                                               handler=function(...) fsaveresults(res.table))
                                         }
@@ -652,13 +709,18 @@ AlradSpectra <- function() {
   spc.last       <- lyt.file.arg[2,6,anchor=c(0,0)]   <- gedit(text = "", cont = lyt.file.arg, width = 4)
                     lyt.file.arg[1,7,anchor=c(1,0)]   <- "Y variable \nis at column:"
   soil.var.col   <- lyt.file.arg[2,7,anchor=c(0,0)]   <- gedit(text = "", cont = lyt.file.arg, width = 4)
+                    lyt.file.arg[1,8,anchor=c(1,0)]   <- "Y variable      \nname:"
+  soil.var.nm   <- lyt.file.arg[2,8,anchor=c(0,0)]   <- gedit(text = "", cont = lyt.file.arg, width = 4)
   ### Import button
   gbutton("Import data", cont = import, handler = fimport)
   ### View data button
   gbutton("View data", cont = import, handler = function(...) fview(alldata, 800))
   ### Plot imported data button
   gbutton("View imported spectra", cont = import, handler = function(...) fplot(Original, spectra.start.number, spectra.end.number))
-
+  ### View descriptive statistics button
+  gbutton("View Y descriptive statistics", cont = import, handler = fdesc)
+  ### View histogram button
+  gbutton("View Y histogram", cont = import, handler = fhist)
   ###################################################
   ### Preprocessing module
   ###################################################
@@ -773,7 +835,11 @@ AlradSpectra <- function() {
   glabel("Size of validation set (%):", cont = models, anchor = c(-1,0))
   split.val          <- gcombobox(splitnumbers, cont = models, selected = 6, handler = fchangesplit)
   gbutton("Split data", cont = models, handler = fsplit)
+  homo.button        <- gbutton("Homogeneity of variance test", cont = models, handler = fhomo)
+  violin.button      <- gbutton("View violin plots", cont = models, handler = fviolin)
   mdl                <- gnotebook(cont = models)
+  enabled(homo.button) = FALSE #Disable homogeneity test button
+  enabled(violin.button) = FALSE #Disable violin plots button
   enabled(models) = FALSE #Disable modeling module
   enabled(mdl)    = FALSE #Disable models notebook
   ### MLR
