@@ -710,7 +710,7 @@ AlradSpectra <- function() {
                     lyt.file.arg[1,7,anchor=c(1,0)]   <- "Y variable \nis at column:"
   soil.var.col   <- lyt.file.arg[2,7,anchor=c(0,0)]   <- gedit(text = "", cont = lyt.file.arg, width = 4)
                     lyt.file.arg[1,8,anchor=c(1,0)]   <- "Y variable      \nname:"
-  soil.var.nm   <- lyt.file.arg[2,8,anchor=c(0,0)]   <- gedit(text = "", cont = lyt.file.arg, width = 4)
+  soil.var.nm    <- lyt.file.arg[2,8,anchor=c(0,0)]   <- gedit(text = "", cont = lyt.file.arg, width = 4)
   ### Import button
   gbutton("Import data", cont = import, handler = fimport)
   ### View data button
