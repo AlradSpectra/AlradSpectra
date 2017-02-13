@@ -23,6 +23,7 @@ Imports:
     digest, 
     e1071, 
     elmNN,
+    fitdistrplus,
     foreach,  
     ggplot2,
     graphics, 
@@ -72,6 +73,7 @@ Imports:
     rstudioapi,
     scales,
     shiny,
+    sm,
     SparseM, 
     stats, 
     stats4, 
@@ -80,6 +82,7 @@ Imports:
     tibble, 
     tools, 
     utils, 
+    vioplot, 
     whisker, 
     withr,
     xtable
