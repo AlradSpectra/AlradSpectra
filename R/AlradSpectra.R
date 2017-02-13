@@ -52,7 +52,7 @@ AlradSpectra <- function() {
   # Creates and shows the window with information about Alrad Spectra
   fabout       <- function(...)       {aboutwin <- gwindow("About Alrad Spectra", width=400, height=300, parent = window)
                                        wingroup <- ggroup(horizontal = FALSE, container = aboutwin)
-                                       gimage(system.file("images","AlradLogo2.png", package="AlradSpectra"), container = wingroup)
+                                       gimage(system.file("images","AlradLogo.png", package="AlradSpectra"), container = wingroup)
                                        glabel(paste0("A GUI to perform preprocessing, multivariate\n",
                                                      "modeling and prediction using spectral data\n\n",
                                                      "Developed by researchers at\n",
