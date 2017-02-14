@@ -32,36 +32,59 @@ AlradSpectra <- function() {
   # Clears all data, empties forms and resets Alrad to initial status
   fnew         <- function(...)       {gconfirm("Clear Alrad Spectra and \nstart a new project?",
                                                 title="New", icon="warning", parent=window,
-                                                handler=function(h, ...) {svalue(file.browse)   <- ""
-                                                                          svalue(file.sep)      <- ","
-                                                                          svalue(spc.start.col) <- ""
-                                                                          svalue(spc.end.col)   <- ""
-                                                                          svalue(spc.first)     <- ""
-                                                                          svalue(spc.last)      <- ""
-                                                                          svalue(soil.var.col)  <- ""
-                                                                          svalue(notebook)      <- 1 #Focus on import tab
-                                                                          enabled(pp) = FALSE
-                                                                          enabled(models) = FALSE
-                                                                          enabled(mdl) = FALSE
-                                                                          enabled(pred) = FALSE
-                                                                          rm(list=ls(), envir=.GlobalEnv) #Remove everything in Global Environment
-                                                                          }
+                                                handler=function(...) {svalue(file.browse)   <- ""
+                                                                       svalue(file.sep)      <- ","
+                                                                       svalue(spc.start.col) <- ""
+                                                                       svalue(spc.end.col)   <- ""
+                                                                       svalue(spc.first)     <- ""
+                                                                       svalue(spc.last)      <- ""
+                                                                       svalue(soil.var.col)  <- ""
+                                                                       svalue(notebook)      <- 1 #Focus on import tab
+                                                                       enabled(pp) = FALSE
+                                                                       enabled(models) = FALSE
+                                                                       enabled(mdl) = FALSE
+                                                                       enabled(pred) = FALSE
+                                                                       rm(list = ls(pos = ".GlobalEnv"),
+                                                                          envir = .GlobalEnv) #Remove everything in Global Environment
+                                                                       }
                                                 )
                                         }
-  # Opens a saved project
   fopen        <- function(...)        {proj.browse <- gfile("Open File", type="open",
                                                              filter=c("Workspace image (.RData)"="RData"),
                                                              cont = window)
-                                        load(proj.browse, envir=.GlobalEnv)
+                                        if(!(is.na(proj.browse))) {
+                                          alertop <<- galert("Wait...", title = "Loading Project", delay=10000, parent=notebook)
+                                          Sys.sleep(1) #Wait for alert to be shown
+                                          load(proj.browse, envir=.GlobalEnv)
+                                          enabled(pp) = TRUE #Enable preprocessing module
+                                          enabled(models) = TRUE #Enable modeling module
+                                          select.dataset[]       <-  dataset
+                                          svalue(select.dataset) <- "Original"
+                                          if(length(pred.models)!=0) {#If there are models in the loaded data
+                                            select.model[]       <- pred.models
+                                            svalue(select.model) <- pred.models[1]
+                                            enabled(pred) = TRUE #Enable prediction module
+                                            }
+                                          if(exists("spc.pred", envir=.GlobalEnv)) {#If there is a dataset for prediction
+                                            enabled(pred.predict) = TRUE #Enable predict group
+                                            }
+                                          dispose(alertop)
+                                          gmessage(message = "Project loaded!", title = "Open Project", parent = window)
+                                          }
                                         }
   # Saves current project with all R workspace
   fsave        <- function(...)        {fdialog <- gfile("Save Project", type="save", initialfilename="Project", container=window,
                                                          filter=c("Workspace image (.RData)"="RData"),
                                                          cont = window)
-                                        #If fdialog is not equal to NA, keep running        
-                                        if(!(is.na(fdialog))) {fname <- paste0(fdialog,".RData")
-                                                               save.image(fname)
-                                                               }
+                                        
+                                        #If fdialog is not equal to NA, keep running
+                                        if(!(is.na(fdialog))) {
+                                          alert <<- galert("Wait...", title = "Saving Project", delay=10000, parent=notebook)
+                                          fname <- paste0(fdialog,".RData")
+                                          save.image(fname)
+                                          dispose(alert)
+                                          gmessage(message = "Project saved!", title = "Save Project", parent = window)
+                                          }
                                         }
   # Handler for quit action. Makes sure the user really wants to quit Alrad.
   fquit        <- function(...)        gconfirm("Are you sure?", icon="warning", parent=window, handler=dispose(window))
@@ -109,6 +132,7 @@ AlradSpectra <- function() {
                                                  dataset                <<- c("Original")
                                                  select.dataset[]       <-  dataset
                                                  svalue(select.dataset) <- "Original"
+                                                 pred.models            <<- c()
                                                  },
                                                  warning = function(w) fwarning(w),
                                                  error =  function(e) ferror(e)
@@ -147,7 +171,7 @@ AlradSpectra <- function() {
                                                               }
                                        }
   # View Y variable descriptive statistics
-  fdesc        <- function(...)       {alert <<- galert("Wait...", title = "Descriptive Statistics", delay=10000, parent=notebook)
+  fdescy       <- function(...)       {alert <<- galert("Wait...", title = "Descriptive Statistics", delay=10000, parent=notebook)
                                        descstats  <- fitdistrplus::descdist(alldata[,soil.var.column], graph=F)
                                        descnames  <- rbind("Obs","Min","Max","Mean","Median","Std Dev","Skewness","Kurtosis")
                                        descvalues <- rbind(nrow(alldata),
@@ -195,7 +219,7 @@ AlradSpectra <- function() {
   faddtodtset  <- function(h, ...) {present <- is.element(h, dataset)
                                        if(present==FALSE)
                                          dataset <<- c(dataset, h)
-                                         select.dataset[] <<- dataset
+                                         select.dataset[] <- dataset
                                        }
   # Splits dataset in training and validaton sets
   fsplit       <- function(...)       {set.seed(1) #Random Number Generation
@@ -214,6 +238,7 @@ AlradSpectra <- function() {
                                                                         paste(names(Train)[c(1:last.col-1)], collapse="+"), collapse=""))
                                        enabled(mdl) = TRUE #Enable models module
                                        enabled(homo.button) = TRUE #Enable homogeneity test button
+                                       enabled(desc.button) = TRUE #Enable descriptive stats button
                                        enabled(boxplot.button) = TRUE #Enable boxplot button
                                        gmessage(paste("Number of training samples:", nrow(Train),
                                                       "\n\nNumber of validation samples:", nrow(Val)),
@@ -241,6 +266,29 @@ AlradSpectra <- function() {
                                                       "\nThe P-value",lev.res[1],"greater than 0.05.",
                                                       "\nTraining and Validation groups",lev.res[2],"homogeneous."),
                                                 title = "Homogeneity of variance test", parent = window)
+                                       }
+  # View train and validation descriptive statistics
+  fdesc        <- function(...)       {alert     <<- galert("Wait...", title = "Descriptive Statistics", delay=10000, parent=notebook)
+                                       trainds    <- fitdistrplus::descdist(Train[,last.col], graph=F)
+                                       valds      <- fitdistrplus::descdist(Val[,last.col], graph=F)
+                                       descnames  <- rbind("Obs","Min","Max","Mean","Median","Std Dev","Skewness","Kurtosis")
+                                       descvalues <- rbind(c(nrow(Train), nrow(Val)),
+                                                           c(round(trainds$min,2), round(valds$min,2)),
+                                                           c(round(trainds$max,2), round(valds$max,2)),
+                                                           c(round(trainds$mean,2), round(valds$mean,2)),
+                                                           c(round(trainds$median,2), round(valds$median,2)),
+                                                           c(round(trainds$sd,2), round(valds$sd,2)),
+                                                           c(round(trainds$skewness,2), round(valds$skewness,2)),
+                                                           c(round(trainds$kurtosis,2), round(valds$kurtosis,2)))
+                                       desctable  <- data.frame("Parameter"=descnames,"Training"=descvalues[,1],
+                                                                "Validation"=descvalues[,2])
+                                       dispose(alert)
+                                       descwin    <- gwindow("Descriptive statistics", width=300, height=300, parent=window)
+                                       desc.lyt   <- glayout(horizontal=FALSE, container=descwin)
+                                       desc.lyt[1,1,expand=TRUE] <- gtable(as.data.frame(desctable), cont = desc.lyt)
+                                       desc.lyt[2,1,expand=FALSE] <- gbutton("Save results", cont=desc.lyt,
+                                                                             anchor=c(0,-1),
+                                                                             handler=function(...) fsaveresults(desctable))
                                        }
   # Boxplot of Y variable
   fboxplot     <- function(...)       {plotwin    <- gwindow("Plot", width = 400, height = 500, parent = window)
@@ -303,7 +351,7 @@ AlradSpectra <- function() {
                                         results      <- rbind(get(t.stats.name), get(v.stats.name)) #Merge training and validation stats
                                         Set          <- c("Training", "Validation") #Titles for prediction statistics table
                                         res.table    <- cbind(Set, results) #Create prediction statistics table
-                                        statswin     <- gwindow("Prediction statistics", width=320, height=150, parent=window)
+                                        statswin     <- gwindow("Prediction statistics", width=350, height=150, parent=window)
                                         stats.lyt    <- glayout(horizontal=FALSE, container=statswin)
                                         stats.lyt[1,1,expand=TRUE] <- gtable(res.table, cont = stats.lyt)
                                         stats.lyt[2,1,expand=FALSE] <- gbutton("Save results", cont=stats.lyt,
@@ -320,40 +368,48 @@ AlradSpectra <- function() {
                                         assign(v.stats.name, fstats(v[,1], v[,2]), envir = .GlobalEnv) #Compute validation stats
                                         train.plot   <- ggplot2::ggplot(t, ggplot2::aes(x=t[,1], y=t[,2])) +
                                                         ggplot2::geom_point(shape=19) +
-                                                        ggplot2::labs(list(title="Training set", x="Measured", y="Predicted")) +
+                                                        ggplot2::ggtitle("Training") +
+                                                        ggplot2::labs(x="Measured", y="Predicted") + 
+                                                        ggplot2::theme(plot.title = ggplot2::element_text(size=12, hjust=0.5)) +
+                                                        ggplot2::theme(axis.title = ggplot2::element_text(size=12, hjust=0.5)) + 
+                                                        #ggplot2::labs(list(title="Training", x="Measured", y="Predicted", hjust = 0.5)) +
                                                         ggplot2::xlim(0, max(t)) +
                                                         ggplot2::ylim(0, max(t)) +
                                                         ggplot2::geom_abline(intercept = 0, slope = 1) +
-                                                        ggplot2::annotate("text", x=max(t)*0.15, y=seq(max(t)*0.9,max(t)*0.7,-max(t)*0.05),
+                                                        ggplot2::annotate("text", x=max(v)*0.05, y=seq(max(t)*0.95, max(t)*0.75,-max(t)*0.05), hjust = 0,
                                                                           label = paste(names(get(t.stats.name)),"=",get(t.stats.name)))
                                         val.plot     <- ggplot2::ggplot(v, ggplot2::aes(x=v[,1], y=v[,2])) +
                                                         ggplot2::geom_point(shape=19) +
-                                                        ggplot2::labs(list(title="Validation set", x="Measured", y="Predicted")) +
+                                                        ggplot2::ggtitle("Validation") +
+                                                        ggplot2::labs(x="Measured", y="Predicted") + 
+                                                        ggplot2::theme(plot.title = ggplot2::element_text(size=12, hjust=0.5)) +
+                                                        ggplot2::theme(axis.title = ggplot2::element_text(size=12, hjust=0.5)) + 
+                                                        #ggplot2::labs(list(title="Validation", x="Measured", y="Predicted", hjust = 0.5)) +
                                                         ggplot2::xlim(0, max(v)) +
                                                         ggplot2::ylim(0, max(v)) +
                                                         ggplot2::geom_abline(intercept = 0, slope = 1) +
-                                                        ggplot2::annotate("text", x=max(v)*0.15, y=seq(max(v)*0.9,max(v)*0.7,-max(v)*0.05),
+                                                        ggplot2::annotate("text", x=max(v)*0.05, y=seq(max(v)*0.95,max(v)*0.75,-max(v)*0.05), hjust = 0,
                                                                           label = paste(names(get(v.stats.name)),"=",get(v.stats.name)))
                                         Sys.sleep(1)
                                         gbutton("Save plot", cont = wingroup, handler = function(...) fsaveplot(800, 400))
                                         Rmisc::multiplot(train.plot, val.plot, cols = 2)
                                         }
   # Plot RMSE of PLSR components
-  fpls.plot.imp <- function(h, ...)    {plotwin   <- gwindow("Plot", width = 800, height = 600, parent=window)
+  fpls.plot.imp <- function(h, ...)    {plotwin   <- gwindow("Plot", width = 400, height = 400, parent=window)
                                         wingroup  <- ggroup(horizontal=FALSE, cont=plotwin)
                                         ggraphics(cont = wingroup, no_popup=TRUE)
                                         Sys.sleep(1)
-                                        gbutton("Save plot", cont = wingroup, handler = function(...) fsaveplot(800, 600))
+                                        gbutton("Save plot", cont = wingroup, handler = function(...) fsaveplot(400, 400))
                                         comp.plot <- ggplot2::ggplot(h) +
                                                      ggplot2::labs(list(x="Components", y="RMSE"))
                                         Rmisc::multiplot(comp.plot)
                                         }
   # Plot variable importance
-  fmdl.plot.imp <- function(h, ...)    {plotwin   <- gwindow("Plot", width = 400, height = 600, parent=window)
+  fmdl.plot.imp <- function(h, ...)    {plotwin   <- gwindow("Plot", width = 400, height = 400, parent=window)
                                         wingroup  <- ggroup(horizontal=FALSE, cont=plotwin)
                                         ggraphics(cont = wingroup, no_popup=TRUE)
                                         Sys.sleep(1)
-                                        gbutton("Save plot", cont = wingroup, handler = function(...) fsaveplot(800, 600))
+                                        gbutton("Save plot", cont = wingroup, handler = function(...) fsaveplot(400, 400))
                                         comp.plot <- ggplot2::ggplot(varImp(h), top=40)
                                         Rmisc::multiplot(comp.plot)
   }
@@ -703,7 +759,6 @@ AlradSpectra <- function() {
                             "satlins","tan-sigmoid","triangular basis", "positive linear")
   kernel.param.kbml    <- c("Linear kernel", "Radial kernel")
   kbml.param.var       <- c(.0001,.001,.01,.1,1,10,100)
-  pred.models          <- c()
 
   ###################################################
   ### Main window
@@ -761,7 +816,7 @@ AlradSpectra <- function() {
   ### Plot imported data button
   gbutton("View imported spectra", cont = import, handler = function(...) fplot(Original, spectra.start.number, spectra.end.number))
   ### View descriptive statistics button
-  gbutton("View Y descriptive statistics", cont = import, handler = fdesc)
+  gbutton("View Y descriptive statistics", cont = import, handler = fdescy)
   ### View histogram button
   gbutton("View Y histogram", cont = import, handler = fhist)
   ###################################################
@@ -879,9 +934,11 @@ AlradSpectra <- function() {
   split.val          <- gcombobox(splitnumbers, cont = models, selected = 6, handler = fchangesplit)
   gbutton("Split data", cont = models, handler = fsplit)
   homo.button        <- gbutton("Homogeneity of variance test", cont = models, handler = fhomo)
+  desc.button        <- gbutton("View descriptive statistics of groups", cont = models, handler = fdesc)
   boxplot.button     <- gbutton("View box plots", cont = models, handler = fboxplot)
   mdl                <- gnotebook(cont = models)
   enabled(homo.button) = FALSE #Disable homogeneity test button
+  enabled(desc.button) = FALSE #Disable descriptive stats button
   enabled(boxplot.button) = FALSE #Disable box plots button
   enabled(models) = FALSE #Disable modeling module
   enabled(mdl)    = FALSE #Disable models notebook
