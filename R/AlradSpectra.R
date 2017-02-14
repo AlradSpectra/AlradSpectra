@@ -128,7 +128,8 @@ AlradSpectra <- function() {
                                                               }
                                        }
   # View Y variable descriptive statistics
-  fdesc        <- function(...)       {descstats  <- fitdistrplus::descdist(alldata[,soil.var.column], graph=F)
+  fdesc        <- function(...)       {alert <<- galert("Wait...", title = "Descriptive Statistics", delay=10000, parent=notebook)
+                                       descstats  <- fitdistrplus::descdist(alldata[,soil.var.column], graph=F)
                                        descnames  <- rbind("Obs","Min","Max","Mean","Median","Std Dev","Skewness","Kurtosis")
                                        descvalues <- rbind(nrow(alldata),
                                                            round(descstats$min,2),
@@ -139,6 +140,7 @@ AlradSpectra <- function() {
                                                            round(descstats$skewness,2),
                                                            round(descstats$kurtosis,2))
                                        desctable  <- data.frame("Parameter"=descnames,"Value"=descvalues)
+                                       dispose(alert)
                                        descwin    <- gwindow("Descriptive statistics", width=300, height=300, parent=window)
                                        desc.lyt   <- glayout(horizontal=FALSE, container=descwin)
                                        desc.lyt[1,1,expand=TRUE] <- gtable(as.data.frame(desctable), cont = desc.lyt)
@@ -188,14 +190,16 @@ AlradSpectra <- function() {
                                                                         paste(names(Train)[c(1:last.col-1)], collapse="+"), collapse=""))
                                        enabled(mdl) = TRUE #Enable models module
                                        enabled(homo.button) = TRUE #Enable homogeneity test button
-                                       enabled(violin.button) = TRUE #Enable violin plots button
+                                       enabled(boxplot.button) = TRUE #Enable boxplot button
                                        gmessage(paste("Number of training samples:", nrow(Train),
                                                       "\n\nNumber of validation samples:", nrow(Val)),
                                                 title = "Split", parent = window)
                                        }
   # Homogeneity of variance test
-  fhomo        <- function(...)       {categories <- as.factor(c(rep(1,length(Train[,last.col])),rep(2,length(Val[,last.col]))))
+  fhomo        <- function(...)       {alert <<- galert("Wait...", title = "Levene's test", delay=10000, parent=notebook)
+                                       categories <- as.factor(c(rep(1,length(Train[,last.col])),rep(2,length(Val[,last.col]))))
                                        homog.test <- car::leveneTest(alldata[,soil.var.column]~categories)
+                                       dispose(alert)
                                        gmessage(paste("Levene's Test for Homogeneity of Variance",
                                                       "\n\nSignificance level = 0.05",
                                                       "\nDegrees of freedom =",homog.test$Df[2],
@@ -206,21 +210,21 @@ AlradSpectra <- function() {
                                                       "between \nthe variances of the two groups."),
                                                 title = "Levene's test", parent = window)
                                        }
-  # Violin plots
-  fviolin      <- function(...)       {plotwin <- gwindow("Plot", width = 800, height = 600, parent = window)
+  # Boxplot of Y variable
+  fboxplot     <- function(...)       {plotwin <- gwindow("Plot", width = 800, height = 600, parent = window)
                                        wingroup <- ggroup(horizontal=FALSE, cont=plotwin)
                                        ggraphics(cont = wingroup, no_popup=TRUE)
                                        Sys.sleep(1) #Wait for window creation before trying to plot to avoid errors
                                        gbutton("Save plot", cont=wingroup, handler = function(...) fsaveplot(800, 600))
-                                       vioplot::vioplot(Train[,last.col], Val[,last.col], col="gray",
-                                                        names=c("Training Set","Validation Set"), range=2)
+                                       graphics::boxplot(Train[,last.col], Val[,last.col], col="gray",
+                                                         names=c("Training Set","Validation Set"), range=2)
                                        graphics::axis(2, at=3.5, pos=0.3, tck=0, labels=soil.var.name)
-                                       graphics::title(main="Violin Plots")
+                                       graphics::title(main="Box Plots")
                                        }
-  # Disables models module and homo and violin buttons when dataset or validation size is changed
+  # Disables models module and homo and boxplot buttons when dataset or validation size is changed
   fchangesplit <- function(h, ...)    {enabled(mdl) = FALSE
                                        enabled(homo.button) = FALSE
-                                       enabled(violin.button) = FALSE
+                                       enabled(boxplot.button) = FALSE
                                        }
   # Export model or prediction results
   fsaveresults <- function(h, ...)    {fdialog <- gfile("Save File", type="save", initialfilename="Output", container=window,
@@ -836,10 +840,10 @@ AlradSpectra <- function() {
   split.val          <- gcombobox(splitnumbers, cont = models, selected = 6, handler = fchangesplit)
   gbutton("Split data", cont = models, handler = fsplit)
   homo.button        <- gbutton("Homogeneity of variance test", cont = models, handler = fhomo)
-  violin.button      <- gbutton("View violin plots", cont = models, handler = fviolin)
+  boxplot.button     <- gbutton("View box plots", cont = models, handler = fboxplot)
   mdl                <- gnotebook(cont = models)
   enabled(homo.button) = FALSE #Disable homogeneity test button
-  enabled(violin.button) = FALSE #Disable violin plots button
+  enabled(boxplot.button) = FALSE #Disable box plots button
   enabled(models) = FALSE #Disable modeling module
   enabled(mdl)    = FALSE #Disable models notebook
   ### MLR
