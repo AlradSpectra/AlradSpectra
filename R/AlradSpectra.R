@@ -113,10 +113,10 @@ AlradSpectra <- function() {
                                                      ggraphics(cont = wingroup, no_popup=TRUE)
                                                      Sys.sleep(1) #Wait for window creation before trying to plot to avoid errors
                                                      gbutton("Save plot", cont=wingroup, handler = function(...) fsaveplot(800, 600))
-                                                     matplot(colnames(h), t(h), xlim = c(s, e),
-                                                             type = "l",
-                                                             xlab = "Wavelength (nm)",
-                                                             ylab = ylab)
+                                                     graphics::matplot(colnames(h), t(h), xlim = c(s, e),
+                                                                       type = "l",
+                                                                       xlab = "Wavelength (nm)",
+                                                                       ylab = ylab)
                                                      }
   # Export plot as png graphics file
   fsaveplot    <- function(w, h,...)  {fdialog <- gfile("Save File", type="save", initialfilename="Plot", container=window,
@@ -149,13 +149,18 @@ AlradSpectra <- function() {
                                                                             handler=function(...) fsaveresults(desctable))
                                        }
   # Plots y histogram
-  fhist        <- function(...)       {plotwin  <- gwindow("Histogram", width = 800, height = 600, parent = window)
+  fhist        <- function(...)       {plotwin  <- gwindow("Histogram", width = 500, height = 500, parent = window)
                                        wingroup <- ggroup(horizontal=FALSE, cont=plotwin)
                                        ggraphics(cont = wingroup, no_popup=TRUE)
                                        Sys.sleep(1) #Wait for window creation before trying to plot to avoid errors
-                                       gbutton("Save plot", cont=wingroup, handler = function(...) fsaveplot(800, 600))
-                                       graphics::hist(alldata[,soil.var.column],main="Histogram",xlab=soil.var.name,
-                                                      border="black",col="gray",las=1)
+                                       gbutton("Save plot", cont=wingroup, handler = function(...) fsaveplot(500, 450))
+                                       histo    <- ggplot2::ggplot(alldata, ggplot2::aes(x=alldata[,soil.var.column])) + 
+                                                   ggplot2::geom_histogram(aes(fill = ..count..), binwidth = 0.5) +
+                                                   ggplot2::scale_fill_gradient("Frequency", low = "darkolivegreen2",
+                                                                                high = "dodgerblue3") +
+                                                   ggplot2::labs(x = soil.var.name, y = "Frequency") +
+                                                   ggplot2::guides(fill=FALSE)
+                                       Rmisc::multiplot(histo)
                                        }
   # Export preprocessed spectra as csv file
   fsavespectra <- function(h, ...)    {fdialog <- gfile("Save File", type="save", initialfilename="Output", container=window,
@@ -196,30 +201,44 @@ AlradSpectra <- function() {
                                                 title = "Split", parent = window)
                                        }
   # Homogeneity of variance test
-  fhomo        <- function(...)       {alert <<- galert("Wait...", title = "Levene's test", delay=10000, parent=notebook)
+  fhomo        <- function(...)       {alert      <<- galert("Wait...", title = "Levene's test", delay=10000, parent=notebook)
                                        categories <- as.factor(c(rep(1,length(Train[,last.col])),rep(2,length(Val[,last.col]))))
                                        homog.test <- car::leveneTest(alldata[,soil.var.column]~categories)
+                                       if(homog.test$`Pr(>F)`[1]>0.05) {
+                                         lev.res <- c("is", 'are')
+                                       } else {
+                                         lev.res <- c("is not", 'are not')
+                                         }
                                        dispose(alert)
                                        gmessage(paste("Levene's Test for Homogeneity of Variance",
+                                                      "\n\nIf the P-value is greater than 0.05 (significance level), \nthe null hypothesis",
+                                                      "is not rejected and it is concluded \nthat there is no significant difference",
+                                                      "between \nthe variances of the two groups.",
                                                       "\n\nSignificance level = 0.05",
                                                       "\nDegrees of freedom =",homog.test$Df[2],
                                                       "\nF-value =", round(homog.test$`F value`[1], 3),
                                                       "\nP-value =", round(homog.test$`Pr(>F)`[1], 3),
-                                                      "\n\nIf the P-value is greater than 0.05 (significance level) \nthe null hypothesis",
-                                                      "is not rejected, and it is concluded \nthat there is no significant difference",
-                                                      "between \nthe variances of the two groups."),
-                                                title = "Levene's test", parent = window)
+                                                      "\n\nTest interpretation:",
+                                                      "\nThe P-value",lev.res[1],"greater than 0.05.",
+                                                      "\nTraining and Validation groups",lev.res[2],"homogeneous."),
+                                                title = "Homogeneity of variance test", parent = window)
                                        }
   # Boxplot of Y variable
-  fboxplot     <- function(...)       {plotwin <- gwindow("Plot", width = 800, height = 600, parent = window)
-                                       wingroup <- ggroup(horizontal=FALSE, cont=plotwin)
+  fboxplot     <- function(...)       {plotwin    <- gwindow("Plot", width = 400, height = 500, parent = window)
+                                       wingroup   <- ggroup(horizontal=FALSE, cont=plotwin)
                                        ggraphics(cont = wingroup, no_popup=TRUE)
                                        Sys.sleep(1) #Wait for window creation before trying to plot to avoid errors
-                                       gbutton("Save plot", cont=wingroup, handler = function(...) fsaveplot(800, 600))
-                                       graphics::boxplot(Train[,last.col], Val[,last.col], col="gray",
-                                                         names=c("Training Set","Validation Set"), range=2)
-                                       graphics::axis(2, at=3.5, pos=0.3, tck=0, labels=soil.var.name)
-                                       graphics::title(main="Box Plots")
+                                       gbutton("Save plot", cont=wingroup, handler = function(...) fsaveplot(400, 450))
+                                       categories <- as.factor(c(rep("Training", length(Train[,last.col])),
+                                                                 rep("Validation", length(Val[,last.col]))))
+                                       boxpl      <- ggplot2::ggplot(alldata, ggplot2::aes(x=categories, y=alldata[,soil.var.column],
+                                                                                           fill=categories)) + 
+                                                     ggplot2::geom_boxplot(notch = TRUE) +
+                                                     ggplot2::guides(fill=FALSE) +
+                                                     ggplot2::labs(x = "", y = soil.var.name) +
+                                                     ggplot2::theme(axis.text = ggplot2::element_text(size=12),
+                                                                    axis.title = ggplot2::element_text(size=13))
+                                       Rmisc::multiplot(boxpl)
                                        }
   # Disables models module and homo and boxplot buttons when dataset or validation size is changed
   fchangesplit <- function(h, ...)    {enabled(mdl) = FALSE
@@ -286,7 +305,7 @@ AlradSpectra <- function() {
                                                         ggplot2::xlim(0, max(t)) +
                                                         ggplot2::ylim(0, max(t)) +
                                                         ggplot2::geom_abline(intercept = 0, slope = 1) +
-                                                        ggplot2::annotate("text", x=max(t)*0.1, y=seq(max(t)*0.9,max(t)*0.7,-max(t)*0.05),
+                                                        ggplot2::annotate("text", x=max(t)*0.15, y=seq(max(t)*0.9,max(t)*0.7,-max(t)*0.05),
                                                                           label = paste(names(get(t.stats.name)),"=",get(t.stats.name)))
                                         val.plot     <- ggplot2::ggplot(v, ggplot2::aes(x=v[,1], y=v[,2])) +
                                                         ggplot2::geom_point(shape=19) +
@@ -294,8 +313,7 @@ AlradSpectra <- function() {
                                                         ggplot2::xlim(0, max(v)) +
                                                         ggplot2::ylim(0, max(v)) +
                                                         ggplot2::geom_abline(intercept = 0, slope = 1) +
-                                                        ggplot2::annotate("text", x=max(v)*0.1,
-                                                                          y=seq(max(v)*0.9,max(v)*0.7,-max(v)*0.05),
+                                                        ggplot2::annotate("text", x=max(v)*0.15, y=seq(max(v)*0.9,max(v)*0.7,-max(v)*0.05),
                                                                           label = paste(names(get(v.stats.name)),"=",get(v.stats.name)))
                                         Sys.sleep(1)
                                         gbutton("Save plot", cont = wingroup, handler = function(...) fsaveplot(800, 400))
@@ -317,7 +335,7 @@ AlradSpectra <- function() {
                                         ggraphics(cont = wingroup, no_popup=TRUE)
                                         Sys.sleep(1)
                                         gbutton("Save plot", cont = wingroup, handler = function(...) fsaveplot(800, 600))
-                                        comp.plot <- ggplot(varImp(h), top=40)
+                                        comp.plot <- ggplot2::ggplot(varImp(h), top=40)
                                         Rmisc::multiplot(comp.plot)
   }
   # Adds preprocessing to combobox in Model tab only if it is not already there
