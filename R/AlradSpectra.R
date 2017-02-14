@@ -155,7 +155,7 @@ AlradSpectra <- function() {
                                        Sys.sleep(1) #Wait for window creation before trying to plot to avoid errors
                                        gbutton("Save plot", cont=wingroup, handler = function(...) fsaveplot(500, 450))
                                        histo    <- ggplot2::ggplot(alldata, ggplot2::aes(x=alldata[,soil.var.column])) + 
-                                                   ggplot2::geom_histogram(aes(fill = ..count..), binwidth = 0.5) +
+                                                   ggplot2::geom_histogram(ggplot2::aes(fill = ..count..), binwidth = 0.5) +
                                                    ggplot2::scale_fill_gradient("Frequency", low = "darkolivegreen2",
                                                                                 high = "dodgerblue3") +
                                                    ggplot2::labs(x = soil.var.name, y = "Frequency") +
