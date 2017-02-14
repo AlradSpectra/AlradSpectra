@@ -30,7 +30,8 @@ AlradSpectra <- function() {
                                          return(TRUE) #Don't close
                                        }
   # Clears all data, empties forms and resets Alrad to initial status
-  fclear       <- function(...)       {gconfirm("Clear Alrad Spectra?", title="Clear", icon="warning", parent=window,
+  fnew         <- function(...)       {gconfirm("Clear Alrad Spectra and \nstart a new project?",
+                                                title="New", icon="warning", parent=window,
                                                 handler=function(h, ...) {svalue(file.browse)   <- ""
                                                                           svalue(file.sep)      <- ","
                                                                           svalue(spc.start.col) <- ""
@@ -43,10 +44,25 @@ AlradSpectra <- function() {
                                                                           enabled(models) = FALSE
                                                                           enabled(mdl) = FALSE
                                                                           enabled(pred) = FALSE
-                                                                          rm(envir=.GlobalEnv) #Remove everything in Global Environment
+                                                                          rm(list=ls(), envir=.GlobalEnv) #Remove everything in Global Environment
                                                                           }
                                                 )
-                                       }
+                                        }
+  # Opens a saved project
+  fopen        <- function(...)        {proj.browse <- gfile("Open File", type="open",
+                                                             filter=c("Workspace image (.RData)"="RData"),
+                                                             cont = window)
+                                        load(proj.browse, envir=.GlobalEnv)
+                                        }
+  # Saves current project with all R workspace
+  fsave        <- function(...)        {fdialog <- gfile("Save Project", type="save", initialfilename="Project", container=window,
+                                                         filter=c("Workspace image (.RData)"="RData"),
+                                                         cont = window)
+                                        #If fdialog is not equal to NA, keep running        
+                                        if(!(is.na(fdialog))) {fname <- paste0(fdialog,".RData")
+                                                               save.image(fname)
+                                                               }
+                                        }
   # Handler for quit action. Makes sure the user really wants to quit Alrad.
   fquit        <- function(...)        gconfirm("Are you sure?", icon="warning", parent=window, handler=dispose(window))
   # Creates and shows the window with information about Alrad Spectra
@@ -66,7 +82,9 @@ AlradSpectra <- function() {
                                                      "<b>D</b>","iego Gris\n",
                                                      "\n",
                                                      "For further information:\n",
-                                                     "<i>Contact the authors by e-mail.\nAlrad Spectra paper will be available soon.</i>\n\n",
+                                                     "The paper will be available soon.\n",
+                                                     "Alrad Spectra can be downloaded from\n",
+                                                     "<i>github.com/AlradSpectra/AlradSpectra</i>",
                                                      sep="", collapse=""),
                                               markup = TRUE, container = wingroup
                                               )
@@ -74,7 +92,8 @@ AlradSpectra <- function() {
   # Opens up a dialog to search for file to be imported
   fbrowse      <- function(h, ...)    {svalue(h) <- gfile("Open File", type="open",
                                                           filter=c("Comma Separated Values (.csv)"="csv"),
-                                                          cont = window)}
+                                                          cont = window)
+                                       }
   # Imports csv file to global environment and sets variables used afterwards
   fimport      <- function(...)       {alert <<- galert("Wait...", title = "Importing File", delay=10000, parent=notebook)
                                        tryCatch({alldata <<- read.table(file = svalue(file.browse),
@@ -695,10 +714,12 @@ AlradSpectra <- function() {
   ### Confirm window closing
   addHandlerUnrealize(window, handler = fconfirmquit)
   ### Clear, Quit and About buttons
-  action.list   <- list(clear =  gaction(label = "Clear",  icon = "clear",  handler = fclear),
+  action.list   <- list(new =  gaction(label = "New",  icon = "new",  handler = fnew),
+                        open =  gaction(label = "Open",  icon = "open",  handler = fopen),
+                        save =  gaction(label = "Save",  icon = "save",  handler = fsave),
                         quit = gaction(label = "Quit", icon = "quit",  handler = fquit),
                         about = gaction(label = "About", icon = "about",  handler = fabout))
-  toolbar.list  <- c(action.list[c("clear")], sep = gseparator(), action.list["quit"],
+  toolbar.list  <- c(action.list[c("new", "open", "save")], sep = gseparator(), action.list["quit"],
                      sep = gseparator(), action.list["about"] )
   toolbar       <- gtoolbar(toolbar.list, cont = window)
 
