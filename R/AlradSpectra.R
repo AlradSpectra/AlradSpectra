@@ -8,25 +8,28 @@
 
 AlradSpectra <- function() {
 
+  # Create environment for AlradSpectra
+  AlradEnv <- new.env()
+  
   ###################################################
   ### Auxiliar functions
   ###################################################
   
   # Warning handler
-  fwarning     <- function(w)         {dispose(alert)
+  fwarning     <- function(w)         {dispose(AlradEnv$alert)
                                        gmessage(message = w$message, title = "Warning", icon="warning", parent = window)
                                        stop()
                                        }
   # Error handler
-  ferror       <- function(e)         {dispose(alert)
+  ferror       <- function(e)         {dispose(AlradEnv$alert)
                                        gmessage(message = e$message, title = "Error", icon="error", parent = window)
                                        stop()
                                        }
   # Makes sure the user really wants to quit Alrad when closing the window
   fconfirmquit <- function(h, ...)    {sure <- gconfirm("Clear Alrad Spectra and quit?", parent=h$obj)
                                        if(as.logical(sure)) {
-                                         rm(list = ls(pos = ".GlobalEnv"),
-                                            envir = .GlobalEnv) #Remove everything in Global Environment
+                                         rm(list = ls(AlradEnv),
+                                            envir = AlradEnv) #Remove everything in Alrad Environment
                                          return(FALSE) #Close
                                        } else{
                                            return(TRUE) #Don't close
@@ -48,8 +51,8 @@ AlradSpectra <- function() {
                                                                        enabled(models) = FALSE
                                                                        enabled(mdl) = FALSE
                                                                        enabled(pred) = FALSE
-                                                                       rm(list = ls(pos = ".GlobalEnv"),
-                                                                          envir = .GlobalEnv) #Remove everything in Global Environment
+                                                                       rm(list = ls(AlradEnv),
+                                                                          envir = AlradEnv) #Remove everything in Alrad Environment
                                                                        }
                                                 )
                                         }
@@ -57,22 +60,32 @@ AlradSpectra <- function() {
                                                              filter=c("Workspace image (.RData)"="RData"),
                                                              cont = window)
                                         if(!(is.na(proj.browse))) {
-                                          alertop <<- galert("Wait...", title = "Loading Project", delay=10000, parent=notebook)
+                                          rm(list = ls(AlradEnv), envir = AlradEnv) #Remove everything in Alrad Environment
+                                          AlradEnv$alertop       <- galert("Wait...", title = "Loading Project",
+                                                                           delay=10000, parent=notebook)
                                           Sys.sleep(1) #Wait for alert to be shown
-                                          load(proj.browse, envir=.GlobalEnv)
+                                          load(proj.browse, envir=AlradEnv)
+                                          svalue(file.sep)       <- ","
+                                          svalue(spc.start.col)  <- AlradEnv$spectra.start.column
+                                          svalue(spc.end.col)    <- AlradEnv$spectra.end.column
+                                          svalue(spc.first)      <- AlradEnv$spectra.start.number
+                                          svalue(spc.last)       <- AlradEnv$spectra.end.number
+                                          svalue(soil.var.col)   <- AlradEnv$soil.var.column
+                                          svalue(soil.var.nm)    <- AlradEnv$soil.var.name
+                                          svalue(notebook)       <- 1 #Focus on import tab
                                           enabled(pp) = TRUE #Enable preprocessing module
                                           enabled(models) = TRUE #Enable modeling module
-                                          select.dataset[]       <-  dataset
+                                          select.dataset[]       <-  AlradEnv$dataset
                                           svalue(select.dataset) <- "Original"
-                                          if(length(pred.models)!=0) {#If there are models in the loaded data
-                                            select.model[]       <- pred.models
-                                            svalue(select.model) <- pred.models[1]
+                                          if(length(AlradEnv$pred.models)!=0) {#If there are models in the loaded data
+                                            select.model[]       <- AlradEnv$pred.models
+                                            svalue(select.model) <- AlradEnv$pred.models[1]
                                             enabled(pred) = TRUE #Enable prediction module
                                             }
-                                          if(exists("spc.pred", envir=.GlobalEnv)) {#If there is a dataset for prediction
+                                          if(exists("spc.pred", envir=AlradEnv)) {#If there is a dataset for prediction
                                             enabled(pred.predict) = TRUE #Enable predict group
                                             }
-                                          dispose(alertop)
+                                          dispose(AlradEnv$alertop)
                                           gmessage(message = "Project loaded!", title = "Open Project", parent = window)
                                           }
                                         }
@@ -83,17 +96,18 @@ AlradSpectra <- function() {
                                         
                                         #If fdialog is not equal to NA, keep running
                                         if(!(is.na(fdialog))) {
-                                          alert <<- galert("Wait...", title = "Saving Project", delay=10000, parent=notebook)
+                                          AlradEnv$alert <- galert("Wait...", title = "Saving Project", delay=10000, parent=notebook)
+                                          Sys.sleep(1) #Wait for alert to be shown
                                           fname <- paste0(fdialog,".RData")
-                                          save.image(fname)
-                                          dispose(alert)
+                                          save(list = ls(AlradEnv, all.names = TRUE), file = fname, envir = AlradEnv)
+                                          dispose(AlradEnv$alert)
                                           gmessage(message = "Project saved!", title = "Save Project", parent = window)
                                           }
                                         }
   # Handler for quit action. Makes sure the user really wants to quit Alrad.
   fquit        <- function(...)        gconfirm("Clear Alrad Spectra and quit?", icon="warning", parent=window,
-                                                handler = function(...) {rm(list = ls(pos = ".GlobalEnv"),
-                                                                            envir = .GlobalEnv) #Remove everything in Global Environment
+                                                handler = function(...) {rm(list = ls(AlradEnv),
+                                                                            envir = AlradEnv) #Remove everything in Alrad Environment
                                                                          dispose(window)
                                                                          }
                                                 )
@@ -127,34 +141,34 @@ AlradSpectra <- function() {
                                                           cont = window)
                                        }
   # Imports csv file to global environment and sets variables used afterwards
-  fimport      <- function(...)       {alert <<- galert("Wait...", title = "Importing File", delay=10000, parent=notebook)
-                                       tryCatch({alldata <<- read.table(file = svalue(file.browse),
-                                                                        header = as.logical(svalue(file.header)),
-                                                                        sep = svalue(file.sep))
-                                                 spectra.start.column   <<- as.numeric(svalue(spc.start.col))
-                                                 spectra.end.column     <<- as.numeric(svalue(spc.end.col))
-                                                 spectra.start.number   <<- as.numeric(svalue(spc.first))
-                                                 spectra.end.number     <<- as.numeric(svalue(spc.last))
-                                                 soil.var.column        <<- as.numeric(svalue(soil.var.col))
-                                                 soil.var.name          <<- svalue(soil.var.nm)
+  fimport      <- function(...)       {AlradEnv$alert <- galert("Wait...", title = "Importing File", delay=10000, parent=notebook)
+                                       tryCatch({AlradEnv$alldata <- read.table(file = svalue(file.browse),
+                                                                                header = as.logical(svalue(file.header)),
+                                                                                sep = svalue(file.sep))
+                                                 AlradEnv$spectra.start.column <- as.numeric(svalue(spc.start.col))
+                                                 AlradEnv$spectra.end.column   <- as.numeric(svalue(spc.end.col))
+                                                 AlradEnv$spectra.start.number <- as.numeric(svalue(spc.first))
+                                                 AlradEnv$spectra.end.number   <- as.numeric(svalue(spc.last))
+                                                 AlradEnv$soil.var.column      <- as.numeric(svalue(soil.var.col))
+                                                 AlradEnv$soil.var.name        <- svalue(soil.var.nm)
                                                  fonlyspectra() #Create dataframe with spectra only
-                                                 dataset                <<- c("Original")
-                                                 select.dataset[]       <-  dataset
-                                                 svalue(select.dataset) <- "Original"
-                                                 pred.models            <<- c()
+                                                 AlradEnv$dataset              <- c("Original")
+                                                 select.dataset[]              <-  AlradEnv$dataset
+                                                 svalue(select.dataset)        <- "Original"
+                                                 AlradEnv$pred.models          <- c()
                                                  },
                                                  warning = function(w) fwarning(w),
                                                  error =  function(e) ferror(e)
                                                  )
                                       enabled(pp) = TRUE
                                       enabled(models) = TRUE
-                                      dispose(alert)
+                                      dispose(AlradEnv$alert)
                                       gmessage(message = "Import successful!", title = "File import", parent = window)
                                       }
   # Create dataframe that contains only the spectral data to be used for preprocessing
-  fonlyspectra <- function(...)       {spc <- alldata[,spectra.start.column:spectra.end.column]
-                                       colnames(spc) <- c(spectra.start.number:spectra.end.number)
-                                       Original <<- spc
+  fonlyspectra <- function(...)       {spc <- AlradEnv$alldata[,AlradEnv$spectra.start.column:AlradEnv$spectra.end.column]
+                                       colnames(spc) <- c(AlradEnv$spectra.start.number:AlradEnv$spectra.end.number)
+                                       AlradEnv$Original <- spc
                                        }
   # Opens up a window to display imported data in tabular form
   fview        <- function(h, w, ...) {gtable(h, cont = gwindow("View data", width = w, height = 200, parent = window))}
@@ -180,10 +194,11 @@ AlradSpectra <- function() {
                                                               }
                                        }
   # View Y variable descriptive statistics
-  fdescy       <- function(...)       {alert <<- galert("Wait...", title = "Descriptive Statistics", delay=10000, parent=notebook)
-                                       descstats  <- fitdistrplus::descdist(alldata[,soil.var.column], graph=F)
+  fdescy       <- function(...)       {AlradEnv$alert <- galert("Wait...", title = "Descriptive Statistics",
+                                                                delay=10000, parent=notebook)
+                                       descstats  <- fitdistrplus::descdist(AlradEnv$alldata[,AlradEnv$soil.var.column], graph=F)
                                        descnames  <- rbind("Obs","Min","Max","Mean","Median","Std Dev","Skewness","Kurtosis")
-                                       descvalues <- rbind(nrow(alldata),
+                                       descvalues <- rbind(nrow(AlradEnv$alldata),
                                                            round(descstats$min,2),
                                                            round(descstats$max,2),
                                                            round(descstats$mean,2),
@@ -192,10 +207,10 @@ AlradSpectra <- function() {
                                                            round(descstats$skewness,2),
                                                            round(descstats$kurtosis,2))
                                        desctable  <- data.frame("Parameter"=descnames,"Value"=descvalues)
-                                       dispose(alert)
+                                       dispose(AlradEnv$alert)
                                        descwin    <- gwindow("Descriptive statistics", width=300, height=300, parent=window)
                                        desc.lyt   <- glayout(horizontal=FALSE, container=descwin)
-                                       desc.lyt[1,1,expand=TRUE] <- gtable(as.data.frame(desctable), cont = desc.lyt)
+                                       desc.lyt[1,1,expand=TRUE]  <- gtable(as.data.frame(desctable), cont = desc.lyt)
                                        desc.lyt[2,1,expand=FALSE] <- gbutton("Save results", cont=desc.lyt,
                                                                             anchor=c(0,-1),
                                                                             handler=function(...) fsaveresults(desctable))
@@ -206,11 +221,12 @@ AlradSpectra <- function() {
                                        ggraphics(cont = wingroup, no_popup=TRUE)
                                        Sys.sleep(1) #Wait for window creation before trying to plot to avoid errors
                                        gbutton("Save plot", cont=wingroup, handler = function(...) fsaveplot(500, 450))
-                                       histo    <- ggplot2::ggplot(alldata, ggplot2::aes(x=alldata[,soil.var.column])) + 
+                                       histo    <- ggplot2::ggplot(AlradEnv$alldata,
+                                                                   ggplot2::aes(x=AlradEnv$alldata[,AlradEnv$soil.var.column])) + 
                                                    ggplot2::geom_histogram(ggplot2::aes(fill = ..count..), binwidth = 0.5) +
                                                    ggplot2::scale_fill_gradient("Frequency", low = "darkolivegreen2",
                                                                                 high = "dodgerblue3") +
-                                                   ggplot2::labs(x = soil.var.name, y = "Frequency") +
+                                                   ggplot2::labs(x = AlradEnv$soil.var.name, y = "Frequency") +
                                                    ggplot2::guides(fill=FALSE)
                                        Rmisc::multiplot(histo)
                                        }
@@ -219,50 +235,53 @@ AlradSpectra <- function() {
                                                         filter=c("Comma Separated Values (.csv)"="csv"))
                                        #If fdialog is not equal to NA, keep running        
                                        if(!(is.na(fdialog))) {fname      <- paste0(fdialog,".csv")
-                                                              spectrum   <- seq(spectra.start.column, spectra.end.column)
-                                                              exportdata <- cbind(alldata[,-spectrum], h)
+                                                              spectrum   <- seq(AlradEnv$spectra.start.column,
+                                                                                AlradEnv$spectra.end.column)
+                                                              exportdata <- cbind(AlradEnv$alldata[,-spectrum], h)
                                                               write.csv(exportdata, row.names = FALSE, file = fname)
                                                               }
                                        }
   # Adds preprocessing to combobox in Model tab only if it is not already there
-  faddtodtset  <- function(h, ...) {present <- is.element(h, dataset)
+  faddtodtset  <- function(h, ...) {present <- is.element(h, AlradEnv$dataset)
                                        if(present==FALSE)
-                                         dataset <<- c(dataset, h)
-                                         select.dataset[] <- dataset
+                                         AlradEnv$dataset <- c(AlradEnv$dataset, h)
+                                         select.dataset[] <- AlradEnv$dataset
                                        }
   # Splits dataset in training and validaton sets
   fsplit       <- function(...)       {set.seed(1) #Random Number Generation
-                                       x           <- eval(parse(text = svalue(select.dataset))) #Get selected dataset
-                                       x           <- cbind(x, alldata[soil.var.column]) #Join spectral data and soil property
+                                       x           <- eval(parse(text = paste0("AlradEnv$", svalue(select.dataset)))) #Get selected dataset
+                                       x           <- cbind(x, AlradEnv$alldata[AlradEnv$soil.var.column]) #Join spectral data and soil property
                                        indices     <- sample(1:nrow(x), size = (svalue(split.val)/100)*nrow(x)) #Random sampling
                                        t           <- x[-indices,] #Training set
                                        v           <- x[ indices,] #Validation set
                                        colnames(t) <- paste("X", colnames(t), sep = "") #Add X before wavelength
                                        colnames(v) <- paste("X", colnames(v), sep = "") #Add X before wavelength
-                                       Train       <<- t #Send to Global Environment
-                                       Val         <<- v #Send to Global Environment
-                                       last.col    <<- ncol(Train) #Get position of last column (soil variable)
+                                       AlradEnv$Train    <- t
+                                       AlradEnv$Val      <- v
+                                       AlradEnv$last.col <- ncol(AlradEnv$Train) #Get position of last column (soil variable)
                                        #Create formula for models
-                                       form.mdl    <<- as.formula(paste(colnames(Train[last.col]),"~",
-                                                                        paste(names(Train)[c(1:last.col-1)], collapse="+"), collapse=""))
+                                       AlradEnv$form.mdl <- as.formula(paste(colnames(AlradEnv$Train[AlradEnv$last.col]),"~",
+                                                                       paste(names(AlradEnv$Train)[c(1:AlradEnv$last.col-1)],
+                                                                             collapse="+"), collapse=""))
                                        enabled(mdl) = TRUE #Enable models module
                                        enabled(homo.button) = TRUE #Enable homogeneity test button
                                        enabled(desc.button) = TRUE #Enable descriptive stats button
                                        enabled(boxplot.button) = TRUE #Enable boxplot button
-                                       gmessage(paste("Number of training samples:", nrow(Train),
-                                                      "\n\nNumber of validation samples:", nrow(Val)),
+                                       gmessage(paste("Number of training samples:", nrow(AlradEnv$Train),
+                                                      "\n\nNumber of validation samples:", nrow(AlradEnv$Val)),
                                                 title = "Split", parent = window)
                                        }
   # Homogeneity of variance test
-  fhomo        <- function(...)       {alert      <<- galert("Wait...", title = "Levene's test", delay=10000, parent=notebook)
-                                       categories <- as.factor(c(rep(1,length(Train[,last.col])),rep(2,length(Val[,last.col]))))
-                                       homog.test <- car::leveneTest(alldata[,soil.var.column]~categories)
+  fhomo        <- function(...)       {AlradEnv$alert <- galert("Wait...", title = "Levene's test", delay=10000, parent=notebook)
+                                       categories <- as.factor(c(rep(1,length(AlradEnv$Train[,AlradEnv$last.col])),
+                                                                 rep(2,length(AlradEnv$Val[,AlradEnv$last.col]))))
+                                       homog.test <- car::leveneTest(AlradEnv$alldata[,AlradEnv$soil.var.column]~categories)
                                        if(homog.test$`Pr(>F)`[1]>0.05) {
                                          lev.res <- c("is", 'are')
                                        } else {
                                          lev.res <- c("is not", 'are not')
                                          }
-                                       dispose(alert)
+                                       dispose(AlradEnv$alert)
                                        gmessage(paste("Levene's Test for Homogeneity of Variance",
                                                       "\n\nIf the P-value is greater than 0.05 (significance level), \nthe null hypothesis",
                                                       "is not rejected and it is concluded \nthat there is no significant difference",
@@ -277,11 +296,11 @@ AlradSpectra <- function() {
                                                 title = "Homogeneity of variance test", parent = window)
                                        }
   # View train and validation descriptive statistics
-  fdesc        <- function(...)       {alert     <<- galert("Wait...", title = "Descriptive Statistics", delay=10000, parent=notebook)
-                                       trainds    <- fitdistrplus::descdist(Train[,last.col], graph=F)
-                                       valds      <- fitdistrplus::descdist(Val[,last.col], graph=F)
+  fdesc        <- function(...)       {AlradEnv$alert <- galert("Wait...", title = "Descriptive Statistics", delay=10000, parent=notebook)
+                                       trainds    <- fitdistrplus::descdist(AlradEnv$Train[,AlradEnv$last.col], graph=F)
+                                       valds      <- fitdistrplus::descdist(AlradEnv$Val[,AlradEnv$last.col], graph=F)
                                        descnames  <- rbind("Obs","Min","Max","Mean","Median","Std Dev","Skewness","Kurtosis")
-                                       descvalues <- rbind(c(nrow(Train), nrow(Val)),
+                                       descvalues <- rbind(c(nrow(AlradEnv$Train), nrow(AlradEnv$Val)),
                                                            c(round(trainds$min,2), round(valds$min,2)),
                                                            c(round(trainds$max,2), round(valds$max,2)),
                                                            c(round(trainds$mean,2), round(valds$mean,2)),
@@ -291,7 +310,7 @@ AlradSpectra <- function() {
                                                            c(round(trainds$kurtosis,2), round(valds$kurtosis,2)))
                                        desctable  <- data.frame("Parameter"=descnames,"Training"=descvalues[,1],
                                                                 "Validation"=descvalues[,2])
-                                       dispose(alert)
+                                       dispose(AlradEnv$alert)
                                        descwin    <- gwindow("Descriptive statistics", width=300, height=300, parent=window)
                                        desc.lyt   <- glayout(horizontal=FALSE, container=descwin)
                                        desc.lyt[1,1,expand=TRUE] <- gtable(as.data.frame(desctable), cont = desc.lyt)
@@ -305,13 +324,14 @@ AlradSpectra <- function() {
                                        ggraphics(cont = wingroup, no_popup=TRUE)
                                        Sys.sleep(1) #Wait for window creation before trying to plot to avoid errors
                                        gbutton("Save plot", cont=wingroup, handler = function(...) fsaveplot(400, 450))
-                                       categories <- as.factor(c(rep("Training", length(Train[,last.col])),
-                                                                 rep("Validation", length(Val[,last.col]))))
-                                       boxpl      <- ggplot2::ggplot(alldata, ggplot2::aes(x=categories, y=alldata[,soil.var.column],
-                                                                                           fill=categories)) + 
+                                       categories <- as.factor(c(rep("Training", length(AlradEnv$Train[,AlradEnv$last.col])),
+                                                                 rep("Validation", length(AlradEnv$Val[,AlradEnv$last.col]))))
+                                       boxpl      <- ggplot2::ggplot(AlradEnv$alldata, ggplot2::aes(x=categories,
+                                                                                                    y=AlradEnv$alldata[,AlradEnv$soil.var.column],
+                                                                                                    fill=categories)) + 
                                                      ggplot2::geom_boxplot(notch = TRUE) +
                                                      ggplot2::guides(fill=FALSE) +
-                                                     ggplot2::labs(x = "", y = soil.var.name) +
+                                                     ggplot2::labs(x = "", y = AlradEnv$soil.var.name) +
                                                      ggplot2::theme(axis.text = ggplot2::element_text(size=12),
                                                                     axis.title = ggplot2::element_text(size=13))
                                        Rmisc::multiplot(boxpl)
@@ -356,9 +376,10 @@ AlradSpectra <- function() {
   # Get model accuracy and display in tabular form
   fmdl.stats    <- function(t, v, ...) {t.stats.name <- paste0(deparse(substitute(t)), ".stats") #Create training stats table name
                                         v.stats.name <- paste0(deparse(substitute(v)), ".stats") #Create validation stats table name
-                                        assign(t.stats.name, fstats(t[,1], t[,2]), envir = .GlobalEnv) #Compute training stats
-                                        assign(v.stats.name, fstats(v[,1], v[,2]), envir = .GlobalEnv) #Compute validation stats
-                                        results      <- rbind(get(t.stats.name), get(v.stats.name)) #Merge training and validation stats
+                                        assign(t.stats.name, fstats(t[,1], t[,2]), envir = AlradEnv) #Compute training stats
+                                        assign(v.stats.name, fstats(v[,1], v[,2]), envir = AlradEnv) #Compute validation stats
+                                        results      <- rbind(get(t.stats.name, envir = AlradEnv),
+                                                              get(v.stats.name, envir = AlradEnv)) #Merge training and validation stats
                                         Set          <- c("Training", "Validation") #Titles for prediction statistics table
                                         res.table    <- cbind(Set, results) #Create prediction statistics table
                                         statswin     <- gwindow("Prediction statistics", width=350, height=150, parent=window)
@@ -374,32 +395,32 @@ AlradSpectra <- function() {
                                         ggraphics(cont = wingroup, no_popup=TRUE)
                                         t.stats.name <- paste0(deparse(substitute(t)), ".stats") #Create training stats table name
                                         v.stats.name <- paste0(deparse(substitute(v)), ".stats") #Create validation stats table name
-                                        assign(t.stats.name, fstats(t[,1], t[,2]), envir = .GlobalEnv) #Compute training stats
-                                        assign(v.stats.name, fstats(v[,1], v[,2]), envir = .GlobalEnv) #Compute validation stats
+                                        assign(t.stats.name, fstats(t[,1], t[,2]), envir = AlradEnv) #Compute training stats
+                                        assign(v.stats.name, fstats(v[,1], v[,2]), envir = AlradEnv) #Compute validation stats
                                         train.plot   <- ggplot2::ggplot(t, ggplot2::aes(x=t[,1], y=t[,2])) +
                                                         ggplot2::geom_point(shape=19) +
                                                         ggplot2::ggtitle("Training") +
                                                         ggplot2::labs(x="Measured", y="Predicted") + 
                                                         ggplot2::theme(plot.title = ggplot2::element_text(size=12, hjust=0.5)) +
                                                         ggplot2::theme(axis.title = ggplot2::element_text(size=12, hjust=0.5)) + 
-                                                        #ggplot2::labs(list(title="Training", x="Measured", y="Predicted", hjust = 0.5)) +
                                                         ggplot2::xlim(0, max(t)) +
                                                         ggplot2::ylim(0, max(t)) +
                                                         ggplot2::geom_abline(intercept = 0, slope = 1) +
                                                         ggplot2::annotate("text", x=max(v)*0.05, y=seq(max(t)*0.95, max(t)*0.75,-max(t)*0.05), hjust = 0,
-                                                                          label = paste(names(get(t.stats.name)),"=",get(t.stats.name)))
+                                                                          label = paste(names(get(t.stats.name, envir = AlradEnv)),"=",
+                                                                                        get(t.stats.name, envir = AlradEnv)))
                                         val.plot     <- ggplot2::ggplot(v, ggplot2::aes(x=v[,1], y=v[,2])) +
                                                         ggplot2::geom_point(shape=19) +
                                                         ggplot2::ggtitle("Validation") +
                                                         ggplot2::labs(x="Measured", y="Predicted") + 
                                                         ggplot2::theme(plot.title = ggplot2::element_text(size=12, hjust=0.5)) +
                                                         ggplot2::theme(axis.title = ggplot2::element_text(size=12, hjust=0.5)) + 
-                                                        #ggplot2::labs(list(title="Validation", x="Measured", y="Predicted", hjust = 0.5)) +
                                                         ggplot2::xlim(0, max(v)) +
                                                         ggplot2::ylim(0, max(v)) +
                                                         ggplot2::geom_abline(intercept = 0, slope = 1) +
                                                         ggplot2::annotate("text", x=max(v)*0.05, y=seq(max(v)*0.95,max(v)*0.75,-max(v)*0.05), hjust = 0,
-                                                                          label = paste(names(get(v.stats.name)),"=",get(v.stats.name)))
+                                                                          label = paste(names(get(v.stats.name, envir = AlradEnv)),"=",
+                                                                                        get(v.stats.name, envir = AlradEnv)))
                                         Sys.sleep(1)
                                         gbutton("Save plot", cont = wingroup, handler = function(...) fsaveplot(800, 400))
                                         Rmisc::multiplot(train.plot, val.plot, cols = 2)
@@ -424,52 +445,54 @@ AlradSpectra <- function() {
                                         Rmisc::multiplot(comp.plot)
   }
   # Adds preprocessing to combobox in Model tab only if it is not already there
-  faddtomodels  <- function(h, ...) {present <- is.element(h, pred.models)
+  faddtomodels  <- function(h, ...) {present <- is.element(h, AlradEnv$pred.models)
                                      if(present==FALSE) {
-                                       if(length(pred.models)==0) { #Special case when the list is empty (first model is being added)
-                                         pred.models          <<- c(h)
-                                         select.model[]       <<- pred.models
+                                       if(length(AlradEnv$pred.models)==0) { #Special case when the list is empty (first model is being added)
+                                         AlradEnv$pred.models <- c(h)
+                                         select.model[]       <- AlradEnv$pred.models
                                          svalue(select.model) <-  h
                                        } else {
-                                           pred.models        <<- c(pred.models, h)
-                                           select.model[]     <<- pred.models
+                                         AlradEnv$pred.models <- c(AlradEnv$pred.models, h)
+                                           select.model[]     <- AlradEnv$pred.models
                                          }
                                        
                                      }
                                      }
   # Imports csv file to global environment for prediction
-  fimport.pred  <- function(...)       {alert <<- galert("Wait...", title = "Importing File", delay=10000, parent=notebook)
-                                        tryCatch({spc <- read.table(file = svalue(pred.file.browse),
-                                                                    header = as.logical(svalue(pred.file.header)),
-                                                                    sep = svalue(pred.file.sep))
-                                                  pred.spectra.start.number <<- as.numeric(svalue(pred.spc.first))
-                                                  pred.spectra.end.number   <<- as.numeric(svalue(pred.spc.last))
-                                                  colnames(spc)             <-  c(pred.spectra.start.number:pred.spectra.end.number)
-                                                  spc.pred                  <<- spc
+  fimport.pred  <- function(...)       {AlradEnv$alert <- galert("Wait...", title = "Importing File", delay=10000, parent=notebook)
+                                        tryCatch({spc  <- read.table(file = svalue(pred.file.browse),
+                                                                     header = as.logical(svalue(pred.file.header)),
+                                                                     sep = svalue(pred.file.sep))
+                                                  AlradEnv$pred.spectra.start.number <- as.numeric(svalue(pred.spc.first))
+                                                  AlradEnv$pred.spectra.end.number   <- as.numeric(svalue(pred.spc.last))
+                                                  colnames(spc)     <- c(AlradEnv$pred.spectra.start.number:AlradEnv$pred.spectra.end.number)
+                                                  AlradEnv$spc.pred <- spc
                                                   },
                                                  warning = function(w) fwarning(w),
                                                  error =  function(e) ferror(e)
                                                  )
                                         enabled(pred.predict) = TRUE #Enable predict group
-                                        dispose(alert)
+                                        dispose(AlradEnv$alert)
                                         gmessage(message = "Import successful!", title = "File import", parent = window)
                                         }
   # Predict soil property based on a new spectra
-  fpredict      <- function(...)       {alert <<- galert("Wait...", title = "Importing File", delay=10000, parent=notebook)
-                                        tryCatch({colnames(spc.pred) <- paste("X", colnames(spc.pred), sep = "") #Add X before wavelength
-                                                  mdl                <- eval(parse(text = svalue(select.model))) #Get selected model
+  fpredict      <- function(...)       {AlradEnv$alert <- galert("Wait...", title = "Importing File", delay=10000, parent=notebook)
+                                        tryCatch({colnames(AlradEnv$spc.pred) <- paste("X", colnames(AlradEnv$spc.pred),
+                                                                                       sep = "") #Add X before wavelength
+                                                  mdl <- eval(parse(text = paste0("AlradEnv$", svalue(select.model)))) #Get selected model
                                                   if(svalue(select.model)=="PLSR") {#PLSR special case
-                                                    pls.pred         <-  data.frame(predict(PLSR, newdata=spc.pred))
-                                                    prediction       <<- data.frame(ID=row.names(spc.pred),
-                                                                                    Predicted=pls.pred[,ncol(pls.pred)])
+                                                    pls.pred <-  data.frame(predict(AlradEnv$PLSR, newdata=AlradEnv$spc.pred))
+                                                    AlradEnv$prediction <- data.frame(ID=row.names(AlradEnv$spc.pred),
+                                                                                      Predicted=pls.pred[,ncol(pls.pred)])
                                                   } else {
-                                                      prediction     <<- data.frame(ID=row.names(spc.pred), Predicted=predict(mdl, newdata=spc.pred))
+                                                    AlradEnv$prediction <- data.frame(ID=row.names(AlradEnv$spc.pred),
+                                                                                      Predicted=predict(mdl, newdata=AlradEnv$spc.pred))
                                                     }
                                                   },
                                                  warning = function(w) fwarning(w),
                                                  error =  function(e) ferror(e)
                                                  )
-                                        dispose(alert)
+                                        dispose(AlradEnv$alert)
                                         gmessage(message = "Done!", title = "Prediction", parent = window)
                                         }
   
@@ -478,110 +501,112 @@ AlradSpectra <- function() {
   ###################################################
   
   # Smoothing
-  fnrm         <- function(...) {alert <<- galert("Wait...", title = "Smoothing", delay=10000, parent=notebook)
+  fnrm         <- function(...) {AlradEnv$alert <- galert("Wait...", title = "Smoothing", delay=10000, parent=notebook)
                                  tryCatch(
-                                          {Smoothing  <<- prospectr::movav(Original, w = as.numeric(svalue(number.smooth)))
+                                          {AlradEnv$Smoothing  <- prospectr::movav(AlradEnv$Original, w = as.numeric(svalue(number.smooth)))
                                            faddtodtset("Smoothing")
                                            },
                                           warning = function(w) fwarning(w),
                                           error =  function(e) ferror(e)
                                           )
-                                 dispose(alert)
+                                 dispose(AlradEnv$alert)
                                  gmessage(message = "Done!", title = "Smoothing", icon = "info", parent = window)
                                  }
   # Binning
-  fbin         <- function(...) {alert <<- galert("Wait...", title = "Binning", delay=10000, parent=notebook)
+  fbin         <- function(...) {AlradEnv$alert <- galert("Wait...", title = "Binning", delay=10000, parent=notebook)
                                  tryCatch(
-                                          {Binning <<- prospectr::binning(Original, bin.size = as.numeric(svalue(bin.number)))
+                                          {AlradEnv$Binning <- prospectr::binning(AlradEnv$Original, bin.size = as.numeric(svalue(bin.number)))
                                            faddtodtset("Binning")
                                            },
                                           warning = function(w) fwarning(w),
                                           error =  function(e) ferror(e)
                                           )
-                                 dispose(alert)
+                                 dispose(AlradEnv$alert)
                                  gmessage(message = "Done!", title = "Binning", icon = "info", parent = window)
                                  }
   # Absorbance
-  fabs         <- function(...) {alert <<- galert("Wait...", title = "Absorbance", delay=10000, parent=notebook)
+  fabs         <- function(...) {AlradEnv$alert <- galert("Wait...", title = "Absorbance", delay=10000, parent=notebook)
                                  tryCatch(
-                                          {Absorbance <<- log10(1/Original)
+                                          {AlradEnv$Absorbance <- log10(1/AlradEnv$Original)
                                            faddtodtset("Absorbance")
                                            },
                                           warning = function(w) fwarning(w),
                                           error =  function(e) ferror(e)
                                           )
-                                 dispose(alert)
+                                 dispose(AlradEnv$alert)
                                  gmessage(message = "Done!", title = "Absorbance", icon = "info", parent = window)
                                  }
   # Detrend
-  fdet         <- function(...) {alert <<- galert("Wait...", title = "Detrend", delay=10000, parent=notebook)
+  fdet         <- function(...) {AlradEnv$alert <- galert("Wait...", title = "Detrend", delay=10000, parent=notebook)
                                  tryCatch(
-                                          {Detrend <<- prospectr::detrend(X = Original, wav = as.numeric(colnames(Original)))
+                                          {AlradEnv$Detrend <- prospectr::detrend(X = AlradEnv$Original,
+                                                                                  wav = as.numeric(colnames(AlradEnv$Original)))
                                            faddtodtset("Detrend")
                                            },
                                           warning = function(w) fwarning(w),
                                           error =  function(e) ferror(e)
                                           )
-                                 dispose(alert)
+                                 dispose(AlradEnv$alert)
                                  gmessage(message = "Done!", title = "Detrend", icon = "info", parent = window)
                                  }
   # Continuum Removal
-  fcrm         <- function(...) {alert <<- galert("Wait...", title = "Continuum Removal", delay=10000, parent=notebook)
+  fcrm         <- function(...) {AlradEnv$alert <- galert("Wait...", title = "Continuum Removal", delay=10000, parent=notebook)
                                  tryCatch(
-                                          {ContRem <- prospectr::continuumRemoval(X=Original, wav = as.numeric(colnames(Original)),
+                                          {ContRem <- prospectr::continuumRemoval(X=AlradEnv$Original,
+                                                                                  wav = as.numeric(colnames(AlradEnv$Original)),
                                                                                   type = "R", interpol="linear", method="division")
-                                           ContinuumRemoval <<- ContRem[,c(-1,-ncol(ContRem))]
+                                          AlradEnv$ContinuumRemoval <- ContRem[,c(-1,-ncol(ContRem))]
                                            faddtodtset("ContinuumRemoval")
                                            },
                                           warning = function(w) fwarning(w),
                                           error =  function(e) ferror(e)
                                           )
-                                 dispose(alert)
+                                 dispose(AlradEnv$alert)
                                  gmessage(message = "Done!", title = "Continuum Removal", icon = "info", parent = window)
                                  }
   # Savitzky-Golay Derivative
-  fsgd         <- function(...) {alert <<- galert("Wait...", title = "Savitzky-Golay Derivative", delay=10000, parent=notebook)
+  fsgd         <- function(...) {AlradEnv$alert <- galert("Wait...", title = "Savitzky-Golay Derivative", delay=10000, parent=notebook)
                                  tryCatch(
-                                          {SavitzkyGolayDerivative <<- prospectr::savitzkyGolay(Original,
-                                                                                                p = as.numeric(svalue(sgd.poly)),
-                                                                                                w = as.numeric(svalue(sgd.smooth)),
-                                                                                                m = as.numeric(svalue(sgd.deriv)))
+                                          {AlradEnv$SavitzkyGolayDerivative <- prospectr::savitzkyGolay(AlradEnv$Original,
+                                                                                                        p = as.numeric(svalue(sgd.poly)),
+                                                                                                        w = as.numeric(svalue(sgd.smooth)),
+                                                                                                        m = as.numeric(svalue(sgd.deriv)))
                                            faddtodtset("SavitzkyGolayDerivative")
                                            },
                                           warning = function(w) fwarning(w),
                                           error =  function(e) ferror(e)
                                           )
-                                 dispose(alert)
+                                 dispose(AlradEnv$alert)
                                  gmessage(message = "Done!", title = "Savitzky-Golay Derivative", icon = "info", parent = window)
                                  }
   # Standard Normal Variate
-  fsnv         <- function(...) {alert <<- galert("Wait...", title = "SNV", delay=10000, parent=notebook)
+  fsnv         <- function(...) {AlradEnv$alert <- galert("Wait...", title = "SNV", delay=10000, parent=notebook)
                                  tryCatch(
-                                          {SNV <<- prospectr::standardNormalVariate(X = Original)
+                                          {AlradEnv$SNV <- prospectr::standardNormalVariate(X = AlradEnv$Original)
                                            faddtodtset("SNV")
                                            },
                                           warning = function(w) fwarning(w),
                                           error =  function(e) ferror(e)
                                           )
-                                 dispose(alert)
+                                 dispose(AlradEnv$alert)
                                  gmessage(message = "Done!", title = "SNV", icon = "info", parent = window)
                                  }
   # Multiplicative Scatter Correction
-  fmsc         <- function(...) {alert <<- galert("Wait...", title = "MSC", delay=10000, parent=notebook)
+  fmsc         <- function(...) {AlradEnv$alert <- galert("Wait...", title = "MSC", delay=10000, parent=notebook)
                                  tryCatch(
-                                          {MSC <<- pls::msc(as.matrix(Original))
+                                          {AlradEnv$MSC <- pls::msc(as.matrix(AlradEnv$Original))
                                            faddtodtset("MSC")
                                            },
                                           warning = function(w) fwarning(w),
                                           error =  function(e) ferror(e)
                                           )
-                                 dispose(alert)
+                                 dispose(AlradEnv$alert)
                                  gmessage(message = "Done!", title = "MSC", icon = "info", parent = window)
                                  }
   # Normalization
-  fnor         <- function(...) {alert <<- galert("Wait...", title = "Normalization", delay=10000, parent=notebook)
+  fnor         <- function(...) {AlradEnv$alert <- galert("Wait...", title = "Normalization", delay=10000, parent=notebook)
                                  tryCatch(
-                                          {Normalization <<- clusterSim::data.Normalization(Original,
+                                          {AlradEnv$Normalization <- clusterSim::data.Normalization(AlradEnv$Original,
                                                                                             type = sub(":.*$","", svalue(nor.type)),
                                                                                             normalization = "row")
                                            faddtodtset("Normalization")
@@ -589,7 +614,7 @@ AlradSpectra <- function() {
                                           warning = function(w) fwarning(w),
                                           error =  function(e) ferror(e)
                                           )
-                                 dispose(alert)
+                                 dispose(AlradEnv$alert)
                                  gmessage("Done!", title = "Normalization", icon = "info",  parent = window)
                                  }
   
@@ -598,27 +623,32 @@ AlradSpectra <- function() {
   ###################################################
   
   # MLR
-  fmlr        <- function(...)  {alert <<- galert("Wait... \nThis may take a few minutes!", title = "MLR model", delay=10000, parent=notebook)
-                                 Sys.sleep(1) #Wait for alert to be shown
+  fmlr        <- function(...)  {AlradEnv$alert <- galert("Wait... \nThis may take a few minutes!", title = "MLR model",
+                                                          delay=10000, parent=notebook)
+                                 Sys.sleep(1) #Wait for AlradEnv$alert to be shown
                                  tryCatch(
-                                          {form.mlr  <- as.formula(paste(colnames(Train[last.col]),"~",
-                                                                         paste(names(Train)[c(seq(1,last.col-1, by=svalue(mlr.band.interval)))],
+                                          {form.mlr  <- as.formula(paste(colnames(AlradEnv$Train[AlradEnv$last.col]),"~",
+                                                                         paste(names(AlradEnv$Train)[c(seq(1,AlradEnv$last.col-1,
+                                                                                                           by=svalue(mlr.band.interval)))],
                                                                                collapse="+"),collapse=""))
-                                           mlr.model <<- stats::glm(form.mlr, data=Train)
-                                           MLR       <<- stats::step(mlr.model, direction="both", trace=0)
-                                           mlr.train <<- data.frame(Train[last.col], Predicted=mlr.model$fitted.values)
-                                           mlr.val   <<- data.frame(Val[last.col], Predicted=predict(MLR, newdata=Val))
+                                           AlradEnv$mlr.model <- stats::glm(form.mlr, data=AlradEnv$Train)
+                                           AlradEnv$MLR       <- stats::step(AlradEnv$mlr.model, direction="both", trace=0)
+                                           AlradEnv$mlr.train <- data.frame(AlradEnv$Train[AlradEnv$last.col],
+                                                                            Predicted=AlradEnv$mlr.model$fitted.values)
+                                           AlradEnv$mlr.val   <- data.frame(AlradEnv$Val[AlradEnv$last.col],
+                                                                            Predicted=predict(AlradEnv$MLR, newdata=AlradEnv$Val))
                                            faddtomodels("MLR")
                                            enabled(pred) = TRUE #Enable prediction module
                                            },
                                           warning = function(w) fwarning(w),
                                           error =  function(e) ferror(e)
                                           )
-                                 dispose(alert)
+                                 dispose(AlradEnv$alert)
                                  gmessage("MLR model done", title = "MLR model", parent = window)
                                  }
   # PLSR
-  fpls        <- function(...) {alert <<- galert("Wait... \nThis may take a few minutes!", title = "PLSR model", delay=10000, parent=notebook)
+  fpls        <- function(...) {AlradEnv$alert <- galert("Wait... \nThis may take a few minutes!", title = "PLSR model",
+                                                         delay=10000, parent=notebook)
                                 Sys.sleep(1)
                                 tryCatch(
                                          {bootctrl.pls <- caret::trainControl(method  <- svalue(pls.resampling),
@@ -627,126 +657,142 @@ AlradSpectra <- function() {
                                                                               repeats <- ifelse(grepl("cv", method), svalue(pls.folds),
                                                                                                 number)
                                                                               )
-                                          Grid      <-  expand.grid(.ncomp = seq(1,svalue(pls.comp), 1))
-                                          pls.test  <<- caret::train(form.mdl, data = Train, method = 'pls',
+                                          Grid               <-  expand.grid(.ncomp = seq(1,svalue(pls.comp), 1))
+                                          AlradEnv$pls.test  <- caret::train(AlradEnv$form.mdl, data = AlradEnv$Train, method = 'pls',
                                                                      trControl = bootctrl.pls, tuneGrid = Grid)
-                                          PLSR      <<- pls::plsr(form.mdl, data = Train, ncomp = pls.test$bestTune$ncomp)
-                                          t.pred    <-  data.frame(PLSR$fitted.values)
-                                          v.pred    <-  data.frame(predict(PLSR, newdata=Val))
-                                          pls.train <<- data.frame(Train[last.col], Predicted=t.pred[,ncol(t.pred)])
-                                          pls.val   <<- data.frame(Val[last.col], Predicted=v.pred[,ncol(v.pred)])
+                                          AlradEnv$PLSR      <- pls::plsr(AlradEnv$form.mdl, data = AlradEnv$Train,
+                                                                          ncomp = AlradEnv$pls.test$bestTune$ncomp)
+                                          t.pred             <-  data.frame(AlradEnv$PLSR$fitted.values)
+                                          v.pred             <-  data.frame(predict(AlradEnv$PLSR, newdata=AlradEnv$Val))
+                                          AlradEnv$pls.train <- data.frame(AlradEnv$Train[AlradEnv$last.col], Predicted=t.pred[,ncol(t.pred)])
+                                          AlradEnv$pls.val   <- data.frame(AlradEnv$Val[AlradEnv$last.col], Predicted=v.pred[,ncol(v.pred)])
                                           faddtomodels("PLSR")
                                           enabled(pred) = TRUE #Enable prediction module
                                           },
                                          warning = function(w) fwarning(w),
                                          error =  function(e) ferror(e)
                                          )
-                                dispose(alert)
+                                dispose(AlradEnv$alert)
                                 gmessage("PLSR model done", title = "PLSR model", parent = window)
                                 }
   # SVM
-  fsvm        <- function(...) {alert <<- galert("Wait... \nThis may take a few minutes! ", title = "SVM model", delay=10000, parent=notebook)
+  fsvm        <- function(...) {AlradEnv$alert <- galert("Wait... \nThis may take a few minutes! ", title = "SVM model", delay=10000, parent=notebook)
                                 Sys.sleep(1)
                                 tryCatch(
-                                         {bootctrl.svm <<- caret::trainControl(method <- svalue(svm.resampling))
+                                         {AlradEnv$bootctrl.svm <- caret::trainControl(method <- svalue(svm.resampling))
                                           if (svalue(svm.kernel, index=TRUE)==1) fsvmlinear()
                                           if (svalue(svm.kernel, index=TRUE)==2) fsvmradial()
-                                          svm.train    <<- data.frame(Train[last.col], Predicted=SVM$fitted)
-                                          svm.val      <<- data.frame(Val[last.col], Predicted=predict(SVM, newdata=Val))
+                                          AlradEnv$svm.train    <- data.frame(AlradEnv$Train[AlradEnv$last.col], Predicted=AlradEnv$SVM$fitted)
+                                          AlradEnv$svm.val      <- data.frame(AlradEnv$Val[AlradEnv$last.col],
+                                                                              Predicted=predict(AlradEnv$SVM, newdata=AlradEnv$Val))
                                           faddtomodels("SVM")
                                           enabled(pred) = TRUE #Enable prediction module
                                           },
                                          warning = function(w) fwarning(w),
                                          error =  function(e) ferror(e)
                                          )
-                                dispose(alert)
+                                dispose(AlradEnv$alert)
                                 gmessage("SVM model done", title = "SVM model", parent = window)
                                 }
-  fsvmlinear  <- function(...) {Grid        <-  expand.grid(.C = seq(1,16,5))
-                                svm.test    <<- caret::train(form.mdl, data = Train, method = "svmLinear",
-                                                             trControl = bootctrl.svm, tuneGrid = Grid)
-                                SVM         <<- e1071::svm(form.mdl, data=Train, kernel="linear", type ="eps",
-                                                           cost=svm.test$bestTune$C)
+  fsvmlinear  <- function(...) {Grid              <- expand.grid(.C = seq(1,16,5))
+                                AlradEnv$svm.test <- caret::train(AlradEnv$form.mdl, data = AlradEnv$Train, method = "svmLinear",
+                                                                  trControl = AlradEnv$bootctrl.svm, tuneGrid = Grid)
+                                AlradEnv$SVM      <- e1071::svm(AlradEnv$form.mdl, data=AlradEnv$Train, kernel="linear", type ="eps",
+                                                                cost=AlradEnv$svm.test$bestTune$C)
                                 }
-  fsvmradial  <- function(...) {Grid        <-  expand.grid(.sigma = seq(0.000001,0.1,0.01), .C = seq(1,16,5))
-                                svm.test    <<- caret::train(form.mdl, data = Train, method = "svmRadial",
-                                                             trControl = bootctrl.svm, tuneGrid = Grid)
-                                SVM         <<- e1071::svm(form.mdl, data=Train, kernel="radial", type ="eps",
-                                                           gamma=svm.test$bestTune$sigma, cost=svm.test$bestTune$C)
+  fsvmradial  <- function(...) {Grid              <- expand.grid(.sigma = seq(0.000001,0.1,0.01), .C = seq(1,16,5))
+                                AlradEnv$svm.test <- caret::train(AlradEnv$form.mdl, data = AlradEnv$Train, method = "svmRadial",
+                                                                  trControl = AlradEnv$bootctrl.svm, tuneGrid = Grid)
+                                AlradEnv$SVM      <- e1071::svm(AlradEnv$form.mdl, data=AlradEnv$Train, kernel="radial", type ="eps",
+                                                                gamma=AlradEnv$svm.test$bestTune$sigma, cost=AlradEnv$svm.test$bestTune$C)
                                 }
   # RF
-  frf         <- function(...) {alert <<- galert("Wait... \nThis may take a few minutes! ", title = "RF model", delay=10000, parent=notebook)
+  frf         <- function(...) {AlradEnv$alert <- galert("Wait... \nThis may take a few minutes! ", title = "RF model", 
+                                                         delay=10000, parent=notebook)
                                 Sys.sleep(1)
                                 tryCatch(
                                          {bootControl <- caret::trainControl(method <- svalue(rf.resampling))
                                           Grid        <- expand.grid(.mtry = seq(svalue(rf.mtry)/5,svalue(rf.mtry),svalue(rf.mtry)/5))
-                                          rf.test     <<- caret::train(form.mdl, data = Train, method = 'rf', trControl = bootControl,
-                                                                       tuneGrid = Grid, importance = TRUE)
-                                          RF          <<- randomForest::randomForest(form.mdl, data=Train, mtry=rf.test$bestTune$mtry,
-                                                                                     ntree = as.numeric(svalue(rf.ntree)))
-                                          rf.train    <<- data.frame(Train[last.col], Predicted=RF$predicted)
-                                          rf.val      <<- data.frame(Val[last.col], Predicted=predict(RF, newdata=Val))
+                                          AlradEnv$rf.test     <- caret::train(AlradEnv$form.mdl, data = AlradEnv$Train, 
+                                                                               method = 'rf', trControl = bootControl,
+                                                                               tuneGrid = Grid, importance = TRUE)
+                                          AlradEnv$RF          <- randomForest::randomForest(AlradEnv$form.mdl, 
+                                                                                             data=AlradEnv$Train, mtry=AlradEnv$rf.test$bestTune$mtry,
+                                                                                             ntree = as.numeric(svalue(rf.ntree)))
+                                          AlradEnv$rf.train    <- data.frame(AlradEnv$Train[AlradEnv$last.col], 
+                                                                             Predicted=AlradEnv$RF$predicted)
+                                          AlradEnv$rf.val      <- data.frame(AlradEnv$Val[AlradEnv$last.col], 
+                                                                             Predicted=predict(AlradEnv$RF, newdata=AlradEnv$Val))
                                           faddtomodels("RF")
                                           enabled(pred) = TRUE #Enable prediction module
                                           },
                                          warning = function(w) fwarning(w),
                                          error =  function(e) ferror(e)
                                          )
-                                dispose(alert)
+                                dispose(AlradEnv$alert)
                                 gmessage("RF model done", title = "RF model", parent = window)
                                 }
   # ANN
-  fann         <- function(...) {alert <<- galert("Wait... \nThis may take a few minutes! ", title = "ANN model", delay=10000, parent=notebook)
+  fann         <- function(...) {AlradEnv$alert <- galert("Wait... \nThis may take a few minutes! ", title = "ANN model", 
+                                                          delay=10000, parent=notebook)
                                  Sys.sleep(1)
                                  tryCatch(
-                                          {bootControl  <- caret::trainControl(method= svalue(ann.resampling), preProcOptions = list(thresh = 0.95, cutoff = 0.95))
+                                          {bootControl  <- caret::trainControl(method= svalue(ann.resampling), 
+                                                                               preProcOptions = list(thresh = 0.95, cutoff = 0.95))
                                            Grid         <- expand.grid(.nhid= seq(1,svalue(ann.hid),ceiling(svalue(ann.hid)/10)),
                                                                        .actfun= c("sin", "radbas", "purelin", "tansig"))
-                                           ann.test     <<- caret::train(form.mdl, data = Train, method = 'elm', trControl = bootControl,
-                                                                         tuneGrid = Grid , na.action = na.fail, preProcess = c("nzv","center"))
-                                           ANN          <<- elmNN::elmtrain(form.mdl, data=Train, nhid=ann.test$bestTune$nhid,
-                                                                            actfun= ann.test$bestTune$actfun)
-                                           ann.train    <<- data.frame(Train[last.col], Predicted=ANN$fitted.values)
-                                           ann.val      <<- data.frame(Val[last.col], Predicted=predict(ANN, newdata=Val))
+                                           AlradEnv$ann.test     <- caret::train(AlradEnv$form.mdl, data = AlradEnv$Train, method = 'elm', 
+                                                                                 trControl = bootControl, tuneGrid = Grid , na.action = na.fail, 
+                                                                                 preProcess = c("nzv","center"))
+                                           AlradEnv$ANN          <- elmNN::elmtrain(AlradEnv$form.mdl, data=AlradEnv$Train, 
+                                                                                    nhid=AlradEnv$ann.test$bestTune$nhid,
+                                                                                    actfun= AlradEnv$ann.test$bestTune$actfun)
+                                           AlradEnv$ann.train    <- data.frame(AlradEnv$Train[AlradEnv$last.col], 
+                                                                               Predicted=AlradEnv$ANN$fitted.values)
+                                           AlradEnv$ann.val      <- data.frame(AlradEnv$Val[AlradEnv$last.col], 
+                                                                               Predicted=predict(AlradEnv$ANN, newdata=AlradEnv$Val))
                                            faddtomodels("ANN")
                                            enabled(pred) = TRUE #Enable prediction module
                                            },
                                           warning = function(w) fwarning(w),
                                           error =  function(e) ferror(e)
                                           )
-                                 dispose(alert)
+                                 dispose(AlradEnv$alert)
                                  gmessage("ANN model done", title = "ANN model", parent = window)
                                  }
   # KBML
-  fkbml        <- function(...) {alert <<- galert("Wait... \nThis may take a few minutes! ", title = "KBML model", delay=10000, parent=notebook)
+  fkbml        <- function(...) {AlradEnv$alert <- galert("Wait... \nThis may take a few minutes! ", title = "KBML model", 
+                                                          delay=10000, parent=notebook)
                                  Sys.sleep(1)
                                  tryCatch(
-                                          {bootctrl.kbml <<- caret::trainControl(method= svalue(kbml.resampling))
+                                          {AlradEnv$bootctrl.kbml <- caret::trainControl(method= svalue(kbml.resampling))
                                            if (svalue(kbml.kernel, index=TRUE)==1) fkbmllinear()
                                            if (svalue(kbml.kernel, index=TRUE)==2) fkbmlradial()
-                                           kbml.train    <<- data.frame(Train[last.col], Predicted=predict(KBML, newdata=Train))
-                                           kbml.val      <<- data.frame(Val[last.col], Predicted=predict(KBML, newdata=Val))
+                                           AlradEnv$kbml.train    <- data.frame(AlradEnv$Train[AlradEnv$last.col], 
+                                                                                Predicted=predict(AlradEnv$KBML, newdata=AlradEnv$Train))
+                                           AlradEnv$kbml.val      <- data.frame(AlradEnv$Val[AlradEnv$last.col], 
+                                                                                Predicted=predict(AlradEnv$KBML, newdata=AlradEnv$Val))
                                            faddtomodels("KBML")
                                            enabled(pred) = TRUE #Enable prediction module
                                            },
                                           warning = function(w) fwarning(w),
                                           error =  function(e) ferror(e)
                                           )
-                                 dispose(alert)
+                                 dispose(AlradEnv$alert)
                                  gmessage("KBML model done", title = "KBML model", parent = window)
                                  }
-  fkbmllinear  <- function(...) {kbml.test <<- caret::train(form.mdl, data = Train, method = 'gaussprLinear',
-                                                            trControl = bootctrl.kbml, tuneLength = 10)
-                                KBML       <<- kernlab::gausspr(form.mdl, data=Train, kernel= "vanilladot",
+  fkbmllinear  <- function(...) {AlradEnv$kbml.test <- caret::train(AlradEnv$form.mdl, data = AlradEnv$Train, method = 'gaussprLinear',
+                                                            trControl = AlradEnv$bootctrl.kbml, tuneLength = 10)
+                                AlradEnv$KBML       <- kernlab::gausspr(AlradEnv$form.mdl, data=AlradEnv$Train, kernel= "vanilladot",
                                                                 type = "regression", kpar= "automatic", variance.model = T,
                                                                 var=as.numeric(svalue(kbml.var)), cross= svalue(kbml.cross))
                                 }
   fkbmlradial  <- function(...) {Grid      <-  expand.grid(.sigma = seq(.00001,.1,.005))
-                                kbml.test  <<- caret::train(form.mdl, data = Train, method = 'gaussprRadial', tuneLength = 10,
-                                                            trControl = bootctrl.kbml, tuneGrid = Grid)
-                                KBML       <<- kernlab::gausspr(form.mdl, data=Train, kernel="rbfdot",
-                                                                type ="regression", kpar= "automatic", variance.model = T,
-                                                                var=svalue(kbml.var), cross= svalue(kbml.cross))
+                                AlradEnv$kbml.test  <- caret::train(AlradEnv$form.mdl, data = AlradEnv$Train, method = 'gaussprRadial', 
+                                                                    tuneLength = 10, trControl = AlradEnv$bootctrl.kbml, tuneGrid = Grid)
+                                AlradEnv$KBML       <- kernlab::gausspr(AlradEnv$form.mdl, data=AlradEnv$Train, kernel="rbfdot",
+                                                                        type ="regression", kpar= "automatic", variance.model = T,
+                                                                        var=svalue(kbml.var), cross= svalue(kbml.cross))
                                 }
 
   ###################################################
@@ -822,9 +868,10 @@ AlradSpectra <- function() {
   ### Import button
   gbutton("Import data", cont = import, handler = fimport)
   ### View data button
-  gbutton("View data", cont = import, handler = function(...) fview(alldata, 800))
+  gbutton("View data", cont = import, handler = function(...) fview(AlradEnv$alldata, 800))
   ### Plot imported data button
-  gbutton("View imported spectra", cont = import, handler = function(...) fplot(Original, spectra.start.number, spectra.end.number))
+  gbutton("View imported spectra", cont = import, handler = function(...) fplot(AlradEnv$Original, AlradEnv$spectra.start.number, 
+                                                                                AlradEnv$spectra.end.number))
   ### View descriptive statistics button
   gbutton("View Y descriptive statistics", cont = import, handler = fdescy)
   ### View histogram button
@@ -854,8 +901,9 @@ AlradSpectra <- function() {
   lyt.param.nrm[1,1] <- "Number of smoothing points"
   number.smooth      <- lyt.param.nrm[2,1] <- gspinbutton(from = 5, to = 101, by = 2, cont = lyt.param.nrm)
   gbutton("Run", cont = nrm, handler = fnrm)
-  gbutton("View spectra", cont = nrm, handler = function(...) fplot(Smoothing, spectra.start.number, spectra.end.number))
-  gbutton("Save preprocessed spectra", cont = nrm, handler = function(...) fsavespectra(Smoothing))
+  gbutton("View spectra", cont = nrm, handler = function(...) fplot(AlradEnv$Smoothing, AlradEnv$spectra.start.number, 
+                                                                    AlradEnv$spectra.end.number))
+  gbutton("Save preprocessed spectra", cont = nrm, handler = function(...) fsavespectra(AlradEnv$Smoothing))
   ### Binning
   frame.desc.bin     <- gframe("Description:", cont = bin, horizontal = T)
   lyt.desc.bin       <- glayout(cont = frame.desc.bin , expand = TRUE)
@@ -865,22 +913,25 @@ AlradSpectra <- function() {
   lyt.param.bin[1,1] <- "Bin size"
   bin.number         <- lyt.param.bin[2,1:4] <- gspinbutton(from = 2, to = 100, by = 1, cont = lyt.param.bin)
   gbutton("Run", cont = bin, handler = fbin)
-  gbutton("View spectra", cont = bin, handler = function(...) fplot(Binning, spectra.start.number, spectra.end.number))
-  gbutton("Save preprocessed spectra", cont = bin, handler = function(...) fsavespectra(Binning))
+  gbutton("View spectra", cont = bin, handler = function(...) fplot(AlradEnv$Binning, AlradEnv$spectra.start.number, 
+                                                                    AlradEnv$spectra.end.number))
+  gbutton("Save preprocessed spectra", cont = bin, handler = function(...) fsavespectra(AlradEnv$Binning))
   ### Absorbance
   frame.desc.abs     <- gframe("Description:", cont = abs, horizontal=T)
   lyt.desc.abs       <- glayout(cont = frame.desc.abs, expand = TRUE)
   lyt.desc.abs[1,1]  <- "Transforms reflectance to absorbance values (log10(1/R))."
   gbutton("Run", cont = abs, handler = fabs)
-  gbutton("View spectra", cont = abs, handler = function(...) fplot(Absorbance, spectra.start.number, spectra.end.number, ylab="Absorbance"))
-  gbutton("Save preprocessed spectra", cont = abs, handler = function(...) fsavespectra(Absorbance))
+  gbutton("View spectra", cont = abs, handler = function(...) fplot(AlradEnv$Absorbance, AlradEnv$spectra.start.number, 
+                                                                    AlradEnv$spectra.end.number, ylab="Absorbance"))
+  gbutton("Save preprocessed spectra", cont = abs, handler = function(...) fsavespectra(AlradEnv$Absorbance))
   ### Detrend
   frame.desc.det     <- gframe("Description:", cont = det, horizontal=T)
   lyt.desc.det       <- glayout(cont = frame.desc.det, expand = TRUE)
   lyt.desc.det[1,1]  <- "Normalizes each row by applying a Standard Normal Variate transformation followed by fitting a second order \nlinear model and returning the fitted residuals. Package: prospectr"
   gbutton("Run", cont = det, handler = fdet)
-  gbutton("View spectra", cont = det, handler = function(...) fplot(Detrend, spectra.start.number, spectra.end.number))
-  gbutton("Save preprocessed spectra", cont = det, handler = function(...) fsavespectra(Detrend))
+  gbutton("View spectra", cont = det, handler = function(...) fplot(AlradEnv$Detrend, AlradEnv$spectra.start.number, 
+                                                                    AlradEnv$spectra.end.number))
+  gbutton("Save preprocessed spectra", cont = det, handler = function(...) fsavespectra(AlradEnv$Detrend))
   ### Continuum Removal
   frame.desc.crm     <- gframe("Description:", cont = crm, horizontal=T)
   lyt.desc.crm       <- glayout(cont = frame.desc.crm, expand = TRUE)
@@ -889,8 +940,9 @@ AlradSpectra <- function() {
   lyt.desc.crm[3,1]  <- "Interpolation method: Linear"
   lyt.desc.crm[4,1]  <- "Normalization method: Division"
   gbutton("Run", cont = crm, handler = fcrm)
-  gbutton("View spectra", cont = crm, handler = function(...) fplot(ContinuumRemoval, spectra.start.number, spectra.end.number))
-  gbutton("Save preprocessed spectra", cont = crm, handler = function(...) fsavespectra(ContinuumRemoval))
+  gbutton("View spectra", cont = crm, handler = function(...) fplot(AlradEnv$ContinuumRemoval, AlradEnv$spectra.start.number, 
+                                                                    AlradEnv$spectra.end.number))
+  gbutton("Save preprocessed spectra", cont = crm, handler = function(...) fsavespectra(AlradEnv$ContinuumRemoval))
   ### SG Derivative
   frame.desc.sgd     <- gframe("Description:",cont = sgd, horizontal = T)
   lyt.desc.sgd       <- glayout(cont = frame.desc.sgd , expand = TRUE)
@@ -904,22 +956,25 @@ AlradSpectra <- function() {
   lyt.param.sgd[1,3] <- "Derivative order"
   sgd.deriv          <- lyt.param.sgd[2,3] <- gcombobox(sgderivarive, cont = lyt.param.sgd)
   gbutton("Run", cont = sgd, handler = fsgd)
-  gbutton("View spectra", cont = sgd, handler = function(...) fplot(SavitzkyGolayDerivative, spectra.start.number, spectra.end.number))
-  gbutton("Save preprocessed spectra", cont = sgd, handler = function(...) fsavespectra(SavitzkyGolayDerivative))
+  gbutton("View spectra", cont = sgd, handler = function(...) fplot(AlradEnv$SavitzkyGolayDerivative, AlradEnv$spectra.start.number, 
+                                                                    AlradEnv$spectra.end.number))
+  gbutton("Save preprocessed spectra", cont = sgd, handler = function(...) fsavespectra(AlradEnv$SavitzkyGolayDerivative))
   ### SNV
   frame.desc.snv     <- gframe("Description:", cont = snv, horizontal=T)
   lyt.desc.snv       <- glayout(cont = frame.desc.snv, expand = TRUE)
   lyt.desc.snv[1,1]  <- "Standard Normal Variate normalizes each row by substracting each row by its mean and dividing by \nits standard deviation. Package: prospectr"
   gbutton("Run", cont = snv, handler = fsnv)
-  gbutton("View spectra", cont = snv, handler = function(...) fplot(SNV, spectra.start.number, spectra.end.number))
-  gbutton("Save preprocessed spectra", cont = snv, handler = function(...) fsavespectra(SNV))
+  gbutton("View spectra", cont = snv, handler = function(...) fplot(AlradEnv$SNV, AlradEnv$spectra.start.number, 
+                                                                    AlradEnv$spectra.end.number))
+  gbutton("Save preprocessed spectra", cont = snv, handler = function(...) fsavespectra(AlradEnv$SNV))
   ### MSC
   frame.desc.msc     <- gframe("Description:", cont = msc, horizontal=T)
   lyt.desc.msc       <- glayout(cont = frame.desc.msc, expand = TRUE)
   lyt.desc.msc[1,1]  <- "Performs multiplicative scatter/signal correction on spectral data. Package: pls"
   gbutton("Run", cont = msc, handler = fmsc)
-  gbutton("View spectra", cont = msc, handler = function(...) fplot(MSC, spectra.start.number, spectra.end.number))
-  gbutton("Save preprocessed spectra", cont = msc, handler = function(...) fsavespectra(MSC))
+  gbutton("View spectra", cont = msc, handler = function(...) fplot(AlradEnv$MSC, AlradEnv$spectra.start.number, 
+                                                                    AlradEnv$spectra.end.number))
+  gbutton("Save preprocessed spectra", cont = msc, handler = function(...) fsavespectra(AlradEnv$MSC))
   ### Normalization
   frame.desc.nor     <- gframe("Description:",cont = nor, horizontal = T)
   lyt.desc.nor       <- glayout(cont = frame.desc.nor , expand = TRUE)
@@ -929,8 +984,9 @@ AlradSpectra <- function() {
   lyt.param.nor[1,1] <- "Type of Normalization."
   nor.type           <- lyt.param.nor[2,1] <- gradio(normalization.types, checked = T, cont = lyt.param.nor)
   gbutton("Run", cont = nor, handler = fnor)
-  gbutton("View spectra", cont = nor, handler = function(...) fplot(Normalization, spectra.start.number, spectra.end.number))
-  gbutton("Save preprocessed spectra", cont = nor, handler = function(...) fsavespectra(Normalization))
+  gbutton("View spectra", cont = nor, handler = function(...) fplot(AlradEnv$Normalization, AlradEnv$spectra.start.number, 
+                                                                    AlradEnv$spectra.end.number))
+  gbutton("Save preprocessed spectra", cont = nor, handler = function(...) fsavespectra(AlradEnv$Normalization))
 
   ###################################################
   ### Modeling module
@@ -962,8 +1018,8 @@ AlradSpectra <- function() {
   lyt.param.mlr[1,1] <- "Band interval"
   mlr.band.interval  <- lyt.param.mlr[2,1] <- gspinbutton(from = 1, to = 30, by = 1, value = 25, cont = lyt.param.mlr)
   gbutton("Run MLR model", cont = mdl.mlr, handler = fmlr)
-  gbutton("MLR prediction statistics", cont = mdl.mlr, handler = function(...) fmdl.stats(mlr.train, mlr.val))
-  gbutton("View measured vs. predicted",cont = mdl.mlr, handler = function(...) fmdl.plot.res(mlr.train, mlr.val))
+  gbutton("MLR prediction statistics", cont = mdl.mlr, handler = function(...) fmdl.stats(AlradEnv$mlr.train, AlradEnv$mlr.val))
+  gbutton("View measured vs. predicted",cont = mdl.mlr, handler = function(...) fmdl.plot.res(AlradEnv$mlr.train, AlradEnv$mlr.val))
   ### PLS
   mdl.pls            <- ggroup(cont = mdl, horizontal = F,label = gettext("   PLSR   "))
   frame.desc.pls     <- gframe("Description:",cont = mdl.pls, horizontal = T)
@@ -980,9 +1036,9 @@ AlradSpectra <- function() {
   lyt.param.pls[1,4] <- "Number of components to \ninclude in the model"
   pls.comp           <- lyt.param.pls[2,4] <- gspinbutton(from = 1, to = 500, by = 1, value =  30, cont = lyt.param.pls)
   gbutton("Run PLSR model", cont = mdl.pls , handler = fpls)
-  gbutton("View variable importance", cont = mdl.pls, handler = function(...) fpls.plot.imp(pls.test))
-  gbutton("PLSR prediction statistics", cont = mdl.pls, handler = function(...) fmdl.stats(pls.train, pls.val))
-  gbutton("View measured vs. predicted",cont = mdl.pls, handler = function(...) fmdl.plot.res(pls.train, pls.val))
+  gbutton("View variable importance", cont = mdl.pls, handler = function(...) fpls.plot.imp(AlradEnv$pls.test))
+  gbutton("PLSR prediction statistics", cont = mdl.pls, handler = function(...) fmdl.stats(AlradEnv$pls.train, AlradEnv$pls.val))
+  gbutton("View measured vs. predicted",cont = mdl.pls, handler = function(...) fmdl.plot.res(AlradEnv$pls.train, AlradEnv$pls.val))
   ### SVM
   mdl.svm            <- ggroup(cont = mdl, horizontal = F,label = gettext("    SVM    "))
   frame.desc.svm     <- gframe("Description:",cont = mdl.svm, horizontal = T)
@@ -995,9 +1051,9 @@ AlradSpectra <- function() {
   lyt.param.svm[1,2] <- "Kernel parameters"
   svm.kernel         <- lyt.param.svm[2,2] <- gradio(kernel.param.svm, cont = lyt.param.svm)
   gbutton("Run SVM model", cont = mdl.svm, handler = fsvm)
-  gbutton("View variable importance", cont = mdl.svm, handler = function(...) fmdl.plot.imp(svm.test))
-  gbutton("SVM prediction statistics", cont = mdl.svm, handler = function(...) fmdl.stats(svm.train, svm.val))
-  gbutton("View measured vs. predicted",cont = mdl.svm, handler = function(...) fmdl.plot.res(svm.train, svm.val))
+  gbutton("View variable importance", cont = mdl.svm, handler = function(...) fmdl.plot.imp(AlradEnv$svm.test))
+  gbutton("SVM prediction statistics", cont = mdl.svm, handler = function(...) fmdl.stats(AlradEnv$svm.train, AlradEnv$svm.val))
+  gbutton("View measured vs. predicted",cont = mdl.svm, handler = function(...) fmdl.plot.res(AlradEnv$svm.train, AlradEnv$svm.val))
   ### RF
   mdl.rf             <- ggroup(cont = mdl, horizontal = F,label = gettext("    RF    "))
   frame.desc.rf      <- gframe("Description:",cont = mdl.rf, horizontal = T)
@@ -1012,9 +1068,9 @@ AlradSpectra <- function() {
   lyt.param.rf[1,3]  <- "Number of trees \n(ntree)"
   rf.ntree           <- lyt.param.rf[2,3]  <- gedit(text = "500", cont = lyt.param.rf, width = 4)
   gbutton("Run RF model", cont = mdl.rf, handler = frf)
-  gbutton("View variable importance", cont = mdl.rf, handler = function(...) fmdl.plot.imp(rf.test))
-  gbutton("RF prediction statistics", cont = mdl.rf, handler = function(...) fmdl.stats(rf.train, rf.val))
-  gbutton("View measured vs. predicted",cont = mdl.rf, handler = function(...) fmdl.plot.res(rf.train, rf.val))
+  gbutton("View variable importance", cont = mdl.rf, handler = function(...) fmdl.plot.imp(AlradEnv$rf.test))
+  gbutton("RF prediction statistics", cont = mdl.rf, handler = function(...) fmdl.stats(AlradEnv$rf.train, AlradEnv$rf.val))
+  gbutton("View measured vs. predicted",cont = mdl.rf, handler = function(...) fmdl.plot.res(AlradEnv$rf.train, AlradEnv$rf.val))
   ### ANN
   mdl.ann            <- ggroup(cont = mdl, horizontal = F,label = gettext("    ANN    "))
   frame.desc.ann     <- gframe("Description:",cont = mdl.ann, horizontal = T)
@@ -1029,9 +1085,9 @@ AlradSpectra <- function() {
   lyt.param.ann[1,3] <- "Hidden units"
   ann.hid            <- lyt.param.ann[2,3] <- gspinbutton(from = 1, to = 50, by = 1, value = 50, cont = lyt.param.ann)
   gbutton("Run ANN model", cont = mdl.ann, handler = fann)
-  gbutton("View variable importance", cont = mdl.ann, handler = function(...) fmdl.plot.imp(ann.test))
-  gbutton("ANN prediction statistics", cont = mdl.ann, handler = function(...) fmdl.stats(ann.train, ann.val))
-  gbutton("View measured vs. predicted", cont = mdl.ann, handler = function(...) fmdl.plot.res(ann.train, ann.val))
+  gbutton("View variable importance", cont = mdl.ann, handler = function(...) fmdl.plot.imp(AlradEnv$ann.test))
+  gbutton("ANN prediction statistics", cont = mdl.ann, handler = function(...) fmdl.stats(AlradEnv$ann.train, AlradEnv$ann.val))
+  gbutton("View measured vs. predicted", cont = mdl.ann, handler = function(...) fmdl.plot.res(AlradEnv$ann.train, AlradEnv$ann.val))
   ### KBML
   mdl.kbml            <- ggroup(cont = mdl, horizontal = F,label = gettext(" KBML "))
   frame.desc.kbml     <- gframe("Description:",cont = mdl.kbml, horizontal = T)
@@ -1048,9 +1104,9 @@ AlradSpectra <- function() {
   lyt.param.kbml[1,4] <- "kernel function \nused in training and predicting"
   kbml.kernel         <- lyt.param.kbml[2,4] <- gradio(kernel.param.kbml, cont = lyt.param.kbml)
   gbutton("Run KBML model", cont = mdl.kbml, handler = fkbml)
-  gbutton("View variable importance", cont = mdl.kbml, handler = function(...) fmdl.plot.imp(kbml.test))
-  gbutton("KBML prediction statistics", cont = mdl.kbml, handler = function(...) fmdl.stats(kbml.train, kbml.val))
-  gbutton("View measured vs. predicted", cont = mdl.kbml, handler = function(...) fmdl.plot.res(kbml.train, kbml.val))
+  gbutton("View variable importance", cont = mdl.kbml, handler = function(...) fmdl.plot.imp(AlradEnv$kbml.test))
+  gbutton("KBML prediction statistics", cont = mdl.kbml, handler = function(...) fmdl.stats(AlradEnv$kbml.train, AlradEnv$kbml.val))
+  gbutton("View measured vs. predicted", cont = mdl.kbml, handler = function(...) fmdl.plot.res(AlradEnv$kbml.train, AlradEnv$kbml.val))
   
   ###################################################
   ### Prediction module
@@ -1080,9 +1136,11 @@ AlradSpectra <- function() {
   ### Import button
   gbutton("Import data", cont = pred.imp, handler = fimport.pred)
   ### View data button
-  gbutton("View data", cont = pred.imp, handler = function(...) fview(spc.pred, 800))
+  gbutton("View data", cont = pred.imp, handler = function(...) fview(AlradEnv$spc.pred, 800))
   ### Plot imported data button
-  gbutton("View imported spectra", cont = pred.imp, handler = function(...) fplot(spc.pred, pred.spectra.start.number, pred.spectra.end.number))
+  gbutton("View imported spectra", cont = pred.imp, handler = function(...) fplot(AlradEnv$spc.pred, 
+                                                                                  AlradEnv$pred.spectra.start.number, 
+                                                                                  AlradEnv$pred.spectra.end.number))
   ### Draw a separator line
   gseparator(cont = pred)
   ### Create predict group
@@ -1091,8 +1149,8 @@ AlradSpectra <- function() {
   glabel("Select model for prediction:", cont = pred.predict, anchor = c(-1,0))
   select.model        <- gcombobox("", cont = pred.predict)
   gbutton("Predict", cont = pred.predict, handler = fpredict)
-  gbutton("View predictions", cont = pred.predict, handler = function(...) fview(prediction, 300))
-  gbutton("Save predictions", cont = pred.predict, handler = function(...) fsaveresults(prediction))
+  gbutton("View predictions", cont = pred.predict, handler = function(...) fview(AlradEnv$prediction, 300))
+  gbutton("Save predictions", cont = pred.predict, handler = function(...) fsaveresults(AlradEnv$prediction))
   enabled(pred.predict) = FALSE #Disable predict group
   enabled(pred) = FALSE #Disable prediction module
 
