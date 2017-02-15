@@ -22,12 +22,15 @@ AlradSpectra <- function() {
                                        gmessage(message = e$message, title = "Error", icon="error", parent = window)
                                        stop()
                                        }
-  # Makes sure the user really wants to quit Alrad when closing the window.
-  fconfirmquit <- function(h, ...)    {sure <- gconfirm("Are you sure?", parent=h$obj)
-                                       if(as.logical(sure))
+  # Makes sure the user really wants to quit Alrad when closing the window
+  fconfirmquit <- function(h, ...)    {sure <- gconfirm("Clear Alrad Spectra and quit?", parent=h$obj)
+                                       if(as.logical(sure)) {
+                                         rm(list = ls(pos = ".GlobalEnv"),
+                                            envir = .GlobalEnv) #Remove everything in Global Environment
                                          return(FALSE) #Close
-                                       else
-                                         return(TRUE) #Don't close
+                                       } else{
+                                           return(TRUE) #Don't close
+                                         }
                                        }
   # Clears all data, empties forms and resets Alrad to initial status
   fnew         <- function(...)       {gconfirm("Clear Alrad Spectra and \nstart a new project?",
@@ -39,6 +42,7 @@ AlradSpectra <- function() {
                                                                        svalue(spc.first)     <- ""
                                                                        svalue(spc.last)      <- ""
                                                                        svalue(soil.var.col)  <- ""
+                                                                       svalue(soil.var.nm)   <- ""
                                                                        svalue(notebook)      <- 1 #Focus on import tab
                                                                        enabled(pp) = FALSE
                                                                        enabled(models) = FALSE
@@ -87,7 +91,12 @@ AlradSpectra <- function() {
                                           }
                                         }
   # Handler for quit action. Makes sure the user really wants to quit Alrad.
-  fquit        <- function(...)        gconfirm("Are you sure?", icon="warning", parent=window, handler=dispose(window))
+  fquit        <- function(...)        gconfirm("Clear Alrad Spectra and quit?", icon="warning", parent=window,
+                                                handler = function(...) {rm(list = ls(pos = ".GlobalEnv"),
+                                                                            envir = .GlobalEnv) #Remove everything in Global Environment
+                                                                         dispose(window)
+                                                                         }
+                                                )
   # Creates and shows the window with information about Alrad Spectra
   fabout       <- function(...)       {aboutwin <- gwindow("About Alrad Spectra", width=400, height=300, parent = window)
                                        wingroup <- ggroup(horizontal = FALSE, container = aboutwin)
@@ -106,7 +115,7 @@ AlradSpectra <- function() {
                                                      "\n",
                                                      "For further information:\n",
                                                      "The paper will be available soon.\n",
-                                                     "Alrad Spectra can be downloaded from\n",
+                                                     "Alrad Spectra source code is available at\n",
                                                      "<i>github.com/AlradSpectra/AlradSpectra</i>",
                                                      sep="", collapse=""),
                                               markup = TRUE, container = wingroup
@@ -307,9 +316,10 @@ AlradSpectra <- function() {
                                                                     axis.title = ggplot2::element_text(size=13))
                                        Rmisc::multiplot(boxpl)
                                        }
-  # Disables models module and homo and boxplot buttons when dataset or validation size is changed
+  # Disables models module and homo, desc stats and boxplot buttons when dataset or validation size is changed
   fchangesplit <- function(h, ...)    {enabled(mdl) = FALSE
                                        enabled(homo.button) = FALSE
+                                       enabled(desc.button) = FALSE
                                        enabled(boxplot.button) = FALSE
                                        }
   # Export model or prediction results
