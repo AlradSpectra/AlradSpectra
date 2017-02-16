@@ -38,15 +38,23 @@ AlradSpectra <- function() {
   # Clears all data, empties forms and resets Alrad to initial status
   fnew         <- function(...)       {gconfirm("Clear Alrad Spectra and \nstart a new project?",
                                                 title="New", icon="warning", parent=window,
-                                                handler=function(...) {svalue(file.browse)   <- ""
-                                                                       svalue(file.sep)      <- ","
-                                                                       svalue(spc.start.col) <- ""
-                                                                       svalue(spc.end.col)   <- ""
-                                                                       svalue(spc.first)     <- ""
-                                                                       svalue(spc.last)      <- ""
-                                                                       svalue(soil.var.col)  <- ""
-                                                                       svalue(soil.var.nm)   <- ""
-                                                                       svalue(notebook)      <- 1 #Focus on import tab
+                                                handler=function(...) {svalue(file.browse)      <- ""
+                                                                       svalue(file.sep)         <- ","
+                                                                       svalue(file.dec)         <- "."
+                                                                       svalue(spc.start.col)    <- ""
+                                                                       svalue(spc.end.col)      <- ""
+                                                                       svalue(spc.first)        <- ""
+                                                                       svalue(spc.last)         <- ""
+                                                                       svalue(soil.var.col)     <- ""
+                                                                       svalue(soil.var.nm)      <- ""
+                                                                       svalue(select.dataset)   <- ""
+                                                                       svalue(pred.file.browse) <- ""
+                                                                       svalue(pred.file.sep)    <- ","
+                                                                       svalue(pred.file.dec)    <- "."
+                                                                       svalue(pred.spc.first)   <- ""
+                                                                       svalue(pred.spc.last)    <- ""
+                                                                       svalue(select.model)     <- ""
+                                                                       svalue(notebook)         <- 1 #Focus on import tab
                                                                        enabled(pp) = FALSE
                                                                        enabled(models) = FALSE
                                                                        enabled(mdl) = FALSE
@@ -61,11 +69,13 @@ AlradSpectra <- function() {
                                                              cont = window)
                                         if(!(is.na(proj.browse))) {
                                           rm(list = ls(AlradEnv), envir = AlradEnv) #Remove everything in Alrad Environment
-                                          AlradEnv$alertop       <- galert("Wait...", title = "Loading Project",
-                                                                           delay=10000, parent=notebook)
+                                          alertop       <- galert("Wait...", title = "Loading Project",
+                                                                  delay=10000, parent=notebook)
                                           Sys.sleep(1) #Wait for alert to be shown
                                           load(proj.browse, envir=AlradEnv)
-                                          svalue(file.sep)       <- ","
+                                          svalue(file.browse)    <- AlradEnv$file.location
+                                          svalue(file.sep)       <- AlradEnv$file.separator
+                                          svalue(file.dec)       <- AlradEnv$file.decimal
                                           svalue(spc.start.col)  <- AlradEnv$spectra.start.column
                                           svalue(spc.end.col)    <- AlradEnv$spectra.end.column
                                           svalue(spc.first)      <- AlradEnv$spectra.start.number
@@ -83,9 +93,14 @@ AlradSpectra <- function() {
                                             enabled(pred) = TRUE #Enable prediction module
                                             }
                                           if(exists("spc.pred", envir=AlradEnv)) {#If there is a dataset for prediction
+                                            svalue(pred.file.browse) <- AlradEnv$pred.file.location
+                                            svalue(pred.file.sep)    <- AlradEnv$pred.file.separator
+                                            svalue(pred.file.dec)    <- AlradEnv$pred.file.decimal
+                                            svalue(pred.spc.first)   <- AlradEnv$pred.spectra.start.number
+                                            svalue(pred.spc.last)    <- AlradEnv$pred.spectra.end.number
                                             enabled(pred.predict) = TRUE #Enable predict group
                                             }
-                                          dispose(AlradEnv$alertop)
+                                          dispose(alertop)
                                           gmessage(message = "Project loaded!", title = "Open Project", parent = window)
                                           }
                                         }
@@ -137,14 +152,24 @@ AlradSpectra <- function() {
                                        }
   # Opens up a dialog to search for file to be imported
   fbrowse      <- function(h, ...)    {svalue(h) <- gfile("Open File", type="open",
-                                                          filter=c("Comma Separated Values (.csv)"="csv"),
-                                                          cont = window)
+                                                          filter= list("Delimited Files (*.txt, *.csv)" = list(patterns = c("*.txt", "*.csv")),
+                                                                       "All files" = list(patterns = c("*"))), cont = window)
                                        }
-  # Imports csv file to global environment and sets variables used afterwards
+  # Imports csv file to Alrad environment and sets variables used afterwards
   fimport      <- function(...)       {AlradEnv$alert <- galert("Wait...", title = "Importing File", delay=10000, parent=notebook)
-                                       tryCatch({AlradEnv$alldata <- read.table(file = svalue(file.browse),
-                                                                                header = as.logical(svalue(file.header)),
-                                                                                sep = svalue(file.sep))
+                                       tryCatch({AlradEnv$file.location        <- svalue(file.browse)
+                                                 AlradEnv$file.separator       <- svalue(file.sep)
+                                                 AlradEnv$file.decimal         <- svalue(file.dec)
+                                                 if(AlradEnv$file.separator=="") {
+                                                   AlradEnv$alldata <- read.delim(file = AlradEnv$file.location,
+                                                                                  header = as.logical(svalue(file.header)),
+                                                                                  dec = AlradEnv$file.decimal)
+                                                 } else {
+                                                   AlradEnv$alldata <- read.table(file = AlradEnv$file.location,
+                                                                                  header = as.logical(svalue(file.header)),
+                                                                                  sep = AlradEnv$file.separator,
+                                                                                  dec = AlradEnv$file.decimal)
+                                                 }
                                                  AlradEnv$spectra.start.column <- as.numeric(svalue(spc.start.col))
                                                  AlradEnv$spectra.end.column   <- as.numeric(svalue(spc.end.col))
                                                  AlradEnv$spectra.start.number <- as.numeric(svalue(spc.first))
@@ -444,7 +469,7 @@ AlradSpectra <- function() {
                                         comp.plot <- ggplot2::ggplot(caret::varImp(h), top=40) +
                                                      ggplot2::labs(list(x="Variables", y="Importance"))
                                         Rmisc::multiplot(comp.plot)
-  }
+                                        }
   # Adds preprocessing to combobox in Model tab only if it is not already there
   faddtomodels  <- function(h, ...) {present <- is.element(h, AlradEnv$pred.models)
                                      if(present==FALSE) {
@@ -454,16 +479,25 @@ AlradSpectra <- function() {
                                          svalue(select.model) <-  h
                                        } else {
                                          AlradEnv$pred.models <- c(AlradEnv$pred.models, h)
-                                           select.model[]     <- AlradEnv$pred.models
+                                         select.model[]       <- AlradEnv$pred.models
                                          }
-                                       
+                                       }
                                      }
-                                     }
-  # Imports csv file to global environment for prediction
+  # Imports csv file to Alrad environment for prediction
   fimport.pred  <- function(...)       {AlradEnv$alert <- galert("Wait...", title = "Importing File", delay=10000, parent=notebook)
-                                        tryCatch({spc  <- read.table(file = svalue(pred.file.browse),
-                                                                     header = as.logical(svalue(pred.file.header)),
-                                                                     sep = svalue(pred.file.sep))
+                                        tryCatch({AlradEnv$pred.file.location  <- svalue(pred.file.browse)
+                                                  AlradEnv$pred.file.separator <- svalue(pred.file.sep)
+                                                  AlradEnv$pred.file.decimal   <- svalue(pred.file.dec)
+                                                  if(AlradEnv$pred.file.separator=="") {
+                                                    spc <- read.delim(file = AlradEnv$pred.file.location,
+                                                                      header = as.logical(svalue(pred.file.header)),
+                                                                      dec = AlradEnv$pred.file.decimal)
+                                                    } else {
+                                                      spc <- read.table(file = AlradEnv$pred.file.location,
+                                                                        header = as.logical(svalue(pred.file.header)),
+                                                                        sep = AlradEnv$pred.file.separator,
+                                                                        dec = AlradEnv$pred.file.decimal)
+                                                      }
                                                   AlradEnv$pred.spectra.start.number <- as.numeric(svalue(pred.spc.first))
                                                   AlradEnv$pred.spectra.end.number   <- as.numeric(svalue(pred.spc.last))
                                                   colnames(spc)     <- c(AlradEnv$pred.spectra.start.number:AlradEnv$pred.spectra.end.number)
@@ -850,22 +884,24 @@ AlradSpectra <- function() {
   ### Parameters
   frame.file.arg <- gframe("Parameters:", cont = import, horizontal=TRUE)
   lyt.file.arg   <- glayout(cont = frame.file.arg, expand = F)
-                    lyt.file.arg[1,1,anchor=c(-1,-1)] <- "Header:"
-  file.header    <- lyt.file.arg[2,1,anchor=c(0,0)]   <- gcombobox(c("TRUE", "FALSE"), cont = lyt.file.arg)
-                    lyt.file.arg[1,2,anchor=c(-1,-1)] <- "Separator:"
-  file.sep       <- lyt.file.arg[2,2,anchor=c(1,1)]   <- gedit(text = ",", cont = lyt.file.arg, width = 1)
-                    lyt.file.arg[1,3,anchor=c(1,0)]   <- "Spectral data \nstarts at column:"
-  spc.start.col  <- lyt.file.arg[2,3,anchor=c(0,0)]   <- gedit(text = "", cont = lyt.file.arg, width = 2)
-                    lyt.file.arg[1,4,anchor=c(1,0)]   <- "Spectral data \nends at column:"
-  spc.end.col    <- lyt.file.arg[2,4,anchor=c(0,0)]   <- gedit(text = "", cont = lyt.file.arg, width = 4)
-                    lyt.file.arg[1,5,anchor=c(1,0)]   <- "Spectrum starts \nat wavelength:"
-  spc.first      <- lyt.file.arg[2,5,anchor=c(0,0)]   <- gedit(text = "", cont = lyt.file.arg, width = 4)
-                    lyt.file.arg[1,6,anchor=c(1,0)]   <- "Spectrum ends \nat wavelength:"
-  spc.last       <- lyt.file.arg[2,6,anchor=c(0,0)]   <- gedit(text = "", cont = lyt.file.arg, width = 4)
-                    lyt.file.arg[1,7,anchor=c(1,0)]   <- "Y variable \nis at column:"
-  soil.var.col   <- lyt.file.arg[2,7,anchor=c(0,0)]   <- gedit(text = "", cont = lyt.file.arg, width = 4)
-                    lyt.file.arg[1,8,anchor=c(1,0)]   <- "Y variable      \nname:"
-  soil.var.nm    <- lyt.file.arg[2,8,anchor=c(0,0)]   <- gedit(text = "", cont = lyt.file.arg, width = 4)
+                    lyt.file.arg[1,1,anchor=c(1,0)] <- "Separator (leave blank for tab):"
+  file.sep       <- lyt.file.arg[1,2,anchor=c(0,0)] <- gedit(text = ",", cont = lyt.file.arg, width = 8)
+                    lyt.file.arg[1,3,anchor=c(1,0)] <- "Decimal separator:"
+  file.dec       <- lyt.file.arg[1,4,anchor=c(0,0)] <- gedit(text = ".", cont = lyt.file.arg, width = 8)
+                    lyt.file.arg[1,8,anchor=c(1,0)] <- "Header:"
+  file.header    <- lyt.file.arg[1,9,anchor=c(0,0)] <- gcombobox(c("TRUE", "FALSE"), cont = lyt.file.arg)
+                    lyt.file.arg[2,1,anchor=c(1,0)] <- "Spectral data starts at column:"
+  spc.start.col  <- lyt.file.arg[2,2,anchor=c(0,0)] <- gedit(text = "", cont = lyt.file.arg, width = 8)
+                    lyt.file.arg[2,3,anchor=c(1,0)] <- "Spectral data ends at column:"
+  spc.end.col    <- lyt.file.arg[2,4,anchor=c(0,0)] <- gedit(text = "", cont = lyt.file.arg, width = 8)
+                    lyt.file.arg[3,1,anchor=c(1,0)] <- "Spectrum starts at wavelength:"
+  spc.first      <- lyt.file.arg[3,2,anchor=c(0,0)] <- gedit(text = "", cont = lyt.file.arg, width = 8)
+                    lyt.file.arg[3,3,anchor=c(1,0)] <- "Spectrum ends at wavelength:"
+  spc.last       <- lyt.file.arg[3,4,anchor=c(0,0)] <- gedit(text = "", cont = lyt.file.arg, width = 8)
+                    lyt.file.arg[4,1,anchor=c(1,0)] <- "Y variable is at column:"
+  soil.var.col   <- lyt.file.arg[4,2,anchor=c(0,0)] <- gedit(text = "", cont = lyt.file.arg, width = 8)
+                    lyt.file.arg[4,3,anchor=c(1,0)] <- "Y variable name:"
+  soil.var.nm    <- lyt.file.arg[4,4,anchor=c(0,0)] <- gedit(text = "", cont = lyt.file.arg, width = 8)
   ### Import button
   gbutton("Import data", cont = import, handler = fimport)
   ### View data button
@@ -1126,14 +1162,16 @@ AlradSpectra <- function() {
   ### Parameters
   pred.frame.file.arg <- gframe("Parameters:", cont = pred.imp, horizontal=TRUE)
   pred.lyt.file.arg   <- glayout(cont = pred.frame.file.arg, expand = F)
-                         pred.lyt.file.arg[1,1,anchor=c(-1,-1)] <- "Header:"
-  pred.file.header    <- pred.lyt.file.arg[2,1,anchor=c(0,0)]   <- gcombobox(c("TRUE", "FALSE"), cont = pred.lyt.file.arg)
-                         pred.lyt.file.arg[1,2,anchor=c(-1,-1)] <- "Separator:"
-  pred.file.sep       <- pred.lyt.file.arg[2,2,anchor=c(1,1)]   <- gedit(text = ",", cont = pred.lyt.file.arg, width = 1)
-                         pred.lyt.file.arg[1,3,anchor=c(1,0)]   <- "Spectrum starts \nat wavelength:"
-  pred.spc.first      <- pred.lyt.file.arg[2,3,anchor=c(0,0)]   <- gedit(text = "", cont = pred.lyt.file.arg, width = 4)
-                         pred.lyt.file.arg[1,4,anchor=c(1,0)]   <- "Spectrum ends \nat wavelength:"
-  pred.spc.last       <- pred.lyt.file.arg[2,4,anchor=c(0,0)]   <- gedit(text = "", cont = pred.lyt.file.arg, width = 4)
+                         pred.lyt.file.arg[1,1,anchor=c(1,0)] <- "Separator (leave blank for tab):"
+  pred.file.sep       <- pred.lyt.file.arg[1,2,anchor=c(0,0)] <- gedit(text = ",", cont = pred.lyt.file.arg, width = 8)
+                         pred.lyt.file.arg[1,3,anchor=c(1,0)] <- "Decimal separator:"
+  pred.file.dec       <- pred.lyt.file.arg[1,4,anchor=c(0,0)] <- gedit(text = ".", cont = pred.lyt.file.arg, width = 8)
+                         pred.lyt.file.arg[1,8,anchor=c(1,0)] <- "Header:"
+  pred.file.header    <- pred.lyt.file.arg[1,9,anchor=c(0,0)] <- gcombobox(c("TRUE", "FALSE"), cont = pred.lyt.file.arg)
+                         pred.lyt.file.arg[2,1,anchor=c(1,0)] <- "Spectrum starts at wavelength:"
+  pred.spc.first      <- pred.lyt.file.arg[2,2,anchor=c(0,0)] <- gedit(text = "", cont = pred.lyt.file.arg, width = 4)
+                         pred.lyt.file.arg[2,3,anchor=c(1,0)] <- "Spectrum ends at wavelength:"
+  pred.spc.last       <- pred.lyt.file.arg[2,4,anchor=c(0,0)] <- gedit(text = "", cont = pred.lyt.file.arg, width = 4)
   ### Import button
   gbutton("Import data", cont = pred.imp, handler = fimport.pred)
   ### View data button
