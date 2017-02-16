@@ -442,7 +442,7 @@ AlradSpectra <- function() {
                                         Sys.sleep(1)
                                         gbutton("Save plot", cont = wingroup, handler = function(...) fsaveplot(400, 400))
                                         comp.plot <- ggplot2::ggplot(caret::varImp(h), top=40) +
-                                                     ggplot2::labs(list(x="Importance", y="Variables"))
+                                                     ggplot2::labs(list(x="Variables", y="Importance"))
                                         Rmisc::multiplot(comp.plot)
   }
   # Adds preprocessing to combobox in Model tab only if it is not already there
