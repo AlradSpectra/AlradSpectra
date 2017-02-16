@@ -432,7 +432,7 @@ AlradSpectra <- function() {
                                         Sys.sleep(1)
                                         gbutton("Save plot", cont = wingroup, handler = function(...) fsaveplot(400, 400))
                                         comp.plot <- ggplot2::ggplot(h) +
-                                                     ggplot2::labs(list(x="Components", y="RMSE"))
+                                                     ggplot2::labs(list(x="PLS Components", y="RMSE"))
                                         Rmisc::multiplot(comp.plot)
                                         }
   # Plot variable importance
@@ -441,7 +441,8 @@ AlradSpectra <- function() {
                                         ggraphics(cont = wingroup, no_popup=TRUE)
                                         Sys.sleep(1)
                                         gbutton("Save plot", cont = wingroup, handler = function(...) fsaveplot(400, 400))
-                                        comp.plot <- ggplot2::ggplot(varImp(h), top=40)
+                                        comp.plot <- ggplot2::ggplot(caret::varImp(h), top=40) +
+                                                     ggplot2::labs(list(x="Importance", y="Variables"))
                                         Rmisc::multiplot(comp.plot)
   }
   # Adds preprocessing to combobox in Model tab only if it is not already there
