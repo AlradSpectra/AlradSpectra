@@ -455,18 +455,24 @@ AlradSpectra <- function() {
                                         wingroup  <- ggroup(horizontal=FALSE, cont=plotwin)
                                         ggraphics(cont = wingroup, no_popup=TRUE)
                                         Sys.sleep(1)
-                                        gbutton("Save plot", cont = wingroup, handler = function(...) fsaveplot(400, 450))
+                                        gbutton("Save plot", cont = wingroup, handler = function(...) fsaveplot(400, 500))
                                         comp.plot <- ggplot2::ggplot(h) +
                                                      ggplot2::labs(list(x="PLS Components", y="RMSE"))
                                         Rmisc::multiplot(comp.plot)
                                         }
   # Plot variable importance
-  fmdl.plot.imp <- function(h, ...)    {plotwin   <- gwindow("Plot", width = 400, height = 400, parent=window)
+  fmdl.plot.imp <- function(h, ...)    {plotwin   <- gwindow("Plot", width = 900, height = 300, parent=window)
                                         wingroup  <- ggroup(horizontal=FALSE, cont=plotwin)
                                         ggraphics(cont = wingroup, no_popup=TRUE)
                                         Sys.sleep(1)
-                                        gbutton("Save plot", cont = wingroup, handler = function(...) fsaveplot(400, 450))
-                                        comp.plot <- ggplot2::ggplot(caret::varImp(h), top=40) +
+                                        gbutton("Save plot", cont = wingroup, handler = function(...) fsaveplot(900, 300))
+                                        var.imp   <- caret::varImp(h)$importance
+                                        spc.st    <- AlradEnv$spectra.start.number
+                                        spc.lt    <- AlradEnv$spectra.end.number
+                                        row.names(var.imp) <- c(spc.st:spc.lt)
+                                        comp.plot <- ggplot2::ggplot(var.imp, ggplot2::aes(x=c(spc.st:spc.lt), y=var.imp[,1])) +
+                                                     scale_x_continuous(breaks = floor(seq(spc.st, spc.lt, (spc.lt-spc.st)/20))) +
+                                                     ggplot2::geom_point(pch=20) +
                                                      ggplot2::labs(list(x="Variables", y="Importance"))
                                         Rmisc::multiplot(comp.plot)
                                         }
@@ -884,24 +890,24 @@ AlradSpectra <- function() {
   ### Parameters
   frame.file.arg <- gframe("Parameters:", cont = import, horizontal=TRUE)
   lyt.file.arg   <- glayout(cont = frame.file.arg, expand = F)
-                    lyt.file.arg[1,1,anchor=c(1,0)] <- "Separator (leave blank for tab):"
-  file.sep       <- lyt.file.arg[1,2,anchor=c(0,0)] <- gedit(text = ",", cont = lyt.file.arg, width = 8)
-                    lyt.file.arg[1,3,anchor=c(1,0)] <- "Decimal separator:"
-  file.dec       <- lyt.file.arg[1,4,anchor=c(0,0)] <- gedit(text = ".", cont = lyt.file.arg, width = 8)
-                    lyt.file.arg[1,8,anchor=c(1,0)] <- "Header:"
-  file.header    <- lyt.file.arg[1,9,anchor=c(0,0)] <- gcombobox(c("TRUE", "FALSE"), cont = lyt.file.arg)
-                    lyt.file.arg[2,1,anchor=c(1,0)] <- "Spectral data starts at column:"
-  spc.start.col  <- lyt.file.arg[2,2,anchor=c(0,0)] <- gedit(text = "", cont = lyt.file.arg, width = 8)
-                    lyt.file.arg[2,3,anchor=c(1,0)] <- "Spectral data ends at column:"
-  spc.end.col    <- lyt.file.arg[2,4,anchor=c(0,0)] <- gedit(text = "", cont = lyt.file.arg, width = 8)
-                    lyt.file.arg[3,1,anchor=c(1,0)] <- "Spectrum starts at wavelength:"
-  spc.first      <- lyt.file.arg[3,2,anchor=c(0,0)] <- gedit(text = "", cont = lyt.file.arg, width = 8)
-                    lyt.file.arg[3,3,anchor=c(1,0)] <- "Spectrum ends at wavelength:"
-  spc.last       <- lyt.file.arg[3,4,anchor=c(0,0)] <- gedit(text = "", cont = lyt.file.arg, width = 8)
-                    lyt.file.arg[4,1,anchor=c(1,0)] <- "Y variable is at column:"
-  soil.var.col   <- lyt.file.arg[4,2,anchor=c(0,0)] <- gedit(text = "", cont = lyt.file.arg, width = 8)
-                    lyt.file.arg[4,3,anchor=c(1,0)] <- "Y variable name:"
-  soil.var.nm    <- lyt.file.arg[4,4,anchor=c(0,0)] <- gedit(text = "", cont = lyt.file.arg, width = 8)
+                    lyt.file.arg[1,1,anchor=c(1,0)]    <- "Separator (leave blank for tab):"
+  file.sep       <- lyt.file.arg[1,2,anchor=c(0,0)]    <- gedit(text = ",", cont = lyt.file.arg, width = 6)
+                    lyt.file.arg[1,3,anchor=c(1,0)]    <- "Decimal separator:"
+  file.dec       <- lyt.file.arg[1,4,anchor=c(0,0)]    <- gedit(text = ".", cont = lyt.file.arg, width = 6)
+                    lyt.file.arg[1,9,anchor=c(1,0)]    <- "Header:"
+  file.header    <- lyt.file.arg[1,10,anchor=c(0,0)]   <- gcombobox(c("TRUE", "FALSE"), cont = lyt.file.arg)
+                    lyt.file.arg[2,1,anchor=c(1,0)]    <- "Spectral data starts at column:"
+  spc.start.col  <- lyt.file.arg[2,2,anchor=c(0,0)]    <- gedit(text = "", cont = lyt.file.arg, width = 6)
+                    lyt.file.arg[2,3,anchor=c(1,0)]    <- "Spectral data ends at column:"
+  spc.end.col    <- lyt.file.arg[2,4,anchor=c(0,0)]    <- gedit(text = "", cont = lyt.file.arg, width = 6)
+                    lyt.file.arg[3,1,anchor=c(1,0)]    <- "Spectrum starts at wavelength:"
+  spc.first      <- lyt.file.arg[3,2,anchor=c(0,0)]    <- gedit(text = "", cont = lyt.file.arg, width = 6)
+                    lyt.file.arg[3,3,anchor=c(1,0)]    <- "Spectrum ends at wavelength:"
+  spc.last       <- lyt.file.arg[3,4,anchor=c(0,0)]    <- gedit(text = "", cont = lyt.file.arg, width = 6)
+                    lyt.file.arg[4,1,anchor=c(1,0)]    <- "Y variable is at column:"
+  soil.var.col   <- lyt.file.arg[4,2,anchor=c(0,0)]    <- gedit(text = "", cont = lyt.file.arg, width = 6)
+                    lyt.file.arg[4,3,anchor=c(1,0)]    <- "Y variable name:"
+  soil.var.nm    <- lyt.file.arg[4,4:10,anchor=c(0,0)] <- gedit(text = "", cont = lyt.file.arg, width = 6)
   ### Import button
   gbutton("Import data", cont = import, handler = fimport)
   ### View data button
