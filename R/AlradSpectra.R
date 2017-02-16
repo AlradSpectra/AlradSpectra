@@ -471,7 +471,7 @@ AlradSpectra <- function() {
                                         spc.lt    <- AlradEnv$spectra.end.number
                                         row.names(var.imp) <- c(spc.st:spc.lt)
                                         comp.plot <- ggplot2::ggplot(var.imp, ggplot2::aes(x=c(spc.st:spc.lt), y=var.imp[,1])) +
-                                                     scale_x_continuous(breaks = floor(seq(spc.st, spc.lt, (spc.lt-spc.st)/20))) +
+                                                     ggplot2::scale_x_continuous(breaks = floor(seq(spc.st, spc.lt, (spc.lt-spc.st)/20))) +
                                                      ggplot2::geom_point(pch=20) +
                                                      ggplot2::labs(list(x="Variables", y="Importance"))
                                         Rmisc::multiplot(comp.plot)
