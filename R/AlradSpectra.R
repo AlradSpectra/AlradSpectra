@@ -47,13 +47,13 @@ AlradSpectra <- function() {
                                                                        svalue(spc.last)         <- ""
                                                                        svalue(soil.var.col)     <- ""
                                                                        svalue(soil.var.nm)      <- ""
-                                                                       svalue(select.dataset)   <- ""
+                                                                       select.dataset[]         <- ""
                                                                        svalue(pred.file.browse) <- ""
                                                                        svalue(pred.file.sep)    <- ","
                                                                        svalue(pred.file.dec)    <- "."
                                                                        svalue(pred.spc.first)   <- ""
                                                                        svalue(pred.spc.last)    <- ""
-                                                                       svalue(select.model)     <- ""
+                                                                       select.model[]           <- ""
                                                                        svalue(notebook)         <- 1 #Focus on import tab
                                                                        enabled(pp) = FALSE
                                                                        enabled(models) = FALSE
