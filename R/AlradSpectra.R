@@ -12,7 +12,7 @@ AlradSpectra <- function() {
   AlradEnv <- new.env()
   
   ###################################################
-  ### Auxiliar functions
+  ### Structural functions
   ###################################################
   
   # Warning handler
