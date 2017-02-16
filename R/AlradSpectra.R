@@ -430,7 +430,7 @@ AlradSpectra <- function() {
                                         wingroup  <- ggroup(horizontal=FALSE, cont=plotwin)
                                         ggraphics(cont = wingroup, no_popup=TRUE)
                                         Sys.sleep(1)
-                                        gbutton("Save plot", cont = wingroup, handler = function(...) fsaveplot(400, 400))
+                                        gbutton("Save plot", cont = wingroup, handler = function(...) fsaveplot(400, 450))
                                         comp.plot <- ggplot2::ggplot(h) +
                                                      ggplot2::labs(list(x="PLS Components", y="RMSE"))
                                         Rmisc::multiplot(comp.plot)
@@ -440,7 +440,7 @@ AlradSpectra <- function() {
                                         wingroup  <- ggroup(horizontal=FALSE, cont=plotwin)
                                         ggraphics(cont = wingroup, no_popup=TRUE)
                                         Sys.sleep(1)
-                                        gbutton("Save plot", cont = wingroup, handler = function(...) fsaveplot(400, 400))
+                                        gbutton("Save plot", cont = wingroup, handler = function(...) fsaveplot(400, 450))
                                         comp.plot <- ggplot2::ggplot(caret::varImp(h), top=40) +
                                                      ggplot2::labs(list(x="Variables", y="Importance"))
                                         Rmisc::multiplot(comp.plot)
