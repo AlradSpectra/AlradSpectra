@@ -467,8 +467,8 @@ AlradSpectra <- function() {
                                         Sys.sleep(1)
                                         gbutton("Save plot", cont = wingroup, handler = function(...) fsaveplot(900, 300))
                                         var.imp   <- caret::varImp(h)$importance
-                                        spc.st    <- AlradEnv$spectra.start.number
-                                        spc.lt    <- AlradEnv$spectra.end.number
+                                        spc.st    <- as.numeric(substring(row.names(var.imp)[1], 2))
+                                        spc.lt    <- as.numeric(substring(row.names(var.imp)[length(row.names(var.imp))], 2))
                                         row.names(var.imp) <- c(spc.st:spc.lt)
                                         comp.plot <- ggplot2::ggplot(var.imp, ggplot2::aes(x=c(spc.st:spc.lt), y=var.imp[,1])) +
                                                      ggplot2::scale_x_continuous(breaks = floor(seq(spc.st, spc.lt, (spc.lt-spc.st)/20))) +
