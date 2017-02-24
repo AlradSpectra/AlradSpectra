@@ -394,8 +394,8 @@ AlradSpectra <- function() {
                                        q1             <- quantile(y)[2]
                                        q3             <- quantile(y)[4]
                                        rpiq           <- (q3-q1)/rmse
-                                       error.i        <- round(c(r2, bias, rmse,  rpd, rpiq),2)
-                                       names(error.i) <- c("R-squared", "Bias", "RMSE", "RPD", "RPIQ")
+                                       error.i        <- round(c(r2, rmse, rpiq),2)
+                                       names(error.i) <- c("R-squared", "RMSE", "RPIQ")
                                        return(error.i)
                                        }
   # Get model accuracy and display in tabular form
