@@ -460,7 +460,7 @@ AlradSpectra <- function() {
                                                      ggplot2::labs(list(x="PLS Components", y="RMSE"))
                                         Rmisc::multiplot(comp.plot)
                                         }
-  # Plot variable importance
+  # Plot variables importance
   fmdl.plot.imp <- function(h, ...)    {plotwin   <- gwindow("Plot", width = 900, height = 300, parent=window)
                                         wingroup  <- ggroup(horizontal=FALSE, cont=plotwin)
                                         ggraphics(cont = wingroup, no_popup=TRUE)
@@ -1079,7 +1079,7 @@ AlradSpectra <- function() {
   lyt.param.pls[1,4] <- "Number of components to \ninclude in the model"
   pls.comp           <- lyt.param.pls[2,4] <- gspinbutton(from = 1, to = 500, by = 1, value =  30, cont = lyt.param.pls)
   gbutton("Run PLSR model", cont = mdl.pls , handler = fpls)
-  gbutton("View variable importance", cont = mdl.pls, handler = function(...) fpls.plot.imp(AlradEnv$pls.test))
+  gbutton("View variables importance", cont = mdl.pls, handler = function(...) fpls.plot.imp(AlradEnv$pls.test))
   gbutton("PLSR prediction statistics", cont = mdl.pls, handler = function(...) fmdl.stats(AlradEnv$pls.train, AlradEnv$pls.val))
   gbutton("View measured vs. predicted",cont = mdl.pls, handler = function(...) fmdl.plot.res(AlradEnv$pls.train, AlradEnv$pls.val))
   ### SVM
@@ -1094,7 +1094,7 @@ AlradSpectra <- function() {
   lyt.param.svm[1,2] <- "Kernel parameters"
   svm.kernel         <- lyt.param.svm[2,2] <- gradio(kernel.param.svm, cont = lyt.param.svm)
   gbutton("Run SVM model", cont = mdl.svm, handler = fsvm)
-  gbutton("View variable importance", cont = mdl.svm, handler = function(...) fmdl.plot.imp(AlradEnv$svm.test))
+  gbutton("View variables importance", cont = mdl.svm, handler = function(...) fmdl.plot.imp(AlradEnv$svm.test))
   gbutton("SVM prediction statistics", cont = mdl.svm, handler = function(...) fmdl.stats(AlradEnv$svm.train, AlradEnv$svm.val))
   gbutton("View measured vs. predicted",cont = mdl.svm, handler = function(...) fmdl.plot.res(AlradEnv$svm.train, AlradEnv$svm.val))
   ### RF
@@ -1111,7 +1111,7 @@ AlradSpectra <- function() {
   lyt.param.rf[1,3]  <- "Number of trees \n(ntree)"
   rf.ntree           <- lyt.param.rf[2,3]  <- gedit(text = "500", cont = lyt.param.rf, width = 4)
   gbutton("Run RF model", cont = mdl.rf, handler = frf)
-  gbutton("View variable importance", cont = mdl.rf, handler = function(...) fmdl.plot.imp(AlradEnv$rf.test))
+  gbutton("View variables importance", cont = mdl.rf, handler = function(...) fmdl.plot.imp(AlradEnv$rf.test))
   gbutton("RF prediction statistics", cont = mdl.rf, handler = function(...) fmdl.stats(AlradEnv$rf.train, AlradEnv$rf.val))
   gbutton("View measured vs. predicted",cont = mdl.rf, handler = function(...) fmdl.plot.res(AlradEnv$rf.train, AlradEnv$rf.val))
   ### ANN
@@ -1128,7 +1128,7 @@ AlradSpectra <- function() {
   lyt.param.ann[1,3] <- "Hidden units"
   ann.hid            <- lyt.param.ann[2,3] <- gspinbutton(from = 1, to = 50, by = 1, value = 50, cont = lyt.param.ann)
   gbutton("Run ANN model", cont = mdl.ann, handler = fann)
-  gbutton("View variable importance", cont = mdl.ann, handler = function(...) fmdl.plot.imp(AlradEnv$ann.test))
+  gbutton("View variables importance", cont = mdl.ann, handler = function(...) fmdl.plot.imp(AlradEnv$ann.test))
   gbutton("ANN prediction statistics", cont = mdl.ann, handler = function(...) fmdl.stats(AlradEnv$ann.train, AlradEnv$ann.val))
   gbutton("View measured vs. predicted", cont = mdl.ann, handler = function(...) fmdl.plot.res(AlradEnv$ann.train, AlradEnv$ann.val))
   ### KBML
@@ -1147,7 +1147,7 @@ AlradSpectra <- function() {
   lyt.param.kbml[1,4] <- "kernel function \nused in training and predicting"
   kbml.kernel         <- lyt.param.kbml[2,4] <- gradio(kernel.param.kbml, cont = lyt.param.kbml)
   gbutton("Run KBML model", cont = mdl.kbml, handler = fkbml)
-  gbutton("View variable importance", cont = mdl.kbml, handler = function(...) fmdl.plot.imp(AlradEnv$kbml.test))
+  gbutton("View variables importance", cont = mdl.kbml, handler = function(...) fmdl.plot.imp(AlradEnv$kbml.test))
   gbutton("KBML prediction statistics", cont = mdl.kbml, handler = function(...) fmdl.stats(AlradEnv$kbml.train, AlradEnv$kbml.val))
   gbutton("View measured vs. predicted", cont = mdl.kbml, handler = function(...) fmdl.plot.res(AlradEnv$kbml.train, AlradEnv$kbml.val))
   
