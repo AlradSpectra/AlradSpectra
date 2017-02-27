@@ -273,7 +273,7 @@ AlradSpectra <- function() {
                                          select.dataset[] <- AlradEnv$dataset
                                        }
   # Splits dataset in training and validaton sets
-  fsplit       <- function(...)       {set.seed(1) #Random Number Generation
+  fsplit       <- function(...)       {#set.seed(1)
                                        x           <- eval(parse(text = paste0("AlradEnv$", svalue(select.dataset)))) #Get selected dataset
                                        x           <- cbind(x, AlradEnv$alldata[AlradEnv$soil.var.column]) #Join spectral data and soil property
                                        indices     <- sample(1:nrow(x), size = (svalue(split.val)/100)*nrow(x)) #Random sampling
@@ -394,9 +394,9 @@ AlradSpectra <- function() {
                                        q1             <- quantile(y)[2]
                                        q3             <- quantile(y)[4]
                                        rpiq           <- (q3-q1)/rmse
-                                       error.i        <- round(c(r2, rmse, rpiq),2)
-                                       names(error.i) <- c("R-squared", "RMSE", "RPIQ")
-                                       return(error.i)
+                                       error.s        <- round(c(r2, rmse, rpiq ),2)
+                                       names(error.s) <- c("R-squared", "RMSE", "RPIQ")
+                                       return(error.s)
                                        }
   # Get model accuracy and display in tabular form
   fmdl.stats    <- function(t, v, ...) {t.stats.name <- paste0(deparse(substitute(t)), ".stats") #Create training stats table name
@@ -407,7 +407,7 @@ AlradSpectra <- function() {
                                                               get(v.stats.name, envir = AlradEnv)) #Merge training and validation stats
                                         Set          <- c("Training", "Validation") #Titles for prediction statistics table
                                         res.table    <- cbind(Set, results) #Create prediction statistics table
-                                        statswin     <- gwindow("Prediction statistics", width=350, height=150, parent=window)
+                                        statswin     <- gwindow("Prediction statistics", width=300, height=150, parent=window)
                                         stats.lyt    <- glayout(horizontal=FALSE, container=statswin)
                                         stats.lyt[1,1,expand=TRUE] <- gtable(res.table, cont = stats.lyt)
                                         stats.lyt[2,1,expand=FALSE] <- gbutton("Save results", cont=stats.lyt,
