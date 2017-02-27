@@ -376,7 +376,7 @@ AlradSpectra <- function() {
                                                               }
                                        }
   # Compute model prediction errors
-  fstats       <- function(y, yhat)   {n              <- length(y)
+  fpredstats       <- function(y, yhat)   {n              <- length(y)
                                        r              <- cor(y, yhat)
                                        lmy            <- lm(y~yhat)
                                        a              <- coefficients(lmy)[1]
@@ -401,8 +401,8 @@ AlradSpectra <- function() {
   # Get model accuracy and display in tabular form
   fmdl.stats    <- function(t, v, ...) {t.stats.name <- paste0(deparse(substitute(t)), ".stats") #Create training stats table name
                                         v.stats.name <- paste0(deparse(substitute(v)), ".stats") #Create validation stats table name
-                                        assign(t.stats.name, fstats(t[,1], t[,2]), envir = AlradEnv) #Compute training stats
-                                        assign(v.stats.name, fstats(v[,1], v[,2]), envir = AlradEnv) #Compute validation stats
+                                        assign(t.stats.name, fpredstats(t[,1], t[,2]), envir = AlradEnv) #Compute training stats
+                                        assign(v.stats.name, fpredstats(v[,1], v[,2]), envir = AlradEnv) #Compute validation stats
                                         results      <- rbind(get(t.stats.name, envir = AlradEnv),
                                                               get(v.stats.name, envir = AlradEnv)) #Merge training and validation stats
                                         Set          <- c("Training", "Validation") #Titles for prediction statistics table
@@ -420,8 +420,8 @@ AlradSpectra <- function() {
                                         ggraphics(cont = wingroup, no_popup=TRUE)
                                         t.stats.name <- paste0(deparse(substitute(t)), ".stats") #Create training stats table name
                                         v.stats.name <- paste0(deparse(substitute(v)), ".stats") #Create validation stats table name
-                                        assign(t.stats.name, fstats(t[,1], t[,2]), envir = AlradEnv) #Compute training stats
-                                        assign(v.stats.name, fstats(v[,1], v[,2]), envir = AlradEnv) #Compute validation stats
+                                        assign(t.stats.name, fpredstats(t[,1], t[,2]), envir = AlradEnv) #Compute training stats
+                                        assign(v.stats.name, fpredstats(v[,1], v[,2]), envir = AlradEnv) #Compute validation stats
                                         train.plot   <- ggplot2::ggplot(t, ggplot2::aes(x=t[,1], y=t[,2])) +
                                                         ggplot2::geom_point(shape=19) +
                                                         ggplot2::ggtitle("Training") +
