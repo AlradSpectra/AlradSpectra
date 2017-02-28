@@ -431,7 +431,7 @@ AlradSpectra <- function() {
                                                         ggplot2::xlim(0, max(t)) +
                                                         ggplot2::ylim(0, max(t)) +
                                                         ggplot2::geom_abline(intercept = 0, slope = 1) +
-                                                        ggplot2::annotate("text", x=max(v)*0.05, y=seq(max(t)*0.95, max(t)*0.75,-max(t)*0.05), hjust = 0,
+                                                        ggplot2::annotate("text", x=max(v)*0.05, y=seq(max(t)*0.95, max(t)*0.85,-max(t)*0.05), hjust = 0,
                                                                           label = paste(names(get(t.stats.name, envir = AlradEnv)),"=",
                                                                                         get(t.stats.name, envir = AlradEnv)))
                                         val.plot     <- ggplot2::ggplot(v, ggplot2::aes(x=v[,1], y=v[,2])) +
@@ -443,7 +443,7 @@ AlradSpectra <- function() {
                                                         ggplot2::xlim(0, max(v)) +
                                                         ggplot2::ylim(0, max(v)) +
                                                         ggplot2::geom_abline(intercept = 0, slope = 1) +
-                                                        ggplot2::annotate("text", x=max(v)*0.05, y=seq(max(v)*0.95,max(v)*0.75,-max(v)*0.05), hjust = 0,
+                                                        ggplot2::annotate("text", x=max(v)*0.05, y=seq(max(v)*0.95,max(v)*0.85,-max(v)*0.05), hjust = 0,
                                                                           label = paste(names(get(v.stats.name, envir = AlradEnv)),"=",
                                                                                         get(v.stats.name, envir = AlradEnv)))
                                         Sys.sleep(1)
