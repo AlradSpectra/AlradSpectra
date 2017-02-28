@@ -801,39 +801,39 @@ AlradSpectra <- function() {
                                  dispose(AlradEnv$alert)
                                  gmessage("ANN model done", title = "ANN model", parent = window)
                                  }
-  # KBML
-  fkbml        <- function(...) {AlradEnv$alert <- galert("Wait... \nThis may take a few minutes! ", title = "KBML model", 
+  # GPR
+  fgpr        <- function(...) {AlradEnv$alert <- galert("Wait... \nThis may take a few minutes! ", title = "GPR model", 
                                                           delay=10000, parent=notebook)
                                  Sys.sleep(1)
                                  tryCatch(
-                                          {AlradEnv$bootctrl.kbml <- caret::trainControl(method= svalue(kbml.resampling))
-                                           if (svalue(kbml.kernel, index=TRUE)==1) fkbmllinear()
-                                           if (svalue(kbml.kernel, index=TRUE)==2) fkbmlradial()
-                                           AlradEnv$kbml.train    <- data.frame(AlradEnv$Train[AlradEnv$last.col], 
-                                                                                Predicted=predict(AlradEnv$KBML, newdata=AlradEnv$Train))
-                                           AlradEnv$kbml.val      <- data.frame(AlradEnv$Val[AlradEnv$last.col], 
-                                                                                Predicted=predict(AlradEnv$KBML, newdata=AlradEnv$Val))
-                                           faddtomodels("KBML")
+                                          {AlradEnv$bootctrl.gpr <- caret::trainControl(method= svalue(gpr.resampling))
+                                           if (svalue(gpr.kernel, index=TRUE)==1) fgprlinear()
+                                           if (svalue(gpr.kernel, index=TRUE)==2) fgprradial()
+                                           AlradEnv$gpr.train    <- data.frame(AlradEnv$Train[AlradEnv$last.col], 
+                                                                                Predicted=predict(AlradEnv$gpr, newdata=AlradEnv$Train))
+                                           AlradEnv$gpr.val      <- data.frame(AlradEnv$Val[AlradEnv$last.col], 
+                                                                                Predicted=predict(AlradEnv$gpr, newdata=AlradEnv$Val))
+                                           faddtomodels("GPR")
                                            enabled(pred) = TRUE #Enable prediction module
                                            },
                                           warning = function(w) fwarning(w),
                                           error =  function(e) ferror(e)
                                           )
                                  dispose(AlradEnv$alert)
-                                 gmessage("KBML model done", title = "KBML model", parent = window)
+                                 gmessage("GPR model done", title = "GPR model", parent = window)
                                  }
-  fkbmllinear  <- function(...) {AlradEnv$kbml.test <- caret::train(AlradEnv$form.mdl, data = AlradEnv$Train, method = 'gaussprLinear',
-                                                            trControl = AlradEnv$bootctrl.kbml, tuneLength = 10)
-                                AlradEnv$KBML       <- kernlab::gausspr(AlradEnv$form.mdl, data=AlradEnv$Train, kernel= "vanilladot",
+  fgprlinear  <- function(...) {AlradEnv$gpr.test <- caret::train(AlradEnv$form.mdl, data = AlradEnv$Train, method = 'gaussprLinear',
+                                                            trControl = AlradEnv$bootctrl.gpr, tuneLength = 10)
+                                AlradEnv$gpr       <- kernlab::gausspr(AlradEnv$form.mdl, data=AlradEnv$Train, kernel= "vanilladot",
                                                                 type = "regression", kpar= "automatic", variance.model = T,
-                                                                var=as.numeric(svalue(kbml.var)), cross= svalue(kbml.cross))
+                                                                var=as.numeric(svalue(gpr.var)), cross= svalue(gpr.cross))
                                 }
-  fkbmlradial  <- function(...) {Grid      <-  expand.grid(.sigma = seq(.00001,.1,.005))
-                                AlradEnv$kbml.test  <- caret::train(AlradEnv$form.mdl, data = AlradEnv$Train, method = 'gaussprRadial', 
-                                                                    tuneLength = 10, trControl = AlradEnv$bootctrl.kbml, tuneGrid = Grid)
-                                AlradEnv$KBML       <- kernlab::gausspr(AlradEnv$form.mdl, data=AlradEnv$Train, kernel="rbfdot",
+  fgprradial  <- function(...) {Grid      <-  expand.grid(.sigma = seq(.00001,.1,.005))
+                                AlradEnv$gpr.test  <- caret::train(AlradEnv$form.mdl, data = AlradEnv$Train, method = 'gaussprRadial', 
+                                                                    tuneLength = 10, trControl = AlradEnv$bootctrl.gpr, tuneGrid = Grid)
+                                AlradEnv$gpr       <- kernlab::gausspr(AlradEnv$form.mdl, data=AlradEnv$Train, kernel="rbfdot",
                                                                         type ="regression", kpar= "automatic", variance.model = T,
-                                                                        var=svalue(kbml.var), cross= svalue(kbml.cross))
+                                                                        var=svalue(gpr.var), cross= svalue(gpr.cross))
                                 }
 
   ###################################################
@@ -854,8 +854,8 @@ AlradSpectra <- function() {
                             "Support Vector Machines with Radial Kernel")
   actf                 <- c("linear","radial basis","sigmoid","sine","hard-limit","symmetric hard-limit",
                             "satlins","tan-sigmoid","triangular basis", "positive linear")
-  kernel.param.kbml    <- c("Linear kernel", "Radial kernel")
-  kbml.param.var       <- c(.0001,.001,.01,.1,1,10,100)
+  kernel.param.gpr    <- c("Linear kernel", "Radial kernel")
+  gpr.param.var       <- c(.0001,.001,.01,.1,1,10,100)
 
   ###################################################
   ### Main window
@@ -1131,25 +1131,25 @@ AlradSpectra <- function() {
   gbutton("View variables importance", cont = mdl.ann, handler = function(...) fmdl.plot.imp(AlradEnv$ann.test))
   gbutton("ANN prediction statistics", cont = mdl.ann, handler = function(...) fmdl.stats(AlradEnv$ann.train, AlradEnv$ann.val))
   gbutton("View measured vs. predicted", cont = mdl.ann, handler = function(...) fmdl.plot.res(AlradEnv$ann.train, AlradEnv$ann.val))
-  ### KBML
-  mdl.kbml            <- ggroup(cont = mdl, horizontal = F,label = gettext(" KBML "))
-  frame.desc.kbml     <- gframe("Description:",cont = mdl.kbml, horizontal = T)
-  lyt.desc.kbml       <- glayout(cont = frame.desc.kbml, expand = TRUE)
-  lyt.desc.kbml[1,1]  <- "Kernel-Based Machine Learning. Implements Gaussian processes for regression. Packages: kernlab / caret"
-  frame.param.kbml    <- gframe("Tuning parameters:", cont = mdl.kbml, horizontal=T)
-  lyt.param.kbml      <- glayout(cont = frame.param.kbml , expand = TRUE)
-  lyt.param.kbml[1,1] <- "Resampling method"
-  kbml.resampling     <- lyt.param.kbml[2,1] <- gcombobox(train.ctrl.method, cont = lyt.param.kbml)
-  lyt.param.kbml[1,2] <- "Initial noise variance"
-  kbml.var            <- lyt.param.kbml[2,2] <- gcombobox(kbml.param.var, selected = 2, cont = lyt.param.kbml)
-  lyt.param.kbml[1,3] <- "For cv resampling method only: \nnumber of folds (k-fold)"
-  kbml.cross          <- lyt.param.kbml[2,3] <- gspinbutton(from = 2, to = 100, by = 1, value = 10, cont = lyt.param.kbml)
-  lyt.param.kbml[1,4] <- "kernel function \nused in training and predicting"
-  kbml.kernel         <- lyt.param.kbml[2,4] <- gradio(kernel.param.kbml, cont = lyt.param.kbml)
-  gbutton("Run KBML model", cont = mdl.kbml, handler = fkbml)
-  gbutton("View variables importance", cont = mdl.kbml, handler = function(...) fmdl.plot.imp(AlradEnv$kbml.test))
-  gbutton("KBML prediction statistics", cont = mdl.kbml, handler = function(...) fmdl.stats(AlradEnv$kbml.train, AlradEnv$kbml.val))
-  gbutton("View measured vs. predicted", cont = mdl.kbml, handler = function(...) fmdl.plot.res(AlradEnv$kbml.train, AlradEnv$kbml.val))
+  ### GPR
+  mdl.gpr            <- ggroup(cont = mdl, horizontal = F,label = gettext(" GPR "))
+  frame.desc.gpr     <- gframe("Description:",cont = mdl.gpr, horizontal = T)
+  lyt.desc.gpr       <- glayout(cont = frame.desc.gpr, expand = TRUE)
+  lyt.desc.gpr[1,1]  <- "Kernel-Based Machine Learning. Implements Gaussian processes for regression. Packages: kernlab / caret"
+  frame.param.gpr    <- gframe("Tuning parameters:", cont = mdl.gpr, horizontal=T)
+  lyt.param.gpr      <- glayout(cont = frame.param.gpr , expand = TRUE)
+  lyt.param.gpr[1,1] <- "Resampling method"
+  gpr.resampling     <- lyt.param.gpr[2,1] <- gcombobox(train.ctrl.method, cont = lyt.param.gpr)
+  lyt.param.gpr[1,2] <- "Initial noise variance"
+  gpr.var            <- lyt.param.gpr[2,2] <- gcombobox(gpr.param.var, selected = 2, cont = lyt.param.gpr)
+  lyt.param.gpr[1,3] <- "For cv resampling method only: \nnumber of folds (k-fold)"
+  gpr.cross          <- lyt.param.gpr[2,3] <- gspinbutton(from = 2, to = 100, by = 1, value = 10, cont = lyt.param.gpr)
+  lyt.param.gpr[1,4] <- "kernel function \nused in training and predicting"
+  gpr.kernel         <- lyt.param.gpr[2,4] <- gradio(kernel.param.gpr, cont = lyt.param.gpr)
+  gbutton("Run gpr model", cont = mdl.gpr, handler = fgpr)
+  gbutton("View variables importance", cont = mdl.gpr, handler = function(...) fmdl.plot.imp(AlradEnv$gpr.test))
+  gbutton("GPR prediction statistics", cont = mdl.gpr, handler = function(...) fmdl.stats(AlradEnv$gpr.train, AlradEnv$gpr.val))
+  gbutton("View measured vs. predicted", cont = mdl.gpr, handler = function(...) fmdl.plot.res(AlradEnv$gpr.train, AlradEnv$gpr.val))
   
   ###################################################
   ### Prediction module
