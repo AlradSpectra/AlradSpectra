@@ -29,6 +29,7 @@ Imports:
     graphics, 
     grDevices,
     grid, 
+    gridExtra,
     gtable, 
     gWidgets,
     gWidgetsRGtk2,
