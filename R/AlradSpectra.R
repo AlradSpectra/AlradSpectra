@@ -1135,7 +1135,7 @@ AlradSpectra <- function() {
   mdl.gpr            <- ggroup(cont = mdl, horizontal = F,label = gettext(" GPR "))
   frame.desc.gpr     <- gframe("Description:",cont = mdl.gpr, horizontal = T)
   lyt.desc.gpr       <- glayout(cont = frame.desc.gpr, expand = TRUE)
-  lyt.desc.gpr[1,1]  <- "Kernel-Based Machine Learning. Implements Gaussian processes for regression. Packages: kernlab / caret"
+  lyt.desc.gpr[1,1]  <- "Gaussian process applies a kernel function for training and predicting. Packages: kernlab / caret"
   frame.param.gpr    <- gframe("Tuning parameters:", cont = mdl.gpr, horizontal=T)
   lyt.param.gpr      <- glayout(cont = frame.param.gpr , expand = TRUE)
   lyt.param.gpr[1,1] <- "Resampling method"
