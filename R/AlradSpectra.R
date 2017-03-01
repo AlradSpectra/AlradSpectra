@@ -681,7 +681,7 @@ AlradSpectra <- function() {
                                            AlradEnv$mlr.test  <- train(form.mlr, data = AlradEnv$Train, method = "glmStepAIC", 
                                                                        trControl = bootctrl.mlr)
                                            AlradEnv$mlr.train <- data.frame(AlradEnv$Train[AlradEnv$last.col],
-                                                                            Predicted=predict(AlradEnv$mlr.test)
+                                                                            Predicted=predict(AlradEnv$mlr.test))
                                            AlradEnv$mlr.val   <- data.frame(AlradEnv$Val[AlradEnv$last.col],
                                                                             Predicted=predict(AlradEnv$mlr.test, newdata=AlradEnv$Val))
                                            faddtomodels("MLR")
