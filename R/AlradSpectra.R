@@ -672,12 +672,18 @@ AlradSpectra <- function() {
                                                                          paste(names(AlradEnv$Train)[c(seq(1,AlradEnv$last.col-1,
                                                                                                            by=svalue(mlr.band.interval)))],
                                                                                collapse="+"),collapse=""))
-                                           AlradEnv$mlr.model <- stats::glm(form.mlr, data=AlradEnv$Train)
-                                           AlradEnv$MLR       <- stats::step(AlradEnv$mlr.model, direction="both", trace=0)
+                                           bootctrl.mlr <- caret::trainControl(method  <- svalue(mlr.resampling),
+                                                                               number  <- ifelse(grepl("cv", method), svalue(mlr.kfold),
+                                                                                                 (svalue(pls.kfold)+10)),
+                                                                               repeats <- ifelse(grepl("cv", method), svalue(mlr.folds),
+                                                                                                 number)
+                                                                               )
+                                           AlradEnv$mlr.test  <- train(form.mlr, data = AlradEnv$Train, method = "glmStepAIC", 
+                                                                       trControl = bootctrl.mlr)
                                            AlradEnv$mlr.train <- data.frame(AlradEnv$Train[AlradEnv$last.col],
-                                                                            Predicted=AlradEnv$mlr.model$fitted.values)
+                                                                            Predicted=predict(AlradEnv$mlr.test)
                                            AlradEnv$mlr.val   <- data.frame(AlradEnv$Val[AlradEnv$last.col],
-                                                                            Predicted=predict(AlradEnv$MLR, newdata=AlradEnv$Val))
+                                                                            Predicted=predict(AlradEnv$mlr.test, newdata=AlradEnv$Val))
                                            faddtomodels("MLR")
                                            enabled(pred) = TRUE #Enable prediction module
                                            },
@@ -806,7 +812,10 @@ AlradSpectra <- function() {
                                                           delay=10000, parent=notebook)
                                  Sys.sleep(1)
                                  tryCatch(
-                                          {AlradEnv$bootctrl.gpr <- caret::trainControl(method= svalue(gpr.resampling))
+                                          {bootctrl.gpr <- caret::trainControl(method  <- svalue(gpr.resampling),
+                                                                               number  <- ifelse(grepl("cv", method), svalue(gpr.kfold),
+                                                                                                (svalue(gpr.kfold)+10))
+                                                                               )
                                            if (svalue(gpr.kernel, index=TRUE)==1) fgprlinear()
                                            if (svalue(gpr.kernel, index=TRUE)==2) fgprradial()
                                            AlradEnv$gpr.train    <- data.frame(AlradEnv$Train[AlradEnv$last.col], 
@@ -1060,7 +1069,14 @@ AlradSpectra <- function() {
   lyt.param.mlr      <- glayout(cont = frame.param.mlr , expand = TRUE)
   lyt.param.mlr[1,1] <- "Band interval"
   mlr.band.interval  <- lyt.param.mlr[2,1] <- gspinbutton(from = 1, to = 30, by = 1, value = 25, cont = lyt.param.mlr)
+  lyt.param.mlr[1,2] <- "Resampling method"
+  mlr.resampling     <- lyt.param.mlr[2,2] <- gcombobox(train.ctrl.method, cont = lyt.param.mlr)
+  lyt.param.mlr[1,3] <- "Number of resampling \niterations"
+  mlr.folds          <- lyt.param.mlr[2,3] <- gspinbutton(from = 1, to = 500, by = 1, value = 5, cont = lyt.param.mlr)
+  lyt.param.mlr[1,4] <- "For cv resampling method only: \nnumber of folds (k-fold)"
+  mlr.kfold          <- lyt.param.mlr[2,4] <- gspinbutton(from = 1, to = 500, by = 1,value =  10, cont = lyt.param.mlr)
   gbutton("Run MLR model", cont = mdl.mlr, handler = fmlr)
+  gbutton("View variables importance", cont = mdl.mlr, handler = function(...) fmdl.plot.imp(AlradEnv$mlr.test))
   gbutton("MLR prediction statistics", cont = mdl.mlr, handler = function(...) fmdl.stats(AlradEnv$mlr.train, AlradEnv$mlr.val))
   gbutton("View measured vs. predicted",cont = mdl.mlr, handler = function(...) fmdl.plot.res(AlradEnv$mlr.train, AlradEnv$mlr.val))
   ### PLS
@@ -1079,7 +1095,8 @@ AlradSpectra <- function() {
   lyt.param.pls[1,4] <- "Number of components to \ninclude in the model"
   pls.comp           <- lyt.param.pls[2,4] <- gspinbutton(from = 1, to = 500, by = 1, value =  30, cont = lyt.param.pls)
   gbutton("Run PLSR model", cont = mdl.pls , handler = fpls)
-  gbutton("View variables importance", cont = mdl.pls, handler = function(...) fpls.plot.imp(AlradEnv$pls.test))
+  gbutton("View variables importance", cont = mdl.pls, handler = function(...) fmdl.plot.imp(AlradEnv$pls.test))
+  gbutton("View PLS components vs. RMSE", cont = mdl.pls, handler = function(...) fpls.plot.imp(AlradEnv$pls.test))
   gbutton("PLSR prediction statistics", cont = mdl.pls, handler = function(...) fmdl.stats(AlradEnv$pls.train, AlradEnv$pls.val))
   gbutton("View measured vs. predicted",cont = mdl.pls, handler = function(...) fmdl.plot.res(AlradEnv$pls.train, AlradEnv$pls.val))
   ### SVM
@@ -1132,7 +1149,7 @@ AlradSpectra <- function() {
   gbutton("ANN prediction statistics", cont = mdl.ann, handler = function(...) fmdl.stats(AlradEnv$ann.train, AlradEnv$ann.val))
   gbutton("View measured vs. predicted", cont = mdl.ann, handler = function(...) fmdl.plot.res(AlradEnv$ann.train, AlradEnv$ann.val))
   ### GPR
-  mdl.gpr            <- ggroup(cont = mdl, horizontal = F,label = gettext(" GPR "))
+  mdl.gpr            <- ggroup(cont = mdl, horizontal = F,label = gettext("    GPR    "))
   frame.desc.gpr     <- gframe("Description:",cont = mdl.gpr, horizontal = T)
   lyt.desc.gpr       <- glayout(cont = frame.desc.gpr, expand = TRUE)
   lyt.desc.gpr[1,1]  <- "Gaussian Process for Regression. Gaussian process applies a kernel function for training and predicting. Packages: kernlab / caret"
