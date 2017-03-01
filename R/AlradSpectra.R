@@ -253,7 +253,7 @@ AlradSpectra <- function() {
                                                                                 high = "dodgerblue3") +
                                                    ggplot2::labs(x = AlradEnv$soil.var.name, y = "Frequency") +
                                                    ggplot2::guides(fill=FALSE)
-                                       Rmisc::multiplot(histo)
+                                       print(histo)
                                        }
   # Export preprocessed spectra as csv file
   fsavespectra <- function(h, ...)    {fdialog <- gfile("Save File", type="save", initialfilename="Output", container=window,
@@ -359,7 +359,7 @@ AlradSpectra <- function() {
                                                      ggplot2::labs(x = "", y = AlradEnv$soil.var.name) +
                                                      ggplot2::theme(axis.text = ggplot2::element_text(size=12),
                                                                     axis.title = ggplot2::element_text(size=13))
-                                       Rmisc::multiplot(boxpl)
+                                       print(boxpl)
                                        }
   # Disables models module and homo, desc stats and boxplot buttons when dataset or validation size is changed
   fchangesplit <- function(h, ...)    {enabled(mdl) = FALSE
@@ -425,7 +425,7 @@ AlradSpectra <- function() {
                                         train.plot   <- ggplot2::ggplot(t, ggplot2::aes(x=t[,1], y=t[,2])) +
                                                         ggplot2::geom_point(shape=19) +
                                                         ggplot2::ggtitle("Training") +
-                                                        ggplot2::labs(y="Predicted") + 
+                                                        ggplot2::labs(x=NULL, y=paste(AlradEnv$soil.var.name, "Predicted")) + 
                                                         ggplot2::theme(plot.title = ggplot2::element_text(size=12, hjust=0.5)) +
                                                         ggplot2::theme(axis.title = ggplot2::element_text(size=12, hjust=0.5)) + 
                                                         ggplot2::xlim(0, max(t)) +
@@ -437,6 +437,7 @@ AlradSpectra <- function() {
                                         val.plot     <- ggplot2::ggplot(v, ggplot2::aes(x=v[,1], y=v[,2])) +
                                                         ggplot2::geom_point(shape=19) +
                                                         ggplot2::ggtitle("Validation") +
+                                                        ggplot2::labs(x=NULL, y=NULL) + 
                                                         ggplot2::theme(plot.title = ggplot2::element_text(size=12, hjust=0.5)) +
                                                         ggplot2::theme(axis.title = ggplot2::element_text(size=12, hjust=0.5)) + 
                                                         ggplot2::xlim(0, max(v)) +
@@ -447,7 +448,7 @@ AlradSpectra <- function() {
                                                                                         get(v.stats.name, envir = AlradEnv)))
                                         Sys.sleep(1)
                                         gbutton("Save plot", cont = wingroup, handler = function(...) fsaveplot(800, 400))
-                                        Rmisc::multiplot(train.plot, val.plot, cols = 2)
+                                        gridExtra::grid.arrange(train.plot, val.plot, ncol=2, bottom=paste(AlradEnv$soil.var.name, "Measured"))
                                         }
   # Plot RMSE of PLSR components
   fpls.plot.imp <- function(h, ...)    {plotwin   <- gwindow("Plot", width = 400, height = 400, parent=window)
@@ -457,7 +458,7 @@ AlradSpectra <- function() {
                                         gbutton("Save plot", cont = wingroup, handler = function(...) fsaveplot(400, 500))
                                         comp.plot <- ggplot2::ggplot(h) +
                                                      ggplot2::labs(list(x="PLS Components", y="RMSE"))
-                                        Rmisc::multiplot(comp.plot)
+                                        print(comp.plot)
                                         }
   # Plot variables importance
   fmdl.plot.imp <- function(h, ...)    {plotwin   <- gwindow("Plot", width = 900, height = 300, parent=window)
@@ -473,7 +474,7 @@ AlradSpectra <- function() {
                                                      ggplot2::scale_x_continuous(breaks = floor(seq(spc.st, spc.lt, (spc.lt-spc.st)/20))) +
                                                      ggplot2::geom_point(pch=20) +
                                                      ggplot2::labs(list(x="Variables", y="Importance"))
-                                        Rmisc::multiplot(comp.plot)
+                                        print(comp.plot)
                                         }
   # Adds preprocessing to combobox in Model tab only if it is not already there
   faddtomodels  <- function(h, ...) {present <- is.element(h, AlradEnv$pred.models)
