@@ -1,6 +1,6 @@
-#' A GUI to perform preprocessing, multivariate modeling and prediction using spectral data
+#' A GUI to perform preprocessing, multivariate modeling and prediction using spectroscopic data
 #'
-#' Alrad Spectra was developed to accomplish tasks such as perform a large range of spectral preprocessing techniques, implement several multivariate calibration methods, provide statistics assessment, provide graphical output, validate the models using independent datasets, and predict unknown samples.
+#' Alrad Spectra was developed to accomplish tasks such as perform a large range of spectral preprocessing techniques, implement several multivariate calibration methods, which can provide well-fitted and accurate models, statistics assessment, graphical output, validate the models using independent data sets, and predict unknown samples.
 #' @author Andre C. Dotto, \email{andrecdot@gmail.com}
 #' @author Diego J. Gris, \email{diegojgris@gmail.com}
 #' @import gWidgets
@@ -425,7 +425,7 @@ AlradSpectra <- function() {
                                         train.plot   <- ggplot2::ggplot(t, ggplot2::aes(x=t[,1], y=t[,2])) +
                                                         ggplot2::geom_point(shape=19) +
                                                         ggplot2::ggtitle("Training") +
-                                                        ggplot2::labs(x="Measured", y="Predicted") + 
+                                                        ggplot2::labs(y="Predicted") + 
                                                         ggplot2::theme(plot.title = ggplot2::element_text(size=12, hjust=0.5)) +
                                                         ggplot2::theme(axis.title = ggplot2::element_text(size=12, hjust=0.5)) + 
                                                         ggplot2::xlim(0, max(t)) +
@@ -437,7 +437,6 @@ AlradSpectra <- function() {
                                         val.plot     <- ggplot2::ggplot(v, ggplot2::aes(x=v[,1], y=v[,2])) +
                                                         ggplot2::geom_point(shape=19) +
                                                         ggplot2::ggtitle("Validation") +
-                                                        ggplot2::labs(x="Measured", y="Predicted") + 
                                                         ggplot2::theme(plot.title = ggplot2::element_text(size=12, hjust=0.5)) +
                                                         ggplot2::theme(axis.title = ggplot2::element_text(size=12, hjust=0.5)) + 
                                                         ggplot2::xlim(0, max(v)) +
@@ -1055,7 +1054,7 @@ AlradSpectra <- function() {
   mdl.mlr            <- ggroup(cont = mdl, horizontal = F,label = gettext("   MLR   "))
   frame.desc.mlr     <- gframe("Description:",cont = mdl.mlr, horizontal = T)
   lyt.desc.mlr       <- glayout(cont = frame.desc.mlr, expand = TRUE)
-  lyt.desc.mlr[1,1]  <- "Multiple Linear Regression. Packages: stats / MASS / caret"
+  lyt.desc.mlr[1,1]  <- "Multiple Linear Regression. Packages: stats"
   frame.param.mlr    <- gframe("Tuning parameters:", cont = mdl.mlr, horizontal=T)
   lyt.param.mlr      <- glayout(cont = frame.param.mlr , expand = TRUE)
   lyt.param.mlr[1,1] <- "Band interval"
