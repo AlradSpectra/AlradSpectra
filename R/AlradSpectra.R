@@ -1055,7 +1055,7 @@ AlradSpectra <- function() {
   mdl.mlr            <- ggroup(cont = mdl, horizontal = F,label = gettext("   MLR   "))
   frame.desc.mlr     <- gframe("Description:",cont = mdl.mlr, horizontal = T)
   lyt.desc.mlr       <- glayout(cont = frame.desc.mlr, expand = TRUE)
-  lyt.desc.mlr[1,1]  <- "Multiple Linear Regression. Packages: stats"
+  lyt.desc.mlr[1,1]  <- "Multiple Linear Regression. MLR is a statistical method that uses several explanatory variables to predict the outcome of a response variable in a simple linear model. Packages: stats"
   frame.param.mlr    <- gframe("Tuning parameters:", cont = mdl.mlr, horizontal=T)
   lyt.param.mlr      <- glayout(cont = frame.param.mlr , expand = TRUE)
   lyt.param.mlr[1,1] <- "Band interval"
@@ -1067,7 +1067,7 @@ AlradSpectra <- function() {
   mdl.pls            <- ggroup(cont = mdl, horizontal = F,label = gettext("   PLSR   "))
   frame.desc.pls     <- gframe("Description:",cont = mdl.pls, horizontal = T)
   lyt.desc.pls       <- glayout(cont = frame.desc.pls, expand = TRUE)
-  lyt.desc.pls[1,1]  <- "Partial Least Squares Regression. Packages: pls / caret"
+  lyt.desc.pls[1,1]  <- "Partial Least Squares Regression. PLSR is considered the most common regression method applied in chemometrics and can deal with complex modeling problems. Packages: pls / caret"
   frame.param.pls    <- gframe("Tuning parameters:", cont = mdl.pls, horizontal=T)
   lyt.param.pls      <- glayout(cont = frame.param.pls , expand = TRUE)
   lyt.param.pls[1,1] <- "Resampling method"
@@ -1086,7 +1086,7 @@ AlradSpectra <- function() {
   mdl.svm            <- ggroup(cont = mdl, horizontal = F,label = gettext("    SVM    "))
   frame.desc.svm     <- gframe("Description:",cont = mdl.svm, horizontal = T)
   lyt.desc.svm       <- glayout(cont = frame.desc.svm, expand = TRUE)
-  lyt.desc.svm[1,1]  <- "Support Vector Machine. Packages: e1071 / caret"
+  lyt.desc.svm[1,1]  <- "Support Vector Machine. SVM models are efficient in modeling linear or nonlinear relationships and handling large databases. Packages: e1071 / caret"
   frame.param.svm    <- gframe("Tuning parameters:", cont = mdl.svm, horizontal=T)
   lyt.param.svm      <- glayout(cont = frame.param.svm , expand = TRUE)
   lyt.param.svm[1,1] <- "Resampling method"
@@ -1101,7 +1101,7 @@ AlradSpectra <- function() {
   mdl.rf             <- ggroup(cont = mdl, horizontal = F,label = gettext("    RF    "))
   frame.desc.rf      <- gframe("Description:",cont = mdl.rf, horizontal = T)
   lyt.desc.rf        <- glayout(cont = frame.desc.rf, expand = TRUE)
-  lyt.desc.rf[1,1]   <- "Implements Breiman's Random Forest. Packages: randomForest / caret"
+  lyt.desc.rf[1,1]   <- "Random Forest. RF models are black boxes approach that are very hard to interpret. Packages: randomForest / caret"
   frame.param.rf     <- gframe("Tuning parameters:", cont = mdl.rf, horizontal=T)
   lyt.param.rf       <- glayout(cont = frame.param.rf , expand = TRUE)
   lyt.param.rf[1,1]  <- "Resampling method"
@@ -1118,7 +1118,7 @@ AlradSpectra <- function() {
   mdl.ann            <- ggroup(cont = mdl, horizontal = F,label = gettext("    ANN    "))
   frame.desc.ann     <- gframe("Description:",cont = mdl.ann, horizontal = T)
   lyt.desc.ann       <- glayout(cont = frame.desc.ann, expand = TRUE)
-  lyt.desc.ann[1,1]  <- "Artificial Neural Network. Packages: elmNN / caret / MASS"
+  lyt.desc.ann[1,1]  <- "Artificial Neural Network. ANN calculates the output from the hidden layer based on the activation function. Packages: elmNN / caret"
   frame.param.ann    <- gframe("Tuning parameters:", cont = mdl.ann, horizontal=T)
   lyt.param.ann      <- glayout(cont = frame.param.ann , expand = TRUE)
   lyt.param.ann[1,1] <- "Resampling method"
@@ -1135,7 +1135,7 @@ AlradSpectra <- function() {
   mdl.gpr            <- ggroup(cont = mdl, horizontal = F,label = gettext(" GPR "))
   frame.desc.gpr     <- gframe("Description:",cont = mdl.gpr, horizontal = T)
   lyt.desc.gpr       <- glayout(cont = frame.desc.gpr, expand = TRUE)
-  lyt.desc.gpr[1,1]  <- "Gaussian process applies a kernel function for training and predicting. Packages: kernlab / caret"
+  lyt.desc.gpr[1,1]  <- "Gaussian Process for Regression. Gaussian process applies a kernel function for training and predicting. Packages: kernlab / caret"
   frame.param.gpr    <- gframe("Tuning parameters:", cont = mdl.gpr, horizontal=T)
   lyt.param.gpr      <- glayout(cont = frame.param.gpr , expand = TRUE)
   lyt.param.gpr[1,1] <- "Resampling method"
