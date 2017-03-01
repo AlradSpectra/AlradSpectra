@@ -2,16 +2,15 @@
 % Please edit documentation in R/AlradSpectra.R
 \name{AlradSpectra}
 \alias{AlradSpectra}
-\title{A GUI to perform preprocessing, multivariate modeling and prediction using spectral data}
+\title{A GUI to perform preprocessing, multivariate modeling and prediction using spectroscopic data}
 \usage{
 AlradSpectra()
 }
 \description{
-Alrad Spectra was developed to accomplish tasks such as perform a large range of spectral preprocessing techniques, implement several multivariate calibration methods, provide statistics assessment, provide graphical output, validate the models using independent datasets, and predict unknown samples.
+Alrad Spectra was developed to accomplish tasks such as perform a large range of spectral preprocessing techniques, implement several multivariate calibration methods, which can provide well-fitted and accurate models, statistics assessment, graphical output, validate the models using independent data sets, and predict unknown samples.
 }
 \author{
 Andre C. Dotto, \email{andrecdot@gmail.com}
 
 Diego J. Gris, \email{diegojgris@gmail.com}
 }
-
