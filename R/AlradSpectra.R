@@ -695,13 +695,13 @@ AlradSpectra <- function() {
                                                                                number = svalue(mlr.kfold),
                                                                                repeats = svalue(mlr.reps)
                                                                                )
-                                           AE$mlr.test  <- caret::train(form.mlr, data = AE$Train, method = "glmStepAIC", 
+                                           AE$MLR  <- caret::train(form.mlr, data = AE$Train, method = "glmStepAIC", 
                                                                         direction = "backward", trace = 0,
                                                                         trControl = bootctrl.mlr)
                                            AE$mlr.train <- data.frame(AE$Train[AE$last.col],
-                                                                            Predicted=predict(AE$mlr.test))
+                                                                            Predicted=predict(AE$MLR))
                                            AE$mlr.val   <- data.frame(AE$Val[AE$last.col],
-                                                                            Predicted=predict(AE$mlr.test, newdata=AE$Val))
+                                                                            Predicted=predict(AE$MLR, newdata=AE$Val))
                                            faddtomodels("MLR")
                                            enabled(pred) = TRUE #Enable prediction module
                                            },
@@ -720,7 +720,11 @@ AlradSpectra <- function() {
                                                                               number = svalue(pls.kfold),
                                                                               repeats = svalue(pls.reps)
                                                                               )
-                                          Grid               <-  expand.grid(.ncomp = seq(1,svalue(pls.comp), 1))
+                                          if(svalue(pls.resampling)=="none") {
+                                            Grid <- expand.grid(.ncomp = svalue(pls.comp))
+                                          } else {
+                                            Grid <- expand.grid(.ncomp = seq(1,svalue(pls.comp), 1))
+                                          }
                                           AE$pls.test  <- caret::train(AE$form.mdl, data = AE$Train, method = 'pls',
                                                                      trControl = bootctrl.pls, tuneGrid = Grid)
                                           AE$PLSR      <- pls::plsr(AE$form.mdl, data = AE$Train,
@@ -760,17 +764,26 @@ AlradSpectra <- function() {
                                 dispose(AE$alert)
                                 gmessage("SVM model done", title = "SVM model", parent = window)
                                 }
-  fsvmlinear  <- function(...) {Grid              <- expand.grid(.C = seq(1,16,5))
+  fsvmlinear  <- function(...) {if(svalue(svm.resampling)=="none") {
+                                  Grid <- expand.grid(.C = 1)
+                                  } else {
+                                    Grid <- expand.grid(.C = seq(1,16,5))
+                                    }
                                 AE$svm.test <- caret::train(AE$form.mdl, data = AE$Train, method = "svmLinear",
                                                                   trControl = AE$bootctrl.svm, tuneGrid = Grid)
                                 AE$SVM      <- e1071::svm(AE$form.mdl, data=AE$Train, kernel="linear", type ="eps",
                                                                 cost=AE$svm.test$bestTune$C)
                                 }
-  fsvmradial  <- function(...) {Grid              <- expand.grid(.sigma = seq(0.000001,0.1,0.01), .C = seq(1,16,5))
-                                AE$svm.test <- caret::train(AE$form.mdl, data = AE$Train, method = "svmRadial",
-                                                                  trControl = AE$bootctrl.svm, tuneGrid = Grid)
+  fsvmradial  <- function(...) {if(svalue(svm.resampling)=="none") {
+                                  Grid <- expand.grid(.sigma = 0.001, .C = 1)
+                                  } else {
+                                    Grid <- expand.grid(.sigma = seq(0.000001,0.1,0.01), .C = seq(1,16,5))
+                                    }
+                                    AE$svm.test <- caret::train(AE$form.mdl, data = AE$Train, method = "svmRadial",
+                                                            trControl = AE$bootctrl.svm, tuneGrid = Grid
+                                                            )
                                 AE$SVM      <- e1071::svm(AE$form.mdl, data=AE$Train, kernel="radial", type ="eps",
-                                                                gamma=AE$svm.test$bestTune$sigma, cost=AE$svm.test$bestTune$C)
+                                                          gamma=AE$svm.test$bestTune$sigma, cost=AE$svm.test$bestTune$C)
                                 }
   # RF
   frf         <- function(...) {AE$alert <- galert("Wait... \nThis may take a few minutes! ", title = "RF model", 
@@ -781,7 +794,11 @@ AlradSpectra <- function() {
                                                                              number = svalue(rf.kfold),
                                                                              repeats = svalue(rf.reps)
                                                                              )
-                                          Grid        <- expand.grid(.mtry = seq(svalue(rf.mtry)/5,svalue(rf.mtry),svalue(rf.mtry)/5))
+                                          if(svalue(rf.resampling)=="none") {
+                                            Grid <- expand.grid(.mtry = svalue(rf.mtry))
+                                          } else {
+                                            Grid <- expand.grid(.mtry = seq(svalue(rf.mtry)/5,svalue(rf.mtry),svalue(rf.mtry)/5))
+                                          }
                                           AE$rf.test     <- caret::train(AE$form.mdl, data = AE$Train, 
                                                                                method = 'rf', trControl = bootControl,
                                                                                tuneGrid = Grid, importance = TRUE)
@@ -811,8 +828,13 @@ AlradSpectra <- function() {
                                                                                repeats = svalue(ann.reps),
                                                                                preProcOptions = list(thresh = 0.95, cutoff = 0.95)
                                                                                )
-                                           Grid         <- expand.grid(.nhid= seq(1,svalue(ann.hid),ceiling(svalue(ann.hid)/10)),
-                                                                       .actfun= svalue(ann.act))
+                                           if(svalue(ann.resampling)=="none") {
+                                             Grid <- expand.grid(.nhid= svalue(ann.hid),
+                                                                 .actfun= svalue(ann.act))
+                                           } else {
+                                             Grid <- expand.grid(.nhid= seq(1,svalue(ann.hid),ceiling(svalue(ann.hid)/10)),
+                                                                 .actfun= svalue(ann.act))
+                                           }
                                            AE$ann.test     <- caret::train(AE$form.mdl, data = AE$Train, method = 'elm', 
                                                                                  trControl = bootControl, tuneGrid = Grid , na.action = na.fail, 
                                                                                  preProcess = c("nzv","center"))
@@ -837,16 +859,16 @@ AlradSpectra <- function() {
                                                           delay=10000, parent=notebook)
                                  Sys.sleep(1)
                                  tryCatch(
-                                          {bootctrl.gpr <- caret::trainControl(method = svalue(gpr.resampling),
-                                                                               number = svalue(gpr.kfold),
-                                                                               repeats = svalue(gpr.reps)
-                                                                               )
+                                          {AE$bootctrl.gpr <- caret::trainControl(method = svalue(gpr.resampling),
+                                                                                  number = svalue(gpr.kfold),
+                                                                                  repeats = svalue(gpr.reps)
+                                                                                  )
                                            if (svalue(gpr.kernel, index=TRUE)==1) fgprlinear()
                                            if (svalue(gpr.kernel, index=TRUE)==2) fgprradial()
                                            AE$gpr.train    <- data.frame(AE$Train[AE$last.col], 
-                                                                                Predicted=predict(AE$gpr, newdata=AE$Train))
+                                                                         Predicted=predict(AE$GPR, newdata=AE$Train))
                                            AE$gpr.val      <- data.frame(AE$Val[AE$last.col], 
-                                                                                Predicted=predict(AE$gpr, newdata=AE$Val))
+                                                                         Predicted=predict(AE$GPR, newdata=AE$Val))
                                            faddtomodels("GPR")
                                            enabled(pred) = TRUE #Enable prediction module
                                            },
@@ -856,18 +878,17 @@ AlradSpectra <- function() {
                                  dispose(AE$alert)
                                  gmessage("GPR model done", title = "GPR model", parent = window)
                                  }
-  fgprlinear  <- function(...) {AE$gpr.test <- caret::train(AE$form.mdl, data = AE$Train, method = 'gaussprLinear',
-                                                            trControl = AE$bootctrl.gpr, tuneLength = 10)
-                                AE$gpr       <- kernlab::gausspr(AE$form.mdl, data=AE$Train, kernel= "vanilladot",
-                                                                type = "regression", kpar= "automatic", variance.model = T,
-                                                                var=as.numeric(svalue(gpr.var)), cross= svalue(gpr.cross))
+  fgprlinear  <- function(...) {AE$GPR <- caret::train(AE$form.mdl, data = AE$Train, method = 'gaussprLinear',
+                                                       trControl = AE$bootctrl.gpr)
                                 }
-  fgprradial  <- function(...) {Grid      <-  expand.grid(.sigma = seq(.00001,.1,.005))
-                                AE$gpr.test  <- caret::train(AE$form.mdl, data = AE$Train, method = 'gaussprRadial', 
-                                                                    tuneLength = 10, trControl = AE$bootctrl.gpr, tuneGrid = Grid)
-                                AE$gpr       <- kernlab::gausspr(AE$form.mdl, data=AE$Train, kernel="rbfdot",
-                                                                        type ="regression", kpar= "automatic", variance.model = T,
-                                                                        var=svalue(gpr.var), cross= svalue(gpr.cross))
+  fgprradial  <- function(...) {if(svalue(gpr.resampling)=="none") {
+                                  Grid <- expand.grid(.sigma = 0.001)
+                                  } else {
+                                    Grid <- expand.grid(.sigma = seq(.00001,.1,.005))
+                                    }
+                                AE$GPR  <- caret::train(AE$form.mdl, data = AE$Train, method = 'gaussprRadial', 
+                                                        trControl = AE$bootctrl.gpr, tuneGrid = Grid
+                                                        )
                                 }
 
   ###################################################
@@ -1091,16 +1112,16 @@ AlradSpectra <- function() {
   lyt.desc.mlr[1,1]  <- "Multiple Linear Regression. MLR is a statistical method that uses several explanatory variables to predict the outcome of a \nresponse variable in a simple linear model. Package: caret"
   frame.param.mlr    <- gframe("Tuning parameters:", cont = mdl.mlr, horizontal=T)
   lyt.param.mlr      <- glayout(cont = frame.param.mlr , expand = TRUE)
-  lyt.param.mlr[1,1] <- "Band interval"
-  mlr.band.interval  <- lyt.param.mlr[2,1] <- gspinbutton(from = 1, to = 30, by = 1, value = 25, cont = lyt.param.mlr)
-  lyt.param.mlr[1,2] <- "Resampling method"
-  mlr.resampling     <- lyt.param.mlr[2,2] <- gcombobox(train.ctrl.method, cont = lyt.param.mlr)
-  lyt.param.mlr[1,3] <- "Number of folds or \nresampling iterations"
-  mlr.kfold          <- lyt.param.mlr[2,3] <- gspinbutton(from = 1, to = 50, by = 1, value = 10, cont = lyt.param.mlr)
-  lyt.param.mlr[1,4] <- "For repeatedcv only: \nnumber of repetitions"
-  mlr.reps           <- lyt.param.mlr[2,4] <- gspinbutton(from = 1, to = 20, by = 1, value = 3, cont = lyt.param.mlr)
+  lyt.param.mlr[1,1] <- "Resampling method"
+  mlr.resampling     <- lyt.param.mlr[2,1] <- gcombobox(train.ctrl.method, cont = lyt.param.mlr)
+  lyt.param.mlr[1,2] <- "Number of folds or \nresampling iterations"
+  mlr.kfold          <- lyt.param.mlr[2,2] <- gspinbutton(from = 1, to = 50, by = 1, value = 10, cont = lyt.param.mlr)
+  lyt.param.mlr[1,3] <- "For repeatedcv only: \nnumber of repetitions"
+  mlr.reps           <- lyt.param.mlr[2,3] <- gspinbutton(from = 1, to = 20, by = 1, value = 3, cont = lyt.param.mlr)
+  lyt.param.mlr[1,4] <- "Band interval"
+  mlr.band.interval  <- lyt.param.mlr[2,4] <- gspinbutton(from = 1, to = 30, by = 1, value = 25, cont = lyt.param.mlr)
   gbutton("Run MLR model", cont = mdl.mlr, handler = fmlr)
-  gbutton("View variables importance", cont = mdl.mlr, handler = function(...) fmlr.plot.imp(AE$mlr.test))
+  gbutton("View variables importance", cont = mdl.mlr, handler = function(...) fmlr.plot.imp(AE$MLR))
   gbutton("MLR prediction statistics", cont = mdl.mlr, handler = function(...) fmdl.stats(AE$mlr.train, AE$mlr.val))
   gbutton("View measured vs. predicted",cont = mdl.mlr, handler = function(...) fmdl.plot.res(AE$mlr.train, AE$mlr.val))
   ### PLS
@@ -1155,7 +1176,7 @@ AlradSpectra <- function() {
   rf.kfold           <- lyt.param.rf[2,2] <- gspinbutton(from = 1, to = 50, by = 1, value = 10, cont = lyt.param.rf)
   lyt.param.rf[1,3]  <- "For repeatedcv only: \nnumber of repetitions"
   rf.reps            <- lyt.param.rf[2,3] <- gspinbutton(from = 1, to = 20, by = 1,value =  3, cont = lyt.param.rf)
-  lyt.param.rf[1,4]  <- "Randomly selected predictors \n(mtry)"
+  lyt.param.rf[1,4]  <- "Randomly selected \npredictors (mtry)"
   rf.mtry            <- lyt.param.rf[2,4]  <- gspinbutton(from = 5, to = 500, by = 5, value = 5, cont = lyt.param.rf)
   lyt.param.rf[1,5]  <- "Number of trees \n(ntree)"
   rf.ntree           <- lyt.param.rf[2,5]  <- gedit(text = "500", cont = lyt.param.rf, width = 4)
@@ -1197,12 +1218,10 @@ AlradSpectra <- function() {
   gpr.kfold          <- lyt.param.gpr[2,2] <- gspinbutton(from = 1, to = 50, by = 1, value = 10, cont = lyt.param.gpr)
   lyt.param.gpr[1,3] <- "For repeatedcv only: \nnumber of repetitions"
   gpr.reps           <- lyt.param.gpr[2,3] <- gspinbutton(from = 1, to = 20, by = 1,value =  3, cont = lyt.param.gpr)
-  lyt.param.gpr[1,4] <- "Initial noise variance"
-  gpr.var            <- lyt.param.gpr[2,4] <- gcombobox(gpr.param.var, selected = 2, cont = lyt.param.gpr)
-  lyt.param.gpr[1,5] <- "Kernel function used \nin training and predicting"
-  gpr.kernel         <- lyt.param.gpr[2,5] <- gradio(kernel.param.gpr, cont = lyt.param.gpr)
+  lyt.param.gpr[1,4] <- "Kernel function used \nin training and predicting"
+  gpr.kernel         <- lyt.param.gpr[2,4] <- gradio(kernel.param.gpr, cont = lyt.param.gpr)
   gbutton("Run GPR model", cont = mdl.gpr, handler = fgpr)
-  gbutton("View variables importance", cont = mdl.gpr, handler = function(...) fmdl.plot.imp(AE$gpr.test))
+  gbutton("View variables importance", cont = mdl.gpr, handler = function(...) fmdl.plot.imp(AE$GPR))
   gbutton("GPR prediction statistics", cont = mdl.gpr, handler = function(...) fmdl.stats(AE$gpr.train, AE$gpr.val))
   gbutton("View measured vs. predicted", cont = mdl.gpr, handler = function(...) fmdl.plot.res(AE$gpr.train, AE$gpr.val))
   
