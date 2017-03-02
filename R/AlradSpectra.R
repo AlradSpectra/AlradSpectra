@@ -460,7 +460,24 @@ AlradSpectra <- function() {
                                                      ggplot2::labs(list(x="PLS Components", y="RMSE"))
                                         print(comp.plot)
                                         }
-  # Plot variables importance
+
+  # Plot variables importance for MLR
+  fmdl.plot.imp.mlr <- function(h, ...) {plotwin   <- gwindow("Plot", width = 900, height = 300, parent=window)
+                                        wingroup  <- ggroup(horizontal=FALSE, cont=plotwin)
+                                        ggraphics(cont = wingroup, no_popup=TRUE)
+                                        Sys.sleep(1)
+                                        gbutton("Save plot", cont = wingroup, handler = function(...) fsaveplot(900, 300))
+                                        var.imp   <- caret::varImp(h)$importance
+                                        spc.st    <- as.numeric(substring(row.names(var.imp)[1], 2))
+                                        spc.lt    <- as.numeric(substring(row.names(var.imp)[length(row.names(var.imp))], 2))
+                                        row.names(var.imp) <- c(seq(spc.st,spc.lt,by=svalue(mlr.band.interval)))
+                                        comp.plot <- ggplot2::ggplot(var.imp, ggplot2::aes(x=c(seq(spc.st,spc.lt,by=svalue(mlr.band.interval))), y=var.imp[,1])) +
+                                                     ggplot2::scale_x_continuous(breaks = floor(seq(spc.st, spc.lt, (spc.lt-spc.st)/20))) +
+                                                     ggplot2::geom_point(pch=20) +
+                                                     ggplot2::labs(list(x="Variables", y="Importance"))
+                                        print(comp.plot)
+                                        }  
+  # Plot variables importance 
   fmdl.plot.imp <- function(h, ...)    {plotwin   <- gwindow("Plot", width = 900, height = 300, parent=window)
                                         wingroup  <- ggroup(horizontal=FALSE, cont=plotwin)
                                         ggraphics(cont = wingroup, no_popup=TRUE)
@@ -674,9 +691,10 @@ AlradSpectra <- function() {
                                                                                collapse="+"),collapse=""))
                                            bootctrl.mlr <- caret::trainControl(method = svalue(mlr.resampling),
                                                                                number = svalue(mlr.kfold),
-                                                                               repeats = ifelse(grepl("repeatedcv", method), svalue(mlr.reps), 1)
+                                                                               repeats = svalue(mlr.reps)
                                                                                )
-                                           AE$mlr.test  <- caret::train(form.mlr, data = AE$Train, method = "glmStepAIC", direction = "backward", 
+                                           AE$mlr.test  <- caret::train(form.mlr, data = AE$Train, method = "glmStepAIC", 
+                                                                        direction = "backward", trace = 0,
                                                                         trControl = bootctrl.mlr)
                                            AE$mlr.train <- data.frame(AE$Train[AE$last.col],
                                                                             Predicted=predict(AE$mlr.test))
@@ -698,7 +716,7 @@ AlradSpectra <- function() {
                                 tryCatch(
                                          {bootctrl.pls <- caret::trainControl(method = svalue(pls.resampling),
                                                                               number = svalue(pls.kfold),
-                                                                              repeats = ifelse(grepl("repeatedcv", method), svalue(pls.reps), 1)
+                                                                              repeats = svalue(pls.reps)
                                                                               )
                                           Grid               <-  expand.grid(.ncomp = seq(1,svalue(pls.comp), 1))
                                           AE$pls.test  <- caret::train(AE$form.mdl, data = AE$Train, method = 'pls',
@@ -724,7 +742,7 @@ AlradSpectra <- function() {
                                 tryCatch(
                                          {AE$bootctrl.svm <- caret::trainControl(method = svalue(svm.resampling),
                                                                                  number = svalue(svm.kfold),
-                                                                                 repeats = ifelse(grepl("repeatedcv", method), svalue(svm.reps), 1)
+                                                                                 repeats = svalue(svm.reps)
                                                                                  )
                                           if (svalue(svm.kernel, index=TRUE)==1) fsvmlinear()
                                           if (svalue(svm.kernel, index=TRUE)==2) fsvmradial()
@@ -759,7 +777,7 @@ AlradSpectra <- function() {
                                 tryCatch(
                                          {bootControl <- caret::trainControl(method = svalue(rf.resampling),
                                                                              number = svalue(rf.kfold),
-                                                                             repeats = ifelse(grepl("repeatedcv", method), svalue(rf.reps), 1)
+                                                                             repeats = svalue(rf.reps)
                                                                              )
                                           Grid        <- expand.grid(.mtry = seq(svalue(rf.mtry)/5,svalue(rf.mtry),svalue(rf.mtry)/5))
                                           AE$rf.test     <- caret::train(AE$form.mdl, data = AE$Train, 
@@ -788,7 +806,7 @@ AlradSpectra <- function() {
                                  tryCatch(
                                           {bootControl  <- caret::trainControl(method= svalue(ann.resampling),
                                                                                number = svalue(ann.kfold),
-                                                                               repeats = ifelse(grepl("repeatedcv", method), svalue(ann.reps), 1),
+                                                                               repeats = svalue(ann.reps),
                                                                                preProcOptions = list(thresh = 0.95, cutoff = 0.95)
                                                                                )
                                            Grid         <- expand.grid(.nhid= seq(1,svalue(ann.hid),ceiling(svalue(ann.hid)/10)),
@@ -819,7 +837,7 @@ AlradSpectra <- function() {
                                  tryCatch(
                                           {bootctrl.gpr <- caret::trainControl(method  <- svalue(gpr.resampling),
                                                                                number = svalue(gpr.kfold),
-                                                                               repeats = ifelse(grepl("repeatedcv", method), svalue(gpr.reps), 1)
+                                                                               repeats = svalue(gpr.reps)
                                                                                )
                                            if (svalue(gpr.kernel, index=TRUE)==1) fgprlinear()
                                            if (svalue(gpr.kernel, index=TRUE)==2) fgprradial()
@@ -866,8 +884,8 @@ AlradSpectra <- function() {
   train.ctrl.method.rf <- c("oob", "cv", "repeatedcv", "LOOCV", "LGOCV", "boot", "boot632", "none")
   kernel.param.svm     <- c("Support Vector Machines with Linear Kernel",
                             "Support Vector Machines with Radial Kernel")
-  actf.ann             <- c("sin", "radbas", "purelin", "tansig")
-  kernel.param.gpr     <- c("Linear kernel", "Radial kernel")
+  actf.ann             <- c("purelin","radbas","sin","tansig")
+  kernel.param.gpr     <- c("Linear kernel","Radial kernel")
   gpr.param.var        <- c(.0001,.001,.01,.1,1,10,100)
 
   ###################################################
@@ -1080,7 +1098,7 @@ AlradSpectra <- function() {
   lyt.param.mlr[1,4] <- "For repeatedcv only: \nnumber of repetitions"
   mlr.reps           <- lyt.param.mlr[2,4] <- gspinbutton(from = 1, to = 20, by = 1, value = 3, cont = lyt.param.mlr)
   gbutton("Run MLR model", cont = mdl.mlr, handler = fmlr)
-  gbutton("View variables importance", cont = mdl.mlr, handler = function(...) fmdl.plot.imp(AE$mlr.test))
+  gbutton("View variables importance", cont = mdl.mlr, handler = function(...) fmdl.plot.imp.mlr(AE$mlr.test))
   gbutton("MLR prediction statistics", cont = mdl.mlr, handler = function(...) fmdl.stats(AE$mlr.train, AE$mlr.val))
   gbutton("View measured vs. predicted",cont = mdl.mlr, handler = function(...) fmdl.plot.res(AE$mlr.train, AE$mlr.val))
   ### PLS
@@ -1159,7 +1177,7 @@ AlradSpectra <- function() {
   lyt.param.ann[1,4] <- "Activation function"
   ann.act            <- lyt.param.ann[2,4] <- gcombobox(actf.ann, cont = lyt.param.ann)
   lyt.param.ann[1,5] <- "Hidden units"
-  ann.hid            <- lyt.param.ann[2,5] <- gspinbutton(from = 1, to = 50, by = 1, value = 50, cont = lyt.param.ann)
+  ann.hid            <- lyt.param.ann[2,5] <- gspinbutton(from = 1, to = 50, by = 1, value = 10, cont = lyt.param.ann)
   gbutton("Run ANN model", cont = mdl.ann, handler = fann)
   gbutton("View variables importance", cont = mdl.ann, handler = function(...) fmdl.plot.imp(AE$ann.test))
   gbutton("ANN prediction statistics", cont = mdl.ann, handler = function(...) fmdl.stats(AE$ann.train, AE$ann.val))
