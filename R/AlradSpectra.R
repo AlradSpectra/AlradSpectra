@@ -462,7 +462,7 @@ AlradSpectra <- function() {
                                         }
 
   # Plot variables importance for MLR
-  fmdl.plot.imp.mlr <- function(h, ...) {plotwin   <- gwindow("Plot", width = 900, height = 300, parent=window)
+  fmlr.plot.imp <- function(h, ...)    {plotwin   <- gwindow("Plot", width = 900, height = 300, parent=window)
                                         wingroup  <- ggroup(horizontal=FALSE, cont=plotwin)
                                         ggraphics(cont = wingroup, no_popup=TRUE)
                                         Sys.sleep(1)
@@ -1098,7 +1098,7 @@ AlradSpectra <- function() {
   lyt.param.mlr[1,4] <- "For repeatedcv only: \nnumber of repetitions"
   mlr.reps           <- lyt.param.mlr[2,4] <- gspinbutton(from = 1, to = 20, by = 1, value = 3, cont = lyt.param.mlr)
   gbutton("Run MLR model", cont = mdl.mlr, handler = fmlr)
-  gbutton("View variables importance", cont = mdl.mlr, handler = function(...) fmdl.plot.imp.mlr(AE$mlr.test))
+  gbutton("View variables importance", cont = mdl.mlr, handler = function(...) fmlr.plot.imp(AE$mlr.test))
   gbutton("MLR prediction statistics", cont = mdl.mlr, handler = function(...) fmdl.stats(AE$mlr.train, AE$mlr.val))
   gbutton("View measured vs. predicted",cont = mdl.mlr, handler = function(...) fmdl.plot.res(AE$mlr.train, AE$mlr.val))
   ### PLS
