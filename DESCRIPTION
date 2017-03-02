@@ -20,7 +20,6 @@ Imports:
     cluster, 
     clusterSim,
     colorspace,
-    digest, 
     e1071, 
     elmNN,
     fitdistrplus,
