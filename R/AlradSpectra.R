@@ -474,7 +474,7 @@ AlradSpectra <- function() {
                                         spc.all   <- c(seq(spc.st,spc.lt,spc.by))
                                         row.names(var.imp) <- spc.all
                                         comp.plot <- ggplot2::ggplot(var.imp, ggplot2::aes(x=spc.all, y=var.imp[,1])) +
-                                                     ggplot2::scale_x_continuous(breaks = spc.all[seq(1,length(a),(length(a)-1)/20)] +
+                                                     ggplot2::scale_x_continuous(breaks = spc.all[seq(1,length(a),(length(a)-1)/20)]) +
                                                      ggplot2::geom_point(pch=20) +
                                                      ggplot2::labs(list(x="Variables", y="Importance"))
                                         print(comp.plot)
