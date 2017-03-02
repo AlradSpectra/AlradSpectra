@@ -1086,7 +1086,7 @@ AlradSpectra <- function() {
   mdl.mlr            <- ggroup(cont = mdl, horizontal = F,label = gettext("   MLR   "))
   frame.desc.mlr     <- gframe("Description:",cont = mdl.mlr, horizontal = T)
   lyt.desc.mlr       <- glayout(cont = frame.desc.mlr, expand = TRUE)
-  lyt.desc.mlr[1,1]  <- "Multiple Linear Regression. MLR is a statistical method that uses several explanatory variables to predict the outcome of a \nresponse variable in a simple linear model. Packages: stats"
+  lyt.desc.mlr[1,1]  <- "Multiple Linear Regression. MLR is a statistical method that uses several explanatory variables to predict the outcome of a \nresponse variable in a simple linear model. Package: caret"
   frame.param.mlr    <- gframe("Tuning parameters:", cont = mdl.mlr, horizontal=T)
   lyt.param.mlr      <- glayout(cont = frame.param.mlr , expand = TRUE)
   lyt.param.mlr[1,1] <- "Band interval"
