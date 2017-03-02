@@ -806,7 +806,7 @@ AlradSpectra <- function() {
                                                           delay=10000, parent=notebook)
                                  Sys.sleep(1)
                                  tryCatch(
-                                          {bootControl  <- caret::trainControl(method= svalue(ann.resampling),
+                                          {bootControl  <- caret::trainControl(method = svalue(ann.resampling),
                                                                                number = svalue(ann.kfold),
                                                                                repeats = svalue(ann.reps),
                                                                                preProcOptions = list(thresh = 0.95, cutoff = 0.95)
@@ -837,7 +837,7 @@ AlradSpectra <- function() {
                                                           delay=10000, parent=notebook)
                                  Sys.sleep(1)
                                  tryCatch(
-                                          {bootctrl.gpr <- caret::trainControl(method  <- svalue(gpr.resampling),
+                                          {bootctrl.gpr <- caret::trainControl(method = svalue(gpr.resampling),
                                                                                number = svalue(gpr.kfold),
                                                                                repeats = svalue(gpr.reps)
                                                                                )
