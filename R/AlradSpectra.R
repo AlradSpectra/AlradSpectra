@@ -470,9 +470,11 @@ AlradSpectra <- function() {
                                         var.imp   <- caret::varImp(h)$importance
                                         spc.st    <- as.numeric(substring(row.names(var.imp)[1], 2))
                                         spc.lt    <- as.numeric(substring(row.names(var.imp)[length(row.names(var.imp))], 2))
-                                        row.names(var.imp) <- c(seq(spc.st,spc.lt,by=svalue(mlr.band.interval)))
-                                        comp.plot <- ggplot2::ggplot(var.imp, ggplot2::aes(x=c(seq(spc.st,spc.lt,by=svalue(mlr.band.interval))), y=var.imp[,1])) +
-                                                     ggplot2::scale_x_continuous(breaks = floor(seq(spc.st, spc.lt, (spc.lt-spc.st)/20))) +
+                                        spc.by    <- as.numeric(substring(row.names(var.imp)[2], 2))-spc.st
+                                        spc.all   <- c(seq(spc.st,spc.lt,spc.by))
+                                        row.names(var.imp) <- spc.all
+                                        comp.plot <- ggplot2::ggplot(var.imp, ggplot2::aes(x=spc.all, y=var.imp[,1])) +
+                                                     ggplot2::scale_x_continuous(breaks = spc.all[seq(1,length(a),(length(a)-1)/20)] +
                                                      ggplot2::geom_point(pch=20) +
                                                      ggplot2::labs(list(x="Variables", y="Importance"))
                                         print(comp.plot)
