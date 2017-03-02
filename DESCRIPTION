@@ -51,6 +51,7 @@ Imports:
     methods,
     mime,
     minqa,
+    mle4,
     modeest, 
     ModelMetrics, 
     munsell,
