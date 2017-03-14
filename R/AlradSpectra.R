@@ -55,6 +55,10 @@ AlradSpectra <- function() {
                                                                        svalue(pred.spc.last)    <- ""
                                                                        select.model[]           <- ""
                                                                        svalue(notebook)         <- 1 #Focus on import tab
+                                                                       enabled(viewdt.button) = FALSE
+                                                                       enabled(plotdt.button) = FALSE
+                                                                       enabled(viewst.button) = FALSE
+                                                                       enabled(viewhs.button) = FALSE
                                                                        enabled(pp) = FALSE
                                                                        enabled(models) = FALSE
                                                                        enabled(mdl) = FALSE
@@ -83,6 +87,10 @@ AlradSpectra <- function() {
                                           svalue(soil.var.col)   <- AE$soil.var.column
                                           svalue(soil.var.nm)    <- AE$soil.var.name
                                           svalue(notebook)       <- 1 #Focus on import tab
+                                          enabled(viewdt.button) = TRUE
+                                          enabled(plotdt.button) = TRUE
+                                          enabled(viewst.button) = TRUE
+                                          enabled(viewhs.button) = TRUE
                                           enabled(pp) = TRUE #Enable preprocessing module
                                           enabled(models) = TRUE #Enable modeling module
                                           select.dataset[]       <-  AE$dataset
@@ -185,6 +193,10 @@ AlradSpectra <- function() {
                                                  warning = function(w) fwarning(w),
                                                  error =  function(e) ferror(e)
                                                  )
+                                      enabled(viewdt.button) = TRUE
+                                      enabled(plotdt.button) = TRUE
+                                      enabled(viewst.button) = TRUE
+                                      enabled(viewhs.button) = TRUE
                                       enabled(pp) = TRUE
                                       enabled(models) = TRUE
                                       dispose(AE$alert)
@@ -965,14 +977,19 @@ AlradSpectra <- function() {
   ### Import button
   gbutton("Import data", cont = import, handler = fimport)
   ### View data button
-  gbutton("View data", cont = import, handler = function(...) fview(AE$alldata, 800))
+  viewdt.button  <- gbutton("View data", cont = import, handler = function(...) fview(AE$alldata, 800))
   ### Plot imported data button
-  gbutton("View imported spectra", cont = import, handler = function(...) fplot(AE$Original, AE$spectra.start.number, 
-                                                                                AE$spectra.end.number))
+  plotdt.button  <- gbutton("View imported spectra", cont = import, handler = function(...) fplot(AE$Original, AE$spectra.start.number, 
+                                                                                                  AE$spectra.end.number))
   ### View descriptive statistics button
-  gbutton("View Y descriptive statistics", cont = import, handler = fdescy)
+  viewst.button  <- gbutton("View Y descriptive statistics", cont = import, handler = fdescy)
   ### View histogram button
-  gbutton("View Y histogram", cont = import, handler = fhist)
+  viewhs.button  <- gbutton("View Y histogram", cont = import, handler = fhist)
+  ### Disable buttons
+  enabled(viewdt.button) = FALSE
+  enabled(plotdt.button) = FALSE
+  enabled(viewst.button) = FALSE
+  enabled(viewhs.button) = FALSE
   ###################################################
   ### Preprocessing module
   ###################################################
