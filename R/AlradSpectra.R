@@ -717,7 +717,6 @@ AlradSpectra <- function() {
                                            faddtomodels("MLR")
                                            enabled(pred) = TRUE #Enable prediction module
                                            },
-                                          warning = function(w) fwarning(w),
                                           error =  function(e) ferror(e)
                                           )
                                  dispose(AE$alert)
@@ -748,7 +747,6 @@ AlradSpectra <- function() {
                                           faddtomodels("PLSR")
                                           enabled(pred) = TRUE #Enable prediction module
                                           },
-                                         warning = function(w) fwarning(w),
                                          error =  function(e) ferror(e)
                                          )
                                 dispose(AE$alert)
@@ -770,7 +768,6 @@ AlradSpectra <- function() {
                                           faddtomodels("SVM")
                                           enabled(pred) = TRUE #Enable prediction module
                                           },
-                                         warning = function(w) fwarning(w),
                                          error =  function(e) ferror(e)
                                          )
                                 dispose(AE$alert)
@@ -824,7 +821,6 @@ AlradSpectra <- function() {
                                           faddtomodels("RF")
                                           enabled(pred) = TRUE #Enable prediction module
                                           },
-                                         warning = function(w) fwarning(w),
                                          error =  function(e) ferror(e)
                                          )
                                 dispose(AE$alert)
@@ -860,7 +856,6 @@ AlradSpectra <- function() {
                                            faddtomodels("ANN")
                                            enabled(pred) = TRUE #Enable prediction module
                                            },
-                                          warning = function(w) fwarning(w),
                                           error =  function(e) ferror(e)
                                           )
                                  dispose(AE$alert)
@@ -884,7 +879,6 @@ AlradSpectra <- function() {
                                            faddtomodels("GPR")
                                            enabled(pred) = TRUE #Enable prediction module
                                            },
-                                          warning = function(w) fwarning(w),
                                           error =  function(e) ferror(e)
                                           )
                                  dispose(AE$alert)
