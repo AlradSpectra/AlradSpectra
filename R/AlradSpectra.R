@@ -151,7 +151,7 @@ AlradSpectra <- function() {
                                                      "<b>D</b>","iego Gris\n",
                                                      "\n",
                                                      "For further information:\n",
-                                                     "The paper will be available soon!\n"
+                                                     "The paper will be available soon!\n",
                                                      "Alrad Spectra source code is available at\n",
                                                      "<i>github.com/AlradSpectra/AlradSpectra</i>",
                                                      sep="", collapse=""),
