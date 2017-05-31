@@ -151,11 +151,7 @@ AlradSpectra <- function() {
                                                      "<b>D</b>","iego Gris\n",
                                                      "\n",
                                                      "For further information:\n",
-                                                     "Dotto, Andre C.; Dalmolin, Ricardo S. D.; ten Caten,\n",
-                                                     "Alexandre; Gris, Diego J.; Ruiz, Luis F. C. Alrad Spectra:\n",
-                                                     "a graphical user interface in R to perform preprocessing,\n",
-                                                     "multivariate modeling and prediction using spectroscopic data.\n",
-                                                     "Chemometrics and Intelligent Laboratory Systems. In press.\n",
+                                                     "The paper will be available soon!\n"
                                                      "Alrad Spectra source code is available at\n",
                                                      "<i>github.com/AlradSpectra/AlradSpectra</i>",
                                                      sep="", collapse=""),
