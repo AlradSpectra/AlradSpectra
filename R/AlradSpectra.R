@@ -289,7 +289,10 @@ AlradSpectra <- function() {
                                        x           <- eval(parse(text = paste0("AE$", svalue(select.dataset)))) #Get selected dataset
                                        x           <- cbind(x, AE$alldata[AE$soil.var.column]) #Join spectral data and soil property
                                        indices     <- sample(1:nrow(x), size = (svalue(split.val)/100)*nrow(x)) #Random sampling
-                                       t           <- x[-indices,] #Training set
+                                       if(svalue(split.val)==0) #If validation set size is equal to zero
+                                         t         <- x #Training set corresponds to all data
+                                       else
+                                         t         <- x[-indices,] #Training set
                                        v           <- x[ indices,] #Validation set
                                        colnames(t) <- paste("X", colnames(t), sep = "") #Add X before wavelength
                                        colnames(v) <- paste("X", colnames(v), sep = "") #Add X before wavelength
@@ -301,8 +304,10 @@ AlradSpectra <- function() {
                                                                        paste(names(AE$Train)[c(1:AE$last.col-1)],
                                                                              collapse="+"), collapse=""))
                                        enabled(mdl) = TRUE #Enable models module
-                                       enabled(homo.button) = TRUE #Enable homogeneity test button
-                                       enabled(desc.button) = TRUE #Enable descriptive stats button
+                                       if(svalue(split.val)!=0) { #If validation set size is not equal to zero
+                                         enabled(homo.button) = TRUE #Enable homogeneity test button
+                                         enabled(desc.button) = TRUE #Enable descriptive stats button
+                                       }
                                        enabled(boxplot.button) = TRUE #Enable boxplot button
                                        gmessage(paste("Number of training samples:", nrow(AE$Train),
                                                       "\n\nNumber of validation samples:", nrow(AE$Val)),
@@ -407,18 +412,22 @@ AlradSpectra <- function() {
                                        q3             <- quantile(y)[4]
                                        rpiq           <- (q3-q1)/rmse
                                        error.s        <- round(c(r2, rmse, rpiq ),2)
-                                       names(error.s) <- c("R-squared", "RMSE", "RPIQ")
+                                       names(error.s) <- c("R2", "RMSE", "RPIQ")
                                        return(error.s)
                                        }
   # Get model accuracy and display in tabular form
   fmdl.stats    <- function(t, v, ...) {t.stats.name <- paste0(deparse(substitute(t)), ".stats") #Create training stats table name
-                                        v.stats.name <- paste0(deparse(substitute(v)), ".stats") #Create validation stats table name
                                         assign(t.stats.name, fstats(t[,1], t[,2]), envir = AE) #Compute training stats
-                                        assign(v.stats.name, fstats(v[,1], v[,2]), envir = AE) #Compute validation stats
-                                        results      <- rbind(get(t.stats.name, envir = AE),
-                                                              get(v.stats.name, envir = AE)) #Merge training and validation stats
-                                        Set          <- c("Training", "Validation") #Titles for prediction statistics table
-                                        res.table    <- cbind(Set, results) #Create prediction statistics table
+                                        if(nrow(v)!=0) {#If validation set size is not equal to zero
+                                          v.stats.name <- paste0(deparse(substitute(v)), ".stats") #Create validation stats table name
+                                          assign(v.stats.name, fstats(v[,1], v[,2]), envir = AE) #Compute validation stats
+                                          results      <- rbind(get(t.stats.name, envir = AE),
+                                                                get(v.stats.name, envir = AE)) #Merge training and validation stats
+                                          Set          <- c("Training", "Validation") #Titles for prediction statistics table
+                                          res.table    <- cbind(Set, results) #Create prediction statistics table
+                                        } else {
+                                          res.table    <- rbind(get(t.stats.name, envir = AE)) #Only Training results
+                                        }
                                         statswin     <- gwindow("Prediction statistics", width=300, height=150, parent=window)
                                         stats.lyt    <- glayout(horizontal=FALSE, container=statswin)
                                         stats.lyt[1,1,expand=TRUE] <- gtable(res.table, cont = stats.lyt)
@@ -427,13 +436,11 @@ AlradSpectra <- function() {
                                                                               handler=function(...) fsaveresults(res.table))
                                         }
   # Plot measured vs. predicted
-  fmdl.plot.res <- function(t, v, ...) {plotwin      <- gwindow("Plot", width = 1000, height = 400, parent = window)
+  fmdl.plot.res <- function(t, v, ...) {plotwin      <- gwindow("Plot", width = ifelse(nrow(v)!=0, 1000, 500), height = 400, parent = window)
                                         wingroup     <- ggroup(horizontal=FALSE, cont=plotwin)
                                         ggraphics(cont = wingroup, no_popup=TRUE)
                                         t.stats.name <- paste0(deparse(substitute(t)), ".stats") #Create training stats table name
-                                        v.stats.name <- paste0(deparse(substitute(v)), ".stats") #Create validation stats table name
                                         assign(t.stats.name, fstats(t[,1], t[,2]), envir = AE) #Compute training stats
-                                        assign(v.stats.name, fstats(v[,1], v[,2]), envir = AE) #Compute validation stats
                                         train.plot   <- ggplot2::ggplot(t, ggplot2::aes(x=t[,1], y=t[,2])) +
                                                         ggplot2::geom_point(shape=19) +
                                                         ggplot2::ggtitle("Training") +
@@ -443,24 +450,32 @@ AlradSpectra <- function() {
                                                         ggplot2::xlim(0, max(t)) +
                                                         ggplot2::ylim(0, max(t)) +
                                                         ggplot2::geom_abline(intercept = 0, slope = 1) +
-                                                        ggplot2::annotate("text", x=max(v)*0.05, y=seq(max(t)*0.95, max(t)*0.85,-max(t)*0.05), hjust = 0,
-                                                                          label = paste(names(get(t.stats.name, envir = AE)),"=",
-                                                                                        get(t.stats.name, envir = AE)))
-                                        val.plot     <- ggplot2::ggplot(v, ggplot2::aes(x=v[,1], y=v[,2])) +
-                                                        ggplot2::geom_point(shape=19) +
-                                                        ggplot2::ggtitle("Validation") +
-                                                        ggplot2::labs(x=NULL, y=NULL) + 
-                                                        ggplot2::theme(plot.title = ggplot2::element_text(size=12, hjust=0.5)) +
-                                                        ggplot2::theme(axis.title = ggplot2::element_text(size=12, hjust=0.5)) + 
-                                                        ggplot2::xlim(0, max(v)) +
-                                                        ggplot2::ylim(0, max(v)) +
-                                                        ggplot2::geom_abline(intercept = 0, slope = 1) +
-                                                        ggplot2::annotate("text", x=max(v)*0.05, y=seq(max(v)*0.95,max(v)*0.85,-max(v)*0.05), hjust = 0,
-                                                                          label = paste(names(get(v.stats.name, envir = AE)),"=",
-                                                                                        get(v.stats.name, envir = AE)))
-                                        Sys.sleep(1)
-                                        gbutton("Save plot", cont = wingroup, handler = function(...) fsaveplot(800, 400))
-                                        gridExtra::grid.arrange(train.plot, val.plot, ncol=2, bottom=paste(AE$soil.var.name, "Measured"))
+                                                        ggplot2::annotate("text", x=max(t)*0.05, y=seq(max(t)*0.95, max(t)*0.83,-max(t)*0.06), hjust = 0,
+                                                                          label = paste(c("R^2", "RMSE", "RPIQ"), "==",
+                                                                                        get(t.stats.name, envir = AE)), parse = TRUE)
+                                        if(nrow(v)!=0) {#If validation set size is not equal to zero
+                                          v.stats.name <- paste0(deparse(substitute(v)), ".stats") #Create validation stats table name
+                                          assign(v.stats.name, fstats(v[,1], v[,2]), envir = AE) #Compute validation stats
+                                          val.plot     <- ggplot2::ggplot(v, ggplot2::aes(x=v[,1], y=v[,2])) +
+                                                          ggplot2::geom_point(shape=19) +
+                                                          ggplot2::ggtitle("Validation") +
+                                                          ggplot2::labs(x=NULL, y=NULL) + 
+                                                          ggplot2::theme(plot.title = ggplot2::element_text(size=12, hjust=0.5)) +
+                                                          ggplot2::theme(axis.title = ggplot2::element_text(size=12, hjust=0.5)) + 
+                                                          ggplot2::xlim(0, max(v)) +
+                                                          ggplot2::ylim(0, max(v)) +
+                                                          ggplot2::geom_abline(intercept = 0, slope = 1) +
+                                                          ggplot2::annotate("text", x=max(v)*0.05, y=seq(max(v)*0.95,max(v)*0.83,-max(v)*0.06), hjust = 0,
+                                                                            label = paste(c("R^2", "RMSE", "RPIQ"), "==",
+                                                                                          get(v.stats.name, envir = AE)), parse = TRUE)
+                                          Sys.sleep(1)
+                                          gbutton("Save plot", cont = wingroup, handler = function(...) fsaveplot(800, 400))
+                                          gridExtra::grid.arrange(train.plot, val.plot, ncol=2, bottom=paste(AE$soil.var.name, "Measured"))
+                                        } else {
+                                          Sys.sleep(1)
+                                          gbutton("Save plot", cont = wingroup, handler = function(...) fsaveplot(400, 400))
+                                          gridExtra::grid.arrange(train.plot, bottom=paste(AE$soil.var.name, "Measured"))
+                                        }
                                         }
   # Plot RMSE of PLSR components
   fpls.plot.imp <- function(h, ...)    {plotwin   <- gwindow("Plot", width = 400, height = 400, parent=window)
@@ -903,7 +918,7 @@ AlradSpectra <- function() {
   
   sgpolynomial         <- c(1:12)
   sgderivarive         <- c(1:4)
-  splitnumbers         <- seq(from = 5, to = 50, by = 5)
+  splitnumbers         <- seq(from = 0, to = 50, by = 5)
   normalization.types  <- c("n1: standardization ((x-mean)/sd)",
                             "n5: normalization in range <-1,1> ((x-mean)/max(abs(x-mean)))",
                             "n6: quotient transformation (x/mean)",
@@ -1105,7 +1120,7 @@ AlradSpectra <- function() {
   glabel("Select input data for modeling:", cont = models, anchor = c(-1,0))
   select.dataset     <- gcombobox("", cont = models, handler = fchangesplit)
   glabel("Size of validation set (%):", cont = models, anchor = c(-1,0))
-  split.val          <- gcombobox(splitnumbers, cont = models, selected = 6, handler = fchangesplit)
+  split.val          <- gcombobox(splitnumbers, cont = models, selected = 7, handler = fchangesplit)
   gbutton("Split data", cont = models, handler = fsplit)
   homo.button        <- gbutton("Homogeneity of variance test", cont = models, handler = fhomo)
   desc.button        <- gbutton("View descriptive statistics of groups", cont = models, handler = fdesc)
