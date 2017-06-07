@@ -564,16 +564,16 @@ AlradSpectra <- function() {
                                         }
   # Predict soil property based on a new spectra
   fpredict      <- function(...)       {AE$alert <- galert("Wait...", title = "Importing File", delay=10000, parent=notebook)
-                                        tryCatch({colnames(AE$spc.pred) <- paste("X", colnames(AE$spc.pred),
-                                                                                       sep = "") #Add X before wavelength
+                                        tryCatch({spc.X <- AE$spc.pred
+                                                  colnames(spc.X) <- paste("X", colnames(spc.X), sep = "") #Add X before wavelength
                                                   mdl <- eval(parse(text = paste0("AE$", svalue(select.model)))) #Get selected model
                                                   if(svalue(select.model)=="PLSR") {#PLSR special case
-                                                    pls.pred <-  data.frame(predict(AE$PLSR, newdata=AE$spc.pred))
-                                                    AE$prediction <- data.frame(ID=row.names(AE$spc.pred),
-                                                                                      Predicted=pls.pred[,ncol(pls.pred)])
+                                                    pls.pred <-  data.frame(predict(AE$PLSR, newdata=spc.X))
+                                                    AE$prediction <- data.frame(ID=row.names(spc.X),
+                                                                                Predicted=pls.pred[,ncol(pls.pred)])
                                                   } else {
-                                                    AE$prediction <- data.frame(ID=row.names(AE$spc.pred),
-                                                                                      Predicted=predict(mdl, newdata=AE$spc.pred))
+                                                    AE$prediction <- data.frame(ID=row.names(spc.X),
+                                                                                Predicted=predict(mdl, newdata=spc.X))
                                                     }
                                                   },
                                                  warning = function(w) fwarning(w),
