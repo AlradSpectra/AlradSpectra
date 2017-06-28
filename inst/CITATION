@@ -1,15 +1,15 @@
 citHeader("To cite package AlradSpectra in publications use:")
 
 citEntry(entry = "Article",
-  title        = "AlradSpectra: A GUI to perform preprocessing, multivariate modeling and prediction using spectroscopic data.",
+  title        = "AlradSpectra: A GUI to perform preprocessing, multivariate modeling and prediction using spectroscopic data",
   author       = personList(as.person("Andre C. Dotto"), as.person("Ricardo S. D. Dalmolin"), as.person("Alexandre ten Caten"), as.person("Diego J. Gris"), as.person("Luis F. C. Ruiz")),
-  journal      = "In press.",
+  journal      = "In press",
   year         = "2017",
   url          = "https://github.com/AlradSpectra",
 
   textVersion  =
   paste("Dotto, Andre C.; Dalmolin, Ricardo S. D.; ten Caten, Alexandre; Gris, Diego J. (2017).",
-        "AlradSpectra: A GUI to perform preprocessing, multivariate modeling and prediction using spectroscopic data",
-        "In press",
+        "AlradSpectra: A GUI to perform preprocessing, multivariate modeling and prediction using spectroscopic data.",
+        "In press.",
         "URL: https://github.com/AlradSpectra")
 )
