@@ -8,8 +8,8 @@ citEntry(entry = "Article",
   url          = "https://github.com/AlradSpectra",
 
   textVersion  =
-  paste("Dotto, Andre C.; Dalmolin, Ricardo S. D.; ten Caten, Alexandre; Gris, Diego J. (2017).",
+  paste("Dotto, Andre C.; Dalmolin, Ricardo S. D.; ten Caten, Alexandre; Gris, Diego J.; Ruiz, Luis F. C. (2017).",
         "AlradSpectra: A GUI to perform preprocessing, multivariate modeling and prediction using spectroscopic data.",
         "In press.",
-        "URL: https://github.com/AlradSpectra")
+        "URL: https://github.com/AlradSpectra.")
 )
