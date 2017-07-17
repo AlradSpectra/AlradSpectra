@@ -176,7 +176,8 @@ AlradSpectra <- function() {
                                                    AE$alldata <- read.table(file = AE$file.location,
                                                                                   header = as.logical(svalue(file.header)),
                                                                                   sep = AE$file.separator,
-                                                                                  dec = AE$file.decimal)
+                                                                                  dec = AE$file.decimal, 
+                                                                                  quote = "" )
                                                  }
                                                  AE$spectra.start.column <- as.numeric(svalue(spc.start.col))
                                                  AE$spectra.end.column   <- as.numeric(svalue(spc.end.col))
