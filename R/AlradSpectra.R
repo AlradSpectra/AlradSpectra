@@ -154,7 +154,8 @@ AlradSpectra <- function() {
                                                      "DOTTO, A.C.; DALMOLIN, R.S.D.; TEN CATEN, A.; GRIS, D.J.;\n",
                                                      "RUIZ, L.F.C. Alrad Spectra: a graphical user interface in R\n",
                                                      "to perform preprocessing, multivariate modeling and\n",
-                                                     "prediction using spectroscopic data. Submitted.\n", 
+                                                     "prediction using spectroscopic data. Submitted.\n",
+                                                     "\n",
                                                      "Alrad Spectra source code is available at:\n",
                                                      "<i>github.com/AlradSpectra/AlradSpectra</i>",
                                                      sep="", collapse=""
