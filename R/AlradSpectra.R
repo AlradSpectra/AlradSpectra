@@ -157,7 +157,8 @@ AlradSpectra <- function() {
                                                      "prediction using spectroscopic data. Submitted.\n", 
                                                      "Alrad Spectra source code is available at:\n",
                                                      "<i>github.com/AlradSpectra/AlradSpectra</i>",
-                                                     sep="", collapse=""),
+                                                     sep="", collapse=""
+                                                    ),
                                               markup = TRUE, container = wingroup
                                               )
                                        }
