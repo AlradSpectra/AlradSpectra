@@ -21,7 +21,7 @@ Imports:
     clusterSim,
     colorspace,
     e1071, 
-    elmNN,
+    
     fitdistrplus,
     foreach,  
     ggplot2,
