@@ -845,40 +845,40 @@ AlradSpectra <- function() {
                                 gmessage("RF model done", title = "RF model", parent = window)
                                 }
   # ANN
-  fann         <- function(...) {AE$alert <- galert("Wait... \nThis may take a few minutes! ", title = "ANN model", 
-                                                          delay=10000, parent=notebook)
-                                 Sys.sleep(1)
-                                 tryCatch(
-                                          {bootControl  <- caret::trainControl(method = svalue(ann.resampling),
-                                                                               number = svalue(ann.kfold),
-                                                                               repeats = svalue(ann.reps),
-                                                                               preProcOptions = list(thresh = 0.95, cutoff = 0.95)
-                                                                               )
-                                           if(svalue(ann.resampling)=="none") {
-                                             Grid <- expand.grid(.nhid= svalue(ann.hid),
-                                                                 .actfun= svalue(ann.act))
-                                           } else {
-                                             Grid <- expand.grid(.nhid= seq(1,svalue(ann.hid),ceiling(svalue(ann.hid)/10)),
-                                                                 .actfun= svalue(ann.act))
-                                           }
-                                           AE$ann.test     <- caret::train(AE$form.mdl, data = AE$Train, method = 'elm', 
-                                                                                 trControl = bootControl, tuneGrid = Grid , na.action = na.fail, 
-                                                                                 preProcess = c("nzv","center"))
-                                           AE$ANN          <- elmNN::elmtrain(AE$form.mdl, data=AE$Train, 
-                                                                                    nhid=AE$ann.test$bestTune$nhid,
-                                                                                    actfun= AE$ann.test$bestTune$actfun)
-                                           AE$ann.train    <- data.frame(AE$Train[AE$last.col], 
-                                                                               Predicted=AE$ANN$fitted.values)
-                                           AE$ann.val      <- data.frame(AE$Val[AE$last.col], 
-                                                                               Predicted=predict(AE$ANN, newdata=AE$Val))
-                                           faddtomodels("ANN")
-                                           enabled(pred) = TRUE #Enable prediction module
-                                           },
-                                          error =  function(e) ferror(e)
-                                          )
-                                 dispose(AE$alert)
-                                 gmessage("ANN model done", title = "ANN model", parent = window)
-                                 }
+ # fann         <- function(...) {AE$alert <- galert("Wait... \nThis may take a few minutes! ", title = "ANN model", 
+ #                                                         delay=10000, parent=notebook)
+ #                                Sys.sleep(1)
+ #                                tryCatch(
+ #                                         {bootControl  <- caret::trainControl(method = svalue(ann.resampling),
+ #                                                                              number = svalue(ann.kfold),
+ #                                                                              repeats = svalue(ann.reps),
+ #                                                                              preProcOptions = list(thresh = 0.95, cutoff = 0.95)
+ #                                                                              )
+ #                                          if(svalue(ann.resampling)=="none") {
+ #                                            Grid <- expand.grid(.nhid= svalue(ann.hid),
+ #                                                                .actfun= svalue(ann.act))
+ #                                          } else {
+ #                                            Grid <- expand.grid(.nhid= seq(1,svalue(ann.hid),ceiling(svalue(ann.hid)/10)),
+ #                                                                .actfun= svalue(ann.act))
+ #                                          }
+ #                                          AE$ann.test     <- caret::train(AE$form.mdl, data = AE$Train, method = 'elm', 
+ #                                                                                trControl = bootControl, tuneGrid = Grid , na.action = na.fail, 
+ #                                                                                preProcess = c("nzv","center"))
+ #                                          AE$ANN          <- elmNN::elmtrain(AE$form.mdl, data=AE$Train, 
+ #                                                                                    nhid=AE$ann.test$bestTune$nhid,
+ #                                                                                   actfun= AE$ann.test$bestTune$actfun)
+ #                                          AE$ann.train    <- data.frame(AE$Train[AE$last.col], 
+ #                                                                              Predicted=AE$ANN$fitted.values)
+ #                                          AE$ann.val      <- data.frame(AE$Val[AE$last.col], 
+ #                                                                              Predicted=predict(AE$ANN, newdata=AE$Val))
+ #                                          faddtomodels("ANN")
+ #                                          enabled(pred) = TRUE #Enable prediction module
+ #                                          },
+ #                                         error =  function(e) ferror(e)
+ #                                         )
+ #                                dispose(AE$alert)
+ #                                gmessage("ANN model done", title = "ANN model", parent = window)
+ #                                }
   # GPR
   fgpr        <- function(...) {AE$alert <- galert("Wait... \nThis may take a few minutes! ", title = "GPR model", 
                                                           delay=10000, parent=notebook)
@@ -1214,26 +1214,26 @@ AlradSpectra <- function() {
   gbutton("RF prediction statistics", cont = mdl.rf, handler = function(...) fmdl.stats(AE$rf.train, AE$rf.val))
   gbutton("View measured vs. predicted",cont = mdl.rf, handler = function(...) fmdl.plot.res(AE$rf.train, AE$rf.val))
   ### ANN
-  mdl.ann            <- ggroup(cont = mdl, horizontal = F,label = gettext("    ANN    "))
-  frame.desc.ann     <- gframe("Description:",cont = mdl.ann, horizontal = T)
-  lyt.desc.ann       <- glayout(cont = frame.desc.ann, expand = TRUE)
-  lyt.desc.ann[1,1]  <- "Artificial Neural Network. ANN calculates the output from the hidden layer based on the activation function. \nPackages: elmNN / caret"
-  frame.param.ann    <- gframe("Tuning parameters:", cont = mdl.ann, horizontal=T)
-  lyt.param.ann      <- glayout(cont = frame.param.ann , expand = TRUE)
-  lyt.param.ann[1,1] <- "Resampling method"
-  ann.resampling     <- lyt.param.ann[2,1] <- gcombobox(train.ctrl.method, cont = lyt.param.ann)
-  lyt.param.ann[1,2] <- "Number of folds or \nresampling iterations"
-  ann.kfold          <- lyt.param.ann[2,2] <- gspinbutton(from = 1, to = 50, by = 1, value = 10, cont = lyt.param.ann)
-  lyt.param.ann[1,3] <- "For repeatedcv only: \nnumber of repetitions"
-  ann.reps           <- lyt.param.ann[2,3] <- gspinbutton(from = 1, to = 20, by = 1,value =  3, cont = lyt.param.ann)
-  lyt.param.ann[1,4] <- "Activation function"
-  ann.act            <- lyt.param.ann[2,4] <- gcombobox(actf.ann, cont = lyt.param.ann)
-  lyt.param.ann[1,5] <- "Hidden units"
-  ann.hid            <- lyt.param.ann[2,5] <- gspinbutton(from = 1, to = 50, by = 1, value = 10, cont = lyt.param.ann)
-  gbutton("Run ANN model", cont = mdl.ann, handler = fann)
-  gbutton("View variables importance", cont = mdl.ann, handler = function(...) fmdl.plot.imp(AE$ann.test))
-  gbutton("ANN prediction statistics", cont = mdl.ann, handler = function(...) fmdl.stats(AE$ann.train, AE$ann.val))
-  gbutton("View measured vs. predicted", cont = mdl.ann, handler = function(...) fmdl.plot.res(AE$ann.train, AE$ann.val))
+  #mdl.ann            <- ggroup(cont = mdl, horizontal = F,label = gettext("    ANN    "))
+  #frame.desc.ann     <- gframe("Description:",cont = mdl.ann, horizontal = T)
+  #lyt.desc.ann       <- glayout(cont = frame.desc.ann, expand = TRUE)
+  #lyt.desc.ann[1,1]  <- "Artificial Neural Network. ANN calculates the output from the hidden layer based on the activation function. \nPackages: elmNN / caret"
+  #frame.param.ann    <- gframe("Tuning parameters:", cont = mdl.ann, horizontal=T)
+  #lyt.param.ann      <- glayout(cont = frame.param.ann , expand = TRUE)
+  #lyt.param.ann[1,1] <- "Resampling method"
+  #ann.resampling     <- lyt.param.ann[2,1] <- gcombobox(train.ctrl.method, cont = lyt.param.ann)
+  #lyt.param.ann[1,2] <- "Number of folds or \nresampling iterations"
+  #ann.kfold          <- lyt.param.ann[2,2] <- gspinbutton(from = 1, to = 50, by = 1, value = 10, cont = lyt.param.ann)
+  #lyt.param.ann[1,3] <- "For repeatedcv only: \nnumber of repetitions"
+  #ann.reps           <- lyt.param.ann[2,3] <- gspinbutton(from = 1, to = 20, by = 1,value =  3, cont = lyt.param.ann)
+  #lyt.param.ann[1,4] <- "Activation function"
+  #ann.act            <- lyt.param.ann[2,4] <- gcombobox(actf.ann, cont = lyt.param.ann)
+  #lyt.param.ann[1,5] <- "Hidden units"
+  #ann.hid            <- lyt.param.ann[2,5] <- gspinbutton(from = 1, to = 50, by = 1, value = 10, cont = lyt.param.ann)
+  #gbutton("Run ANN model", cont = mdl.ann, handler = fann)
+  #gbutton("View variables importance", cont = mdl.ann, handler = function(...) fmdl.plot.imp(AE$ann.test))
+  #gbutton("ANN prediction statistics", cont = mdl.ann, handler = function(...) fmdl.stats(AE$ann.train, AE$ann.val))
+  #gbutton("View measured vs. predicted", cont = mdl.ann, handler = function(...) fmdl.plot.res(AE$ann.train, AE$ann.val))
   ### GPR
   mdl.gpr            <- ggroup(cont = mdl, horizontal = F,label = gettext("    GPR    "))
   frame.desc.gpr     <- gframe("Description:",cont = mdl.gpr, horizontal = T)
