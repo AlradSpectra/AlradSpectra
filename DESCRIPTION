@@ -61,6 +61,7 @@ Imports:
     plyr,
     pls,
     prospectr,
+    ps,
     quantreg, 
     R2HTML,
     randomForest,
