@@ -8,8 +8,7 @@ Authors@R: c(person("Andre C.", "Dotto", email = "andrecdot@gmail.com", role = c
              person("Alexandre", "ten Caten", role= "ctb"),
              person("Ricardo S. D.", "Dalmolin", role= "ctb"))
 Description: Alrad Spectra was developed to accomplish tasks such as perform a large range of spectral preprocessing techniques, implement several multivariate calibration methods, provide statistics assessment, provide graphical output, validate the models using independent datasets, and predict unknown samples.
-Depends: 
-    R (>= 3.2)
+Depends: R (>= 3.0)
 Imports: 
     ade4,
     assertthat,
