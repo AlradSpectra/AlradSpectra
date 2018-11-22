@@ -1,6 +1,6 @@
 Package: AlradSpectra
 Title: A GUI to perform preprocessing, multivariate modeling and prediction using spectroscopic data
-Version: 1.01
+Version: 1.0001
 Date: 2018-30-10
 Authors@R: c(person("Andre C.", "Dotto", email = "andrecdot@gmail.com", role = c("aut", "cre")),
              person("Diego J.", "Gris", email = "diegojgris@gmail.com", role = "aut"),
@@ -9,7 +9,7 @@ Authors@R: c(person("Andre C.", "Dotto", email = "andrecdot@gmail.com", role = c
              person("Ricardo S. D.", "Dalmolin", role= "ctb"))
 Description: Alrad Spectra was developed to accomplish tasks such as perform a large range of spectral preprocessing techniques, implement several multivariate calibration methods, provide statistics assessment, provide graphical output, validate the models using independent datasets, and predict unknown samples.
 Depends: 
-    R (>= 3.0)
+    R (>= 3.2)
 Imports: 
     ade4,
     assertthat,
