@@ -26,7 +26,7 @@ AlradSpectra <- function() {
                                        stop()
                                        }
   # Makes sure the user really wants to quit Alrad when closing the window
-  fconfirmquit <- function(h, ...)    {sure <- gconfirm("Clear Alrad Spectra and quit?", parent=h$obj)
+  fconfirmquit <- function(h, ...)    {sure <- gconfirm("Clear AlradSpectra and quit?", parent=h$obj)
                                        if(as.logical(sure)) {
                                          rm(list = ls(AE),
                                             envir = AE) #Remove everything in Alrad Environment
