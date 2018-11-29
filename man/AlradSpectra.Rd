@@ -7,7 +7,7 @@
 AlradSpectra()
 }
 \description{
-Alrad Spectra was developed to accomplish tasks such as perform a large range of spectral preprocessing techniques, implement several multivariate calibration methods, which can provide well-fitted and accurate models, statistics assessment, graphical output, validate the models using independent data sets, and predict unknown samples.
+AlradSpectra was developed to accomplish tasks such as perform a large range of spectral preprocessing techniques, implement several multivariate calibration methods, which can provide well-fitted and accurate models, statistics assessment, graphical output, validate the models using independent data sets, and predict unknown samples.
 }
 \author{
 Andre C. Dotto, \email{andrecdot@gmail.com}
