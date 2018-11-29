@@ -1,6 +1,6 @@
 #' A GUI to perform preprocessing, multivariate modeling and prediction using spectroscopic data
 #'
-#' Alrad Spectra was developed to accomplish tasks such as perform a large range of spectral preprocessing techniques, implement several multivariate calibration methods, which can provide well-fitted and accurate models, statistics assessment, graphical output, validate the models using independent data sets, and predict unknown samples.
+#' AlradSpectra was developed to accomplish tasks such as perform a large range of spectral preprocessing techniques, implement several multivariate calibration methods, which can provide well-fitted and accurate models, statistics assessment, graphical output, validate the models using independent data sets, and predict unknown samples.
 #' @author Andre C. Dotto, \email{andrecdot@gmail.com}
 #' @author Diego J. Gris, \email{diegojgris@gmail.com}
 #' @import gWidgets
@@ -36,7 +36,7 @@ AlradSpectra <- function() {
                                          }
                                        }
   # Clears all data, empties forms and resets Alrad to initial status
-  fnew         <- function(...)       {gconfirm("Clear Alrad Spectra and \nstart a new project?",
+  fnew         <- function(...)       {gconfirm("Clear AlradSpectra and \nstart a new project?",
                                                 title="New", icon="warning", parent=window,
                                                 handler=function(...) {svalue(file.browse)      <- ""
                                                                        svalue(file.sep)         <- ","
@@ -128,14 +128,14 @@ AlradSpectra <- function() {
                                           }
                                         }
   # Handler for quit action. Makes sure the user really wants to quit Alrad.
-  fquit        <- function(...)        gconfirm("Clear Alrad Spectra and quit?", icon="warning", parent=window,
+  fquit        <- function(...)        gconfirm("Clear AlradSpectra and quit?", icon="warning", parent=window,
                                                 handler = function(...) {rm(list = ls(AE),
                                                                             envir = AE) #Remove everything in Alrad Environment
                                                                          dispose(window)
                                                                          }
                                                 )
-  # Creates and shows the window with information about Alrad Spectra
-  fabout       <- function(...)       {aboutwin <- gwindow("About Alrad Spectra", width=400, height=300, parent = window)
+  # Creates and shows the window with information about AlradSpectra
+  fabout       <- function(...)       {aboutwin <- gwindow("About AlradSpectra", width=400, height=300, parent = window)
                                        wingroup <- ggroup(horizontal = FALSE, container = aboutwin)
                                        gimage(system.file("images","AlradLogo.png", package="AlradSpectra"), container = wingroup)
                                        glabel(paste0("A GUI to perform preprocessing, multivariate\n",
@@ -153,7 +153,7 @@ AlradSpectra <- function() {
                                                      "How to cite:\n",
                                                      "Will be available soon.\n",
                                                      "\n",
-                                                     "Alrad Spectra source code is available at:\n",
+                                                     "AlradSpectra source code is available at:\n",
                                                      "<i>github.com/AlradSpectra/AlradSpectra</i>",
                                                      sep="", collapse=""
                                                     ),
@@ -940,7 +940,7 @@ AlradSpectra <- function() {
   ###################################################
   
   ### Create main window
-  window        <- gwindow("Alrad Spectra", visible=F, width = 600,height = 600)
+  window        <- gwindow("AlradSpectra", visible=F, width = 600,height = 600)
   ### Confirm window closing
   addHandlerUnrealize(window, handler = fconfirmquit)
   ### Clear, Quit and About buttons
