@@ -151,10 +151,10 @@ AlradSpectra <- function() {
                                                      "<b>D</b>","iego Gris\n",
                                                      "\n",
                                                      "How to cite:\n",
-                                                     "Dotto A.C., Dalmolin R.S.D., ten Caten A., Gris D.J., Ruiz L.F.C.\n"
-                                                     "AlradSpectra: a quantification tool for soil properties using\n"
-                                                     "spectroscopic data in R. Rev Bras Cienc Solo. 2019;43:e0180263.\n"
-                                                     "Doi: https://doi.org/10.1590/18069657rbcs20180263\n",
+                                                     "Dotto A.C., Dalmolin R.S.D., ten Caten A., Gris D.J., Ruiz L.F.C. \n"
+                                                     "AlradSpectra: a quantification tool for soil properties using \n"
+                                                     "spectroscopic data in R. Rev Bras Cienc Solo. 2019;43:e0180263. \n"
+                                                     "Doi: https://doi.org/10.1590/18069657rbcs20180263 \n",
                                                      "\n",
                                                      "AlradSpectra source code is available at:\n",
                                                      "<i>github.com/AlradSpectra/AlradSpectra</i>",
