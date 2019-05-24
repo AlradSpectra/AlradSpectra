@@ -135,7 +135,7 @@ AlradSpectra <- function() {
                                                                          }
                                                 )
   # Creates and shows the window with information about AlradSpectra
-  fabout       <- function(...)       {aboutwin <- gwindow("About AlradSpectra", width=450, height=400, parent = window)
+  fabout       <- function(...)       {aboutwin <- gwindow("About AlradSpectra", width=400, height=500, parent = window)
                                        wingroup <- ggroup(horizontal = FALSE, container = aboutwin)
                                        gimage(system.file("images","AlradLogo.png", package="AlradSpectra"), container = wingroup)
                                        glabel(paste0("A GUI to perform preprocessing, multivariate\n",
@@ -151,9 +151,9 @@ AlradSpectra <- function() {
                                                      "<b>D</b>","iego Gris\n",
                                                      "\n",
                                                      "How to cite:\n",
-                                                     "Dotto A.C., Dalmolin R.S.D., ten Caten A., Gris D.J., Ruiz L.F.C. \n"
-                                                     "AlradSpectra: a quantification tool for soil properties using \n"
-                                                     "spectroscopic data in R. Rev Bras Cienc Solo. 2019;43:e0180263. \n"
+                                                     "Dotto A.C., Dalmolin R.S.D., ten Caten A., Gris D.J., Ruiz L.F.C.\n",
+                                                     "AlradSpectra: a quantification tool for soil properties using\n",
+                                                     "spectroscopic data in R. Rev Bras Cienc Solo. 2019;43:e0180263.\n",
                                                      "Doi: https://doi.org/10.1590/18069657rbcs20180263 \n",
                                                      "\n",
                                                      "AlradSpectra source code is available at:\n",
