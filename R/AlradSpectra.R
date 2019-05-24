@@ -135,7 +135,7 @@ AlradSpectra <- function() {
                                                                          }
                                                 )
   # Creates and shows the window with information about AlradSpectra
-  fabout       <- function(...)       {aboutwin <- gwindow("About AlradSpectra", width=400, height=400, parent = window)
+  fabout       <- function(...)       {aboutwin <- gwindow("About AlradSpectra", width=450, height=400, parent = window)
                                        wingroup <- ggroup(horizontal = FALSE, container = aboutwin)
                                        gimage(system.file("images","AlradLogo.png", package="AlradSpectra"), container = wingroup)
                                        glabel(paste0("A GUI to perform preprocessing, multivariate\n",
