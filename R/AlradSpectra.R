@@ -490,7 +490,7 @@ AlradSpectra <- function() {
                                         Sys.sleep(1)
                                         gbutton("Save plot", cont = wingroup, handler = function(...) fsaveplot(400, 500))
                                         comp.plot <- ggplot2::ggplot(h) +
-                                                     ggplot2::labs(list(x="PLS Components", y="RMSE"))
+                                                     ggplot2::labs(x="PLS Components", y="RMSE")
                                         print(comp.plot)
                                         }
 
@@ -509,7 +509,7 @@ AlradSpectra <- function() {
                                         comp.plot <- ggplot2::ggplot(var.imp, ggplot2::aes(x=spc.all, y=var.imp[,1])) +
                                                      ggplot2::scale_x_continuous(breaks = spc.all[seq(1,length(spc.all),length(spc.all)/20)]) +
                                                      ggplot2::geom_point(pch=20) +
-                                                     ggplot2::labs(list(x="Variables", y="Importance"))
+                                                     ggplot2::labs(x="Variables", y="Importance")
                                         print(comp.plot)
                                         }  
   # Plot variables importance 
@@ -525,7 +525,7 @@ AlradSpectra <- function() {
                                         comp.plot <- ggplot2::ggplot(var.imp, ggplot2::aes(x=c(spc.st:spc.lt), y=var.imp[,1])) +
                                                      ggplot2::scale_x_continuous(breaks = floor(seq(spc.st, spc.lt, (spc.lt-spc.st)/20))) +
                                                      ggplot2::geom_point(pch=20) +
-                                                     ggplot2::labs(list(x="Variables", y="Importance"))
+                                                     ggplot2::labs(x="Variables", y="Importance")
                                         print(comp.plot)
                                         }
   # Adds preprocessing to combobox in Model tab only if it is not already there
