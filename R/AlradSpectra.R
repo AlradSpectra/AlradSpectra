@@ -163,7 +163,14 @@ AlradSpectra <- function() {
                                                     ),
                                               markup = TRUE, container = wingroup
                                               )
-                                       
+                                       gimage(system.file("images","paper.png", package="AlradSpectra"), container = wingroup,
+                                              handler = function(h, ...) {wingroup <<- gfile(text = "Select",type = "open",
+                                                                                             filter = list("pdf data" = list(patterns = c("*.pdf")))
+                                                                                            )
+                                                                          svalue(wingroup) <- "Select"
+                                                                         }
+                                             )
+
                                       }
   # Opens up a dialog to search for file to be imported
   fbrowse      <- function(h, ...)    {svalue(h) <- gfile("Open File", type="open",
