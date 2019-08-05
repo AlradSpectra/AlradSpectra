@@ -1,4 +1,4 @@
-#' A GUI to perform preprocessing, multivariate modeling and prediction using spectroscopic data
+#' AlradSpectra: a Quantification Tool for Soil Properties Using Spectroscopic Data in R
 #'
 #' AlradSpectra was developed to accomplish tasks such as perform a large range of spectral preprocessing techniques, implement several multivariate calibration methods, which can provide well-fitted and accurate models, statistics assessment, graphical output, validate the models using independent data sets, and predict unknown samples.
 #' @author Andre C. Dotto, \email{andrecdot@gmail.com}
@@ -135,14 +135,14 @@ AlradSpectra <- function() {
                                                                          }
                                                 )
   # Creates and shows the window with information about AlradSpectra
-  fabout       <- function(...)       {aboutwin <- gwindow("About AlradSpectra", width=400, height=450, parent = window)
+  fabout       <- function(...)       {aboutwin <- gwindow("About AlradSpectra", width=450, height=450, parent = window)
                                        wingroup <- ggroup(horizontal = FALSE, container = aboutwin)
                                        gimage(system.file("images","AlradLogo.png", package="AlradSpectra"), container = wingroup)
-                                       glabel(paste0("A GUI to perform preprocessing, multivariate\n",
-                                                     "modeling and prediction using spectral data\n\n",
+                                       glabel(paste0("AlradSpectra: a Quantification Tool for Soil Properties\n",
+                                                     "Using Spectroscopic Data in R\n\n",
                                                      "Developed by researchers at\n",
-                                                     "Federal University of Santa Maria and\n",
-                                                     "Federal University of Santa Catarina, Brazil.\n\n",
+                                                     "Universidade Federal de Santa Maria and\n",
+                                                     "Universidade Federal de Santa Catarina, Brazil.\n\n",
                                                      "Authors and contributors:\n",
                                                      "<b>A</b>","ndre Dotto\n",
                                                      "<b>L</b>","uis Ruiz\n",
@@ -150,14 +150,16 @@ AlradSpectra <- function() {
                                                      "<b>A</b>","lexandre ten Caten\n",
                                                      "<b>D</b>","iego Gris\n",
                                                      "\n",
-                                                     "How to cite:\n",
-                                                     "Dotto A.C., Dalmolin R.S.D., ten Caten A., Gris D.J., Ruiz L.F.C.\n",
-                                                     "AlradSpectra: a quantification tool for soil properties using\n",
-                                                     "spectroscopic data in R. Rev Bras Cienc Solo. 2019;43:e0180263.\n",
-                                                     "Doi: https://doi.org/10.1590/18069657rbcs20180263 \n",
+                                                     "How to reference if you use AlradSpectra:\n",
+                                                     "Dotto, Andre Carnieletto; Dalmolin, Ricardo Simão Diniz;\n",
+                                                     "Caten, Alexandre ten; Gris, Diego José; Ruiz, Luis Fernando Chimelo,\n",
+                                                     "AlradSpectra: a Quantification Tool for Soil Properties Using\n",
+                                                     "Spectroscopic Data in R. Rev Bras Cienc Solo. 2019, 43, e0180263.\n",
+                                                     "Doi: https://dx.doi.org/10.1590/18069657rbcs20180263\n",
                                                      "\n",
                                                      "AlradSpectra source code is available at:\n",
                                                      "<i>github.com/AlradSpectra/AlradSpectra</i>",
+                                                     "E-mail: andrecdot@gmail.com",
                                                      sep="", collapse=""
                                                     ),
                                               markup = TRUE, container = wingroup
