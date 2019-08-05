@@ -1,15 +1,16 @@
-citHeader("To cite package AlradSpectra in publications use:")
+citHeader("How to cite AlradSpectra:")
 
 citEntry(entry = "Article",
-  title        = "AlradSpectra: A GUI to perform preprocessing, multivariate modeling and prediction using spectroscopic data",
+  title        = "AlradSpectra: a Quantification Tool for Soil Properties Using Spectroscopic Data in R",
   author       = personList(as.person("Andre C. Dotto"), as.person("Ricardo S. D. Dalmolin"), as.person("Alexandre ten Caten"), as.person("Diego J. Gris"), as.person("Luis F. C. Ruiz")),
-  journal      = "In press",
-  year         = "2017",
-  url          = "https://github.com/AlradSpectra",
+  journal      = "Rev. Bras. Ciênc. Solo",
+  volume       = "43, e0180263",
+  year         = "2019",
+  url          = "https://dx.doi.org/10.1590/18069657rbcs20180263",
 
   textVersion  =
-  paste("Dotto, Andre C.; Dalmolin, Ricardo S. D.; ten Caten, Alexandre; Gris, Diego J.; Ruiz, Luis F. C. (2017).",
-        "AlradSpectra: A GUI to perform preprocessing, multivariate modeling and prediction using spectroscopic data.",
-        "In press.",
-        "URL: https://github.com/AlradSpectra.")
+  paste("Dotto, Andre C.; Dalmolin, Ricardo S. D.; ten Caten, Alexandre; Gris, Diego J.; Ruiz, Luis F. C. (2019).",
+        "AlradSpectra: a Quantification Tool for Soil Properties Using Spectroscopic Data in R",
+        "Rev. Bras. Ciênc. Solo", "43, e0180263",
+        "https://dx.doi.org/10.1590/18069657rbcs20180263")
 )
