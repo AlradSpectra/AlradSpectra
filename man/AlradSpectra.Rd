@@ -2,7 +2,7 @@
 % Please edit documentation in R/AlradSpectra.R
 \name{AlradSpectra}
 \alias{AlradSpectra}
-\title{A GUI to perform preprocessing, multivariate modeling and prediction using spectroscopic data}
+\title{A Quantification Tool for Soil Properties Using Spectroscopic Data in R}
 \usage{
 AlradSpectra()
 }
