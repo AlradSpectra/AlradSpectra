@@ -157,6 +157,8 @@ AlradSpectra <- function() {
                                                      "Spectroscopic Data in R. Rev Bras Cienc Solo. 2019, 43, e0180263.\n",
                                                      "Doi: https://dx.doi.org/10.1590/18069657rbcs20180263\n",
                                                      "\n",
+                                        gfile(text = "Dotto el al. (2019)", type = c("open"), system.file("images","Dotto_et_al_2019.pdf", 
+                                                                                                          package="AlradSpectra"), container = wingroup)
                                                      "AlradSpectra source code is available at:\n",
                                                      "<i>github.com/AlradSpectra/AlradSpectra</i>",
                                                      sep="", collapse=""
