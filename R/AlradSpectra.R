@@ -158,7 +158,7 @@ AlradSpectra <- function() {
                                                      "Doi: https://dx.doi.org/10.1590/18069657rbcs20180263\n",
                                                      "\n",
                                                      "AlradSpectra source code is available at:\n",
-                                                     "<i>github.com/AlradSpectra/AlradSpectra</i>",
+                                                     "<i>github.com/AlradSpectra/AlradSpectra</i>\n",
                                                      "E-mail: andrecdot@gmail.com",
                                                      sep="", collapse=""
                                                     ),
