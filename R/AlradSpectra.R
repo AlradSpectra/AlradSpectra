@@ -135,7 +135,7 @@ AlradSpectra <- function() {
                                                                          }
                                                 )
   # Creates and shows the window with information about AlradSpectra
-  fabout       <- function(...)       {aboutwin <- gwindow("About AlradSpectra", width=450, height=450, parent = window)
+  fabout       <- function(...)       {aboutwin <- gwindow("About AlradSpectra", width=450, height=460, parent = window)
                                        wingroup <- ggroup(horizontal = FALSE, container = aboutwin)
                                        gimage(system.file("images","AlradLogo.png", package="AlradSpectra"), container = wingroup)
                                        glabel(paste0("AlradSpectra: a Quantification Tool for Soil Properties\n",
@@ -158,7 +158,7 @@ AlradSpectra <- function() {
                                                      "Doi: https://dx.doi.org/10.1590/18069657rbcs20180263\n",
                                                      "\n",
                                                      "AlradSpectra source code is available at:\n",
-                                                     "<i>github.com/AlradSpectra/AlradSpectra</i>\n",
+                                                     "<i>github.com/AlradSpectra/AlradSpectra</i> \n",
                                                      "E-mail: andrecdot@gmail.com",
                                                      sep="", collapse=""
                                                     ),
