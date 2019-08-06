@@ -163,9 +163,9 @@ AlradSpectra <- function() {
                                                     ),
                                               markup = TRUE, container = wingroup
                                               )
-                                        p1 <- gbutton("AlradSpectra Paper", border=TRUE, cont = wingroup, handler = function(...) 
+                                        gbutton("AlradSpectra Paper", border=TRUE, cont = wingroup, handler = function(...) 
                                           browseURL("https://dx.doi.org/10.1590/18069657rbcs20180263"))
-                                                      size(p1) <- list("width" =300, "height" = 30)
+                                                   
                                        }
   # Opens up a dialog to search for file to be imported
   fbrowse      <- function(h, ...)    {svalue(h) <- gfile("Open File", type="open",
