@@ -164,7 +164,7 @@ AlradSpectra <- function() {
                                               markup = TRUE, container = wingroup
                                               )
                                         gbutton("AlradSpectra Paper", border=TRUE, cont = wingroup, handler = function(...) 
-                                          browseURL("https://dx.doi.org/10.1590/18069657rbcs20180263"))
+                                          browseURL("https://www.rbcsjournal.org/article/alradspectra-a-quantification-tool-for-soil-properties-using-spectroscopic-data-in-r/"))
                                                    
                                        }
   # Opens up a dialog to search for file to be imported
