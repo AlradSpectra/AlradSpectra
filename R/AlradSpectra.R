@@ -163,15 +163,10 @@ AlradSpectra <- function() {
                                                     ),
                                               markup = TRUE, container = wingroup
                                               )
-                                       gimage(system.file("images","paper.png", package="AlradSpectra"), container = wingroup,
-                                              handler = function(h, ...) {wingroup <<- gfile(text = "Select",type = "open",
-                                                                                             filter = list("pdf data" = list(patterns = c("*.pdf")))
-                                                                                            )
-                                                                          svalue(wingroup) <- "Select"
-                                                                         }
-                                             )
-
-                                      }
+                                        p1 <- gbutton("AlradSpectra Paper", border=TRUE, cont = wingroup, handler = function(...) 
+                                          browseURL("https://dx.doi.org/10.1590/18069657rbcs20180263"))
+                                                      size(p1) <- list("width" =300, "height" = 30)
+                                       }
   # Opens up a dialog to search for file to be imported
   fbrowse      <- function(h, ...)    {svalue(h) <- gfile("Open File", type="open",
                                                           filter= list("Delimited Files (*.txt, *.csv)" = list(patterns = c("*.txt", "*.csv")),
