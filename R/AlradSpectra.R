@@ -3,7 +3,7 @@
 #' AlradSpectra was developed to accomplish tasks such as perform a large range of spectral preprocessing techniques, implement several multivariate calibration methods, which can provide well-fitted and accurate models, statistics assessment, graphical output, validate the models using independent data sets, and predict unknown samples.
 #' @author Andre C. Dotto, \email{andrecdot@gmail.com}
 #' @author Diego J. Gris, \email{diegojgris@gmail.com}
-#' @import gWidgets
+#' @import gWidgets2
 #' @export
 
 AlradSpectra <- function() {
