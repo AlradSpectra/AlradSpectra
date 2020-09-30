@@ -981,6 +981,7 @@ AlradSpectra <- function() {
   file.dec       <- lyt.file.arg[1,4,anchor=c(0,0)]    <- gedit(text = ".", cont = lyt.file.arg, width = 6)
                     lyt.file.arg[1,9,anchor=c(1,0)]    <- "Header:"
   file.header    <- lyt.file.arg[1,10,anchor=c(0,0)]   <- gcombobox(c("TRUE", "FALSE"), cont = lyt.file.arg)
+                    size(file.header)                  <- c(60,1) # Increase width of Header combobox
                     lyt.file.arg[2,1,anchor=c(1,0)]    <- "Spectral data starts at column:"
   spc.start.col  <- lyt.file.arg[2,2,anchor=c(0,0)]    <- gedit(text = "", cont = lyt.file.arg, width = 6)
                     lyt.file.arg[2,3,anchor=c(1,0)]    <- "Spectral data ends at column:"
