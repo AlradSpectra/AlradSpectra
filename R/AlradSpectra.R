@@ -43,31 +43,31 @@ AlradSpectra <- function() {
   }
   # Clears all data, empties forms and resets Alrad to initial status
   fnew         <- function(...)       {sure <- gconfirm("Clear AlradSpectra and \nstart a new project?",
-                                               title="New", icon="warning", parent=window)
-                                               if(as.logical(sure)) {
-                                                 svalue(file.browse)      <- ""
-                                                 svalue(file.sep)         <- ","
-                                                 svalue(file.dec)         <- "."
-                                                 svalue(spc.start.col)    <- ""
-                                                 svalue(spc.end.col)      <- ""
-                                                 svalue(soil.var.col)     <- ""
-                                                 svalue(soil.var.nm)      <- ""
-                                                 select.dataset[]         <- ""
-                                                 svalue(pred.file.browse) <- ""
-                                                 svalue(pred.file.sep)    <- ","
-                                                 svalue(pred.file.dec)    <- "."
-                                                 select.model[]           <- ""
-                                                 svalue(notebook)         <- 1 #Focus on import tab
-                                                 enabled(viewdt.button) = FALSE
-                                                 enabled(plotdt.button) = FALSE
-                                                 enabled(viewst.button) = FALSE
-                                                 enabled(viewhs.button) = FALSE
-                                                 enabled(pp) = FALSE
-                                                 enabled(models) = FALSE
-                                                 enabled(mdl) = FALSE
-                                                 enabled(pred) = FALSE
-                                                 rm(list = ls(AE), envir = AE) #Remove everything in Alrad Environment
-                                                 }
+                                                        title="New", icon="warning", parent=window)
+  if(as.logical(sure)) {
+    svalue(file.browse)      <- ""
+    svalue(file.sep)         <- ","
+    svalue(file.dec)         <- "."
+    svalue(spc.start.col)    <- ""
+    svalue(spc.end.col)      <- ""
+    svalue(soil.var.col)     <- ""
+    svalue(soil.var.nm)      <- ""
+    select.dataset[]         <- ""
+    svalue(pred.file.browse) <- ""
+    svalue(pred.file.sep)    <- ","
+    svalue(pred.file.dec)    <- "."
+    select.model[]           <- ""
+    svalue(notebook)         <- 1 #Focus on import tab
+    enabled(viewdt.button) = FALSE
+    enabled(plotdt.button) = FALSE
+    enabled(viewst.button) = FALSE
+    enabled(viewhs.button) = FALSE
+    enabled(pp) = FALSE
+    enabled(models) = FALSE
+    enabled(mdl) = FALSE
+    enabled(pred) = FALSE
+    rm(list = ls(AE), envir = AE) #Remove everything in Alrad Environment
+  }
   }
   fopen        <- function(...)        {proj.browse <- gfile("Open File", type="open",
                                                              filter=c("Workspace image (.RData)"="RData"),
@@ -133,10 +133,10 @@ AlradSpectra <- function() {
   }
   # Handler for quit action. Makes sure the user really wants to quit Alrad.
   fquit        <- function(...)        {sure <- gconfirm("Clear AlradSpectra and quit?", icon="warning", parent=window)
-                                        if(as.logical(sure)) {
-                                          rm(list = ls(AE), envir = AE) #Remove everything in Alrad Environment
-                                          dispose(window)
-                                        }
+  if(as.logical(sure)) {
+    rm(list = ls(AE), envir = AE) #Remove everything in Alrad Environment
+    dispose(window)
+  }
   }
   # Creates and shows the window with information about AlradSpectra
   fabout       <- function(...)       {aboutwin <- gwindow("About AlradSpectra", width=450, height=430, parent = window)
@@ -229,7 +229,7 @@ AlradSpectra <- function() {
                            wingroup <- ggroup(horizontal=FALSE, cont=plotwin)
                            ggraphics(width = 800, height = 600, dpi = 300, cont = wingroup)
                            Sys.sleep(1) #Wait for window creation before trying to plot to avoid errors
-                           gbutton("Save plot", cont=wingroup, handler = function(...) fsaveplot(800, 600))
+                           gbutton("Save plot", cont=wingroup, handler = function(...) fsaveplot(2400, 1800))
                            graphics::matplot(colnames(h), t(h), xlim = c(s, e),
                                              type = "l",
                                              xlab = "Wavelength (nm)",
@@ -240,7 +240,7 @@ AlradSpectra <- function() {
                                                         filter=c("Portable Network Graphics (.png)"="png"))
   #If fdialog is not equal to NA, keep running
   if(!(is.na(fdialog))) {fname <- paste0(fdialog,".png")
-  dev.copy(png, fname, width=w, height=h, res=100, antialias = "cleartype")
+  dev.copy(png, fname, width=w, height=h, res=300, antialias = "cleartype")
   dev.off() #Close graphics device
   }
   }
@@ -262,15 +262,15 @@ AlradSpectra <- function() {
     desc.lyt   <- glayout(horizontal=FALSE, container=descwin)
     desc.lyt[1,1,expand=TRUE, fill='y']  <- gtable(as.data.frame(desctable), cont = desc.lyt)
     desc.lyt[2,1,expand=TRUE] <- gbutton("Save results", cont=desc.lyt,
-                                          anchor=c(0,-1),
-                                          handler=function(...) fsaveresults(desctable))
+                                         anchor=c(0,-1),
+                                         handler=function(...) fsaveresults(desctable))
   }
   # Plots y histogram
   fhist        <- function(...)       {plotwin  <- gwindow("Histogram", width = 600, height = 500, parent = window)
   wingroup <- ggroup(horizontal=FALSE, cont=plotwin)
   ggraphics(width = 600, height = 500, dpi = 300, cont = wingroup)
   Sys.sleep(1) #Wait for window creation before trying to plot to avoid errors
-  gbutton("Save plot", cont=wingroup, handler = function(...) fsaveplot(500, 450))
+  gbutton("Save plot", cont=wingroup, handler = function(...) fsaveplot(1500, 1350))
   histo    <- ggplot2::ggplot(AE$alldata,
                               ggplot2::aes(x=AE$alldata[,AE$soil.var.column])) + 
     ggplot2::geom_histogram(ggplot2::aes(fill = ..count..), binwidth = 0.5) +
@@ -373,15 +373,15 @@ AlradSpectra <- function() {
     desc.lyt   <- glayout(horizontal=FALSE, container=descwin)
     desc.lyt[1,1,expand=TRUE, fill='y'] <- gtable(as.data.frame(desctable), cont = desc.lyt)
     desc.lyt[2,1,expand=TRUE] <- gbutton("Save results", cont=desc.lyt,
-                                          anchor=c(0,-1),
-                                          handler=function(...) fsaveresults(desctable))
+                                         anchor=c(0,-1),
+                                         handler=function(...) fsaveresults(desctable))
   }
   # Boxplot of Y variable
   fboxplot     <- function(...)       {plotwin    <- gwindow("Plot", width = 400, height = 500, parent = window)
   wingroup   <- ggroup(horizontal=FALSE, cont=plotwin)
-  ggraphics(width = 400, height = 600, dpi = 300, cont = wingroup)
+  ggraphics(width = 400, height = 500, dpi = 300, cont = wingroup)
   Sys.sleep(1) #Wait for window creation before trying to plot to avoid errors
-  gbutton("Save plot", cont=wingroup, handler = function(...) fsaveplot(400, 450))
+  gbutton("Save plot", cont=wingroup, handler = function(...) fsaveplot(1200, 1350))
   categories <- as.factor(c(rep("Training", length(AE$Train[,AE$last.col])),
                             rep("Validation", length(AE$Val[,AE$last.col]))))
   boxpl      <- ggplot2::ggplot(AE$alldata, ggplot2::aes(x=categories,
@@ -448,8 +448,8 @@ AlradSpectra <- function() {
   stats.lyt    <- glayout(horizontal=FALSE, container=statswin)
   stats.lyt[1,1,expand=TRUE,fill='y'] <- gtable(res.table, cont = stats.lyt)
   stats.lyt[2,1,expand=TRUE] <- gbutton("Save results", cont=stats.lyt,
-                                         anchor=c(0,-1),
-                                         handler=function(...) fsaveresults(res.table))
+                                        anchor=c(0,-1),
+                                        handler=function(...) fsaveresults(res.table))
   }
   # Plot measured vs. predicted
   fmdl.plot.res <- function(t, v, ...) {plotwin      <- gwindow("Plot", width = ifelse(nrow(v)!=0, 1000, 500), height = 500, parent = window)
@@ -485,11 +485,11 @@ AlradSpectra <- function() {
                         label = paste(c("R^2", "RMSE", "RPIQ"), "==",
                                       get(v.stats.name, envir = AE)), parse = TRUE)
     Sys.sleep(1)
-    gbutton("Save plot", cont = wingroup, handler = function(...) fsaveplot(800, 400))
+    gbutton("Save plot", cont = wingroup, handler = function(...) fsaveplot(2400, 1200))
     gridExtra::grid.arrange(train.plot, val.plot, ncol=2, bottom=paste(AE$soil.var.name, "Measured"))
   } else {
     Sys.sleep(1)
-    gbutton("Save plot", cont = wingroup, handler = function(...) fsaveplot(400, 400))
+    gbutton("Save plot", cont = wingroup, handler = function(...) fsaveplot(1200, 1200))
     gridExtra::grid.arrange(train.plot, bottom=paste(AE$soil.var.name, "Measured"))
   }
   }
@@ -498,7 +498,7 @@ AlradSpectra <- function() {
   wingroup  <- ggroup(horizontal=FALSE, cont=plotwin)
   ggraphics(width = 600, height = 400, dpi = 300, cont = wingroup)
   Sys.sleep(1)
-  gbutton("Save plot", cont = wingroup, handler = function(...) fsaveplot(400, 500))
+  gbutton("Save plot", cont = wingroup, handler = function(...) fsaveplot(1200, 1500))
   comp.plot <- ggplot2::ggplot(h) +
     ggplot2::labs(x="PLS Components", y="RMSE")
   print(comp.plot)
@@ -509,7 +509,7 @@ AlradSpectra <- function() {
   wingroup  <- ggroup(horizontal=FALSE, cont=plotwin)
   ggraphics(width = 900, height = 300, dpi = 300, cont = wingroup)
   Sys.sleep(1)
-  gbutton("Save plot", cont = wingroup, handler = function(...) fsaveplot(900, 300))
+  gbutton("Save plot", cont = wingroup, handler = function(...) fsaveplot(2700, 900))
   var.imp   <- caret::varImp(h)$importance
   spc.st    <- as.numeric(substring(row.names(var.imp)[1], 2))
   spc.lt    <- as.numeric(substring(row.names(var.imp)[length(row.names(var.imp))], 2))
@@ -526,7 +526,7 @@ AlradSpectra <- function() {
   wingroup  <- ggroup(horizontal=FALSE, cont=plotwin)
   ggraphics(width = 900, height = 300, dpi = 300, cont = wingroup)
   Sys.sleep(1)
-  gbutton("Save plot", cont = wingroup, handler = function(...) fsaveplot(900, 300))
+  gbutton("Save plot", cont = wingroup, handler = function(...) fsaveplot(2700, 900))
   var.imp   <- caret::varImp(h)$importance
   spc.st    <- as.numeric(substring(row.names(var.imp)[1], 2))
   spc.lt    <- as.numeric(substring(row.names(var.imp)[length(row.names(var.imp))], 2))
