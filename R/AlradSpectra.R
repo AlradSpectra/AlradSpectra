@@ -1281,6 +1281,7 @@ AlradSpectra <- function() {
   pred.file.dec       <- pred.lyt.file.arg[1,4,anchor=c(0,0)] <- gedit(text = ".", cont = pred.lyt.file.arg, width = 8)
   pred.lyt.file.arg[1,8,anchor=c(1,0)] <- "Header:"
   pred.file.header    <- pred.lyt.file.arg[1,9,anchor=c(0,0)] <- gcombobox(c("TRUE", "FALSE"), cont = pred.lyt.file.arg)
+  size(pred.file.header)               <- c(60,1) # Increase width of Header combobox
   ### Import button
   gbutton("Import data", cont = pred.imp, handler = fimport.pred)
   ### View data button
